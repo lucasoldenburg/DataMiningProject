@@ -1,0 +1,15 @@
+---
+title: "Deskriptive Analyse"
+output: html_document
+---
+
+## Dekriptive Analyse der Daten
+
+Deskriptive Analyse der Daten: Was beschreiben die Daten, was sind die Datentypen und Wertebereiche, fehlen Daten, gibt es falsche Werte, gibt es Korrelationen zwischen Merkmalen (Features, Spalten)? Benutzen Sie Visualisierungen, wenn es sinnvoll erscheint. Was können wir aus dieser deskriptiven Analyse über das Problem lernen?
+
+```{r}
+library(readxl)
+
+df <- read_xlsx("20211205_raw_dataset.xlsx")
+
+```
