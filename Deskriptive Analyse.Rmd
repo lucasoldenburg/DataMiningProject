@@ -11,5 +11,7 @@ Deskriptive Analyse der Daten: Was beschreiben die Daten, was sind die Datentype
 library(readxl)
 
 df <- read_xlsx("20211205_raw_dataset.xlsx")
+df
+df
 
 ```
