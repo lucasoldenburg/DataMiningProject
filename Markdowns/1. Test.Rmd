@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Data Mining Martins Daten daten daten
 ```{r}
 
-dataSet <- read.csv("C:\\Users\\ericb\\OneDrive\\Desktop\\DataMining\\Data\\raw_dataset.csv")
+dataSet <- read.csv("C:\\Users\\ericb\\OneDrive\\Desktop\\DataMining\\Data\\20211209_raw_dataset")
 #make a dataframe
 
 df <- data.frame(matrix(unlist(dataSet), nrow=length(dataSet), byrow=TRUE))
