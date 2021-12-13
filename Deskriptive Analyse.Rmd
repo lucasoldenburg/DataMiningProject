@@ -11,9 +11,32 @@ Deskriptive Analyse der Daten: Was beschreiben die Daten, was sind die Datentype
 library(readxl)
 library(ggplot2)
 
-df <- read_xlsx("Markdowns/Data/20211205_raw_dataset.xlsx")
+df <- read_xlsx("Markdowns/20211205_raw_dataset.xlsx")
 ```
+#### Years in Numerisch umwandeln
+```{r}
+#all Chars in numeric 
+  #Years of Service Berlin
+data_chars_as_num <- df
 
+YearsOfService_BASFBerlin <- df[3]
+data_chars_as_num[ ,  "YearsOfService_BASFBerlin"] <- 
+  as.data.frame(apply(data_chars_as_num[ , "YearsOfService_BASFBerlin"], 2, as.numeric))
+
+  #Years Service all
+YearsOfService_BASFall <- df[8]
+data_chars_as_num[ ,  "YearsOfService_BASFall"] <- 
+  as.data.frame(apply(data_chars_as_num[ , "YearsOfService_BASFall"], 2, as.numeric))
+
+YearsOfService_BASFBerlin <- data_chars_as_num[3]
+YearsOfService_BASFall <- data_chars_as_num[8]
+
+df[3] = YearsOfService_BASFBerlin
+df[8] = YearsOfService_BASFall
+
+str(df)
+
+```
 ### Gender
 ```{r}
 unique(df$Gender)
@@ -21,12 +44,16 @@ summary(df$Gender)
 sum(is.na(df$Gender))
 qplot(df$Gender)
 ```
+Beschreiung
+
 ### Nationality
 ```{r}
 unique(df$Nationality)
 summary(df$Nationality)
 sum(is.na(df$Nationality))
 ```
+Beschreiung
+
 ### YearsOfService_BASFBerlin
 ```{r}
 unique(df$YearsOfService_BASFBerlin)
@@ -34,16 +61,66 @@ summary(df$YearsOfService_BASFBerlin)
 sum(is.na(df$YearsOfService_BASFBerlin))
 qplot(df$YearsOfService_BASFBerlin)
 ```
+Beschreiung
+
 ### Position text
 ```{r}
 unique(df$`Position text`)
 summary(df$`Position text`)
 sum(is.na(df$`Position text`))
 ```
-### Position text
+Beschreiung
+
+### Role
 ```{r}
 unique(df$Role)
 summary(df$Role)
 sum(is.na(df$Role))
 qplot(df$Role)
 ```
+Beschreiung
+
+### Part Time Mark
+```{r}
+unique(df$`Part Time Mark`)
+summary(df$`Part Time Mark`)
+sum(is.na(df$`Part Time Mark`))
+qplot(df$`Part Time Mark`)
+```
+Beschreiung
+
+### Global contract type
+```{r}
+unique(df$`Global contract type`)
+summary(df$`Global contract type`)
+sum(is.na(df$`Global contract type`))
+qplot(df$`Global contract type`)
+```
+Vertragsart beim verlassen des Unternehmens
+
+### YearsOfService_BASFall
+```{r}
+unique(df$YearsOfService_BASFall)
+summary(df$YearsOfService_BASFall)
+sum(is.na(df$YearsOfService_BASFall))
+qplot(df$YearsOfService_BASFall)
+```
+Beschreibung
+
+### Employee Subgroup text
+```{r}
+unique(df$`Employee Subgroup text`)
+summary(df$`Employee Subgroup text`)
+sum(is.na(df$`Employee Subgroup text`))
+qplot(df$`Employee Subgroup text`)
+```
+Beschreibung
+
+### Employee Subgroup text
+```{r}
+unique(df$`Cost Center long`)
+summary(df$`Cost Center long`)
+sum(is.na(df$`Cost Center long`))
+qplot(df$`Cost Center long`)
+```
+Beschreibung
