@@ -11,116 +11,195 @@ Deskriptive Analyse der Daten: Was beschreiben die Daten, was sind die Datentype
 library(readxl)
 library(ggplot2)
 
-df <- read_xlsx("Markdowns/20211205_raw_dataset.xlsx")
+df <- read_xlsx("Markdowns/20211209_raw_dataset.xlsx")
+View(df)
+
 ```
-#### Years in Numerisch umwandeln
+
+### Vertical_Horizontal_Developments = Beförderungen innerhalb des Unternehmens
+Dieser Wert sagt aus, wie oft der Mitarbeiter vertikal und horizontal im Unternhemen befördert wurde.
+
 ```{r}
-#all Chars in numeric 
-  #Years of Service Berlin
-data_chars_as_num <- df
-
-YearsOfService_BASFBerlin <- df[3]
-data_chars_as_num[ ,  "YearsOfService_BASFBerlin"] <- 
-  as.data.frame(apply(data_chars_as_num[ , "YearsOfService_BASFBerlin"], 2, as.numeric))
-
-  #Years Service all
-YearsOfService_BASFall <- df[8]
-data_chars_as_num[ ,  "YearsOfService_BASFall"] <- 
-  as.data.frame(apply(data_chars_as_num[ , "YearsOfService_BASFall"], 2, as.numeric))
-
-YearsOfService_BASFBerlin <- data_chars_as_num[3]
-YearsOfService_BASFall <- data_chars_as_num[8]
-
-df[3] = YearsOfService_BASFBerlin
-df[8] = YearsOfService_BASFall
-
-str(df)
-
+unique(df$Vertical_Horizontal_Developments)
+summary(df$Vertical_Horizontal_Developments)
+sum(is.na(df$Vertical_Horizontal_Developments))
+qplot(df$Vertical_Horizontal_Developments)
 ```
-### Gender
+#### -> hier könnten wir auch sagen, dass wir 2 oder 3 Kategorien machen -> 0 Beförderungen und dann entweder 1-2 und mehr als 3 oder direkt mehr als 0. Weil gibt echt wenig mit mehr als 1
+
+### start_Calendar Year/Month = Anstellungsdatum
 ```{r}
-unique(df$Gender)
-summary(df$Gender)
-sum(is.na(df$Gender))
-qplot(df$Gender)
+unique(df$'start_Calendar Year/Month')
+summary(df$'start_Calendar Year/Month')
+sum(is.na(df$'start_Calendar Year/Month'))
+qplot(df$'start_Calendar Year/Month')
+#hier nach Jahren und eventuell Monaten splitten, dann könnte man ne Abhängigkeit zeigen, dass z.B. Menschen die Monat Januar anfangen schneller aussteigen als im März :D
 ```
-Beschreiung
+##### nach Berechnung der Gesamtdauer im unternhemen könnte es gelöscht werden oder???
 
-### Nationality
-```{r}
-unique(df$Nationality)
-summary(df$Nationality)
-sum(is.na(df$Nationality))
-```
-Beschreiung
 
-### YearsOfService_BASFBerlin
+### start_contract type = Hat der Mitarbeiter bei Anstellung einen temporären oder dauerhaften Vertrag bekommen?
 ```{r}
-unique(df$YearsOfService_BASFBerlin)
-summary(df$YearsOfService_BASFBerlin)
-sum(is.na(df$YearsOfService_BASFBerlin))
-qplot(df$YearsOfService_BASFBerlin)
+unique(df$'start_contract type')
+summary(df$'start_contract type')
+sum(is.na(df$'start_contract type'))
+qplot(df$'start_contract type')
 ```
-Beschreiung
 
-### Position text
+### start_Part time mark = Zu Beginn der Anstellung in Teilzeit angestellt
 ```{r}
-unique(df$`Position text`)
-summary(df$`Position text`)
-sum(is.na(df$`Position text`))
+unique(df$'start_Part time mark')
+summary(df$'start_Part time mark')
+sum(is.na(df$'start_Part time mark'))
+qplot(df$'start_Part time mark')
 ```
-Beschreiung
+##### Wir haben uns entschieden das Merkmal der Halbtagsanstellung nicht weiter zu berücksichtigen, da die Menge der in Teilzeit Angestellten auf die gesamt Menge vernachlässigbar gering ist. Daher entfernen wir dieses Merkmal aus dem Datensatz
 
-### Role
 ```{r}
-unique(df$Role)
-summary(df$Role)
-sum(is.na(df$Role))
-qplot(df$Role)
+df$`start_Part time mark` <- NULL
 ```
-Beschreiung
 
-### Part Time Mark
-```{r}
-unique(df$`Part Time Mark`)
-summary(df$`Part Time Mark`)
-sum(is.na(df$`Part Time Mark`))
-qplot(df$`Part Time Mark`)
-```
-Beschreiung
 
-### Global contract type
+### start_employee subgroup detail = Vertragsart bei Anstellung
 ```{r}
-unique(df$`Global contract type`)
-summary(df$`Global contract type`)
-sum(is.na(df$`Global contract type`))
-qplot(df$`Global contract type`)
+unique(df$'start_employee subgroup detail')
+summary(df$'start_employee subgroup detail')
+sum(is.na(df$'start_employee subgroup detail'))
+qplot(df$'start_employee subgroup detail')
 ```
-Vertragsart beim verlassen des Unternehmens
+##### Hier ist erkennbar, dass es beinahe ausschließlich Mitarbeiter mit einer Anstellung gibt, die tariflich ist. Daher haben wir uns entschieden dieses Merkmal aus dem Datensatz zu löschen.
+```{r}
+df$`start_employee subgroup detail` <- NULL
+```
 
-### YearsOfService_BASFall
-```{r}
-unique(df$YearsOfService_BASFall)
-summary(df$YearsOfService_BASFall)
-sum(is.na(df$YearsOfService_BASFall))
-qplot(df$YearsOfService_BASFall)
-```
-Beschreibung
 
-### Employee Subgroup text
+### start_Cost Center2 = Die Rechnungsstelle bei Anstellungsbeginn als Abkürzung
 ```{r}
-unique(df$`Employee Subgroup text`)
-summary(df$`Employee Subgroup text`)
-sum(is.na(df$`Employee Subgroup text`))
-qplot(df$`Employee Subgroup text`)
+unique(df$'start_Cost Center2')
+summary(df$'start_Cost Center2')
+sum(is.na(df$'start_Cost Center2'))
+qplot(df$'start_Cost Center2')
 ```
-Beschreibung
+##### Da es sehr viele unterschiedliche Ausprägungen bei diesem Merkmal gibt und die interne Rechnungstelle für uns in keinem sichtbaren Zusammenhang mit dem Mitarbeiter sthet, da dies keinen Einfluss auf den Mitarbeiter an sich hat, haben wir uns entschieden dieses Merkmal nicht weiter zu berücksichtiegen.
+```{r}
+df$`start_Cost Center2` <- NULL
+```
 
-### Employee Subgroup text
+
+### start_Employee group = Gibt an, ob der Mitarbeiter temporär oder permant angestellt wurde. Hier überschneidung mit start_contract type!!!! herausnehmen, bevor der Analyse?
 ```{r}
-unique(df$`Cost Center long`)
-summary(df$`Cost Center long`)
-sum(is.na(df$`Cost Center long`))
-qplot(df$`Cost Center long`)
+unique(df$'start_Employee group')
+summary(df$'start_Employee group')
+sum(is.na(df$'start_Employee groupl'))
+qplot(df$'start_Employee group')
 ```
-Beschreibung
+
+### Cost Center = Kostenstelle
+```{r}
+unique(df$'Cost Center')
+summary(df$'Cost Center')
+sum(is.na(df$'Cost Center'))
+qplot(df$'Cost Center')
+```
+##### Wie oben bereits erläutert hat die Kostenstelle keinen Einfluss auf die Mitarbeiter, da dies intern geschieht und mögliche Zusammenhänge kausal ausgeschlossen sind, werden wir dieses Merkmal nicht weiter berücksichtigen
+```{r}
+df$`Cost Center` <- NULL
+```
+
+##### Wie oben bereits erläutert hat die Kostenstelle keinen Einfluss auf die Mitarbeiter, da dies intern geschieht und mögliche Zusammenhänge kausal ausgeschlossen sind, werden wir dieses Merkmal nicht weiter berücksichtigen
+
+```{r}
+df$`Cost Center` <- NULL
+```
+
+### decrease_Category = Funktionsbereich beim Verlassen des Unternehmens
+```{r}
+unique(df$'decrease_Category')
+summary(df$'decrease_Category')
+sum(is.na(df$'decrease_Category'))
+qplot(df$'decrease_Category')
+```
+
+
+### decrease_Sub-category = Abteilung beim Verlassen des Unternehmens
+```{r}
+unique(df$'decrease_Sub-category')
+summary(df$'decrease_Sub-category')
+sum(is.na(df$'decrease_Sub-category'))
+qplot(df$'decrease_Sub-category')
+```
+
+
+### decrease_SDU Name for ExR = Offizieller Name der Abteilung beim Verlassen des Unternehmens
+```{r}
+unique(df$'decrease_SDU Name for ExR')
+summary(df$'decrease_SDU Name for ExR')
+sum(is.na(df$'decrease_SDU Name for ExR'))
+qplot(df$'decrease_SDU Name for ExR')
+```
+
+### decrease_SDU = Interner Name/Abkürzung der Abteilung beim Verlassen des Unternehmens
+```{r}
+unique(df$'decrease_SDU')
+summary(df$'decrease_SDU')
+sum(is.na(df$'decrease_SDU'))
+qplot(df$'decrease_SDU')
+```
+##### Da wir bereits den offiziellen namen der SDU betrachtet werden wir die gleichen Daten auf Grund von redundanz aus dem Datensatz entfernen
+```{r}
+df$decrease_SDU <- NULL
+```
+
+### decrease_Service Stream = Fachbereich beim verlassen des Unternehmens
+```{r}
+unique(df$'decrease_Service Stream')
+summary(df$'decrease_Service Stream')
+sum(is.na(df$'decrease_Service Stream'))
+qplot(df$'decrease_Service Stream')
+```
+
+### start_Category = Fachbereich in dem der Mitarbeiter anfangs eingestellt wurde
+```{r}
+unique(df$'start_Category')
+summary(df$'start_Category')
+sum(is.na(df$'start_Category'))
+qplot(df$'start_Category')
+```
+
+
+### start_Sub-category = Abteilung in dem der Mitarbeiter anfangs eingestellt wurde
+```{r}
+unique(df$'start_Sub-category')
+summary(df$'start_Sub-category')
+sum(is.na(df$'start_Sub-category'))
+qplot(df$'start_Sub-category')
+```
+
+### start_SDU Name for ExR =  Offizieller Name der Abteilung beim Eintritt in das Unternehmen
+```{r}
+unique(df$'start_SDU Name for ExR')
+summary(df$'start_SDU Name for ExR')
+sum(is.na(df$'start_SDU Name for ExR'))
+qplot(df$'start_SDU Name for ExR')
+```
+
+
+### start_SDU = Interner Name der Abteilung beim Eintritt in das Unternehmen
+```{r}
+unique(df$'start_SDU')
+summary(df$'start_SDU')
+sum(is.na(df$'start_SDU'))
+qplot(df$'start_SDU')
+```
+##### Da wir bereits den offiziellen namen der SDU werden wir die gleichen Daten auf Grund von redundanz aus dem Datensatz entfernen
+```{r}
+df$start_SDU <- NULL
+```
+
+### start_Service Stream = Fachbereich beim Eintritt in das Unternehmen
+```{r}
+unique(df$'start_Service Stream')
+summary(df$'start_Service Stream')
+sum(is.na(df$'start_Service Stream'))
+qplot(df$'start_Service Stream')
+```
