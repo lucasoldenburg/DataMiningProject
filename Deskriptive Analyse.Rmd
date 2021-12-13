@@ -1,0 +1,49 @@
+---
+title: "Deskriptive Analyse"
+output: html_document
+---
+
+## Dekriptive Analyse der Daten
+
+Deskriptive Analyse der Daten: Was beschreiben die Daten, was sind die Datentypen und Wertebereiche, fehlen Daten, gibt es falsche Werte, gibt es Korrelationen zwischen Merkmalen (Features, Spalten)? Benutzen Sie Visualisierungen, wenn es sinnvoll erscheint. Was können wir aus dieser deskriptiven Analyse über das Problem lernen?
+
+```{r}
+library(readxl)
+library(ggplot2)
+
+df <- read_xlsx("Markdowns/Data/20211205_raw_dataset.xlsx")
+```
+
+### Gender
+```{r}
+unique(df$Gender)
+summary(df$Gender)
+sum(is.na(df$Gender))
+qplot(df$Gender)
+```
+### Nationality
+```{r}
+unique(df$Nationality)
+summary(df$Nationality)
+sum(is.na(df$Nationality))
+```
+### YearsOfService_BASFBerlin
+```{r}
+unique(df$YearsOfService_BASFBerlin)
+summary(df$YearsOfService_BASFBerlin)
+sum(is.na(df$YearsOfService_BASFBerlin))
+qplot(df$YearsOfService_BASFBerlin)
+```
+### Position text
+```{r}
+unique(df$`Position text`)
+summary(df$`Position text`)
+sum(is.na(df$`Position text`))
+```
+### Position text
+```{r}
+unique(df$Role)
+summary(df$Role)
+sum(is.na(df$Role))
+qplot(df$Role)
+```
