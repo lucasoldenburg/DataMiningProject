@@ -23,20 +23,15 @@ library(readxl)
 ## Data Mining Martins Daten daten daten
 ```{r}
 df <- read_xlsx("20211209_raw_dataset.xlsx")
-test <- read_xlsx("testData.xlsx")
-
-test2 <- as.POSIXct(test[2], format = "%d.%m.%Y")
-View(test2)
-str(test2)
 
 names(df[18])
 typeof(df[18])
 
-str(df)Data
+str(df)
 #dim(dataSet)
 #names(dataSet)
-head(dataSet)
-View(dataSet)
+head(df)
+View(df)
 
 ```
 ## Was beschreiben die Daten?
@@ -85,10 +80,6 @@ df[8] = YearsOfService_BASFall
 library(dplyr)
 
 birthday <- df["Date of Birth"]
-class(birthday)
-
-b <- 
-
 
 birthday
 str(birthday)
@@ -107,7 +98,9 @@ str(eAE)
 
 ```
 Vertical_Horizontal_Developments: beschreibt wie oft der Mitarbeiter vertikal im Unternehmen befördert wurde
+
 start_Calendar Year/Month: Anfangsdatum uim Unternehmen
+
 start_contract type: beschreibt in welcher Position der Mitarbeiter ins Unternehmen gekommen ist. Möglichkeiten:
 ```{r}
 categories <- unique(eAE["start_contract type"])
