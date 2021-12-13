@@ -11,7 +11,7 @@ Deskriptive Analyse der Daten: Was beschreiben die Daten, was sind die Datentype
 library(readxl)
 library(ggplot2)
 
-df <- read_xlsx("Markdowns/20211209_raw_dataset.xlsx")
+df <- read_xlsx("20211209_raw_dataset.xlsx")
 View(df)
 
 ```
