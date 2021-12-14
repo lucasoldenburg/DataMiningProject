@@ -11,6 +11,7 @@ Deskriptive Analyse der Daten: Was beschreiben die Daten, was sind die Datentype
 library(readxl)
 library(ggplot2)
 library(tidyr)
+library(stringr)
 
 df <- read_xlsx("20211209_raw_dataset.xlsx")
 View(df)
@@ -103,6 +104,20 @@ unique(df$`Employee Subgroup text`)
 summary(df$`Employee Subgroup text`)
 sum(is.na(df$`Employee Subgroup text`))
 qplot(df$`Employee Subgroup text`)
+
+df$'Employee Subgoup text clustered' <- df$`Employee Subgroup text`
+df$`Employee Subgoup text clustered` <- replace(df$`Employee Subgoup text clustered`,df$`Employee Subgoup text clustered`== "exempt higher level","non exempt")
+df$`Employee Subgoup text clustered` <- replace(df$`Employee Subgoup text clustered`,df$`Employee Subgoup text clustered`== "senior executive","non exempt")
+df$`Employee Subgoup text clustered` <- replace(df$`Employee Subgoup text clustered`,df$`Employee Subgoup text clustered`== "non-exempt (white)","non exempt")
+df$`Employee Subgoup text clustered` <- replace(df$`Employee Subgoup text clustered`,df$`Employee Subgoup text clustered`== "working student whit","non exempt")
+df$`Employee Subgoup text clustered` <- replace(df$`Employee Subgoup text clustered`,df$`Employee Subgoup text clustered`== "apprentice","non exempt")
+df
+
+unique(df$'Employee Subgoup text clustered')
+summary(df$'Employee Subgoup text clustered')
+sum(is.na(df$'Employee Subgoup text clustered'))
+qplot(df$'Employee Subgoup text clustered')
+
 ```
 
 ### Cost Center long
@@ -139,6 +154,8 @@ sollten deswegen die TEC-Kräfte stehen, da diese auch nur im Personal-Reporting
 unique(df$TEC)
 summary(df$TEC)
 sum(is.na(df$TEC))
+
+df$TEC <- NULL
 ```
 
 ### Stelle (SAP)
@@ -270,6 +287,8 @@ unique(df$'start_employee subgroup detail')
 summary(df$'start_employee subgroup detail')
 sum(is.na(df$'start_employee subgroup detail'))
 qplot(df$'start_employee subgroup detail')
+
+
 ```
 ##### Hier ist erkennbar, dass es beinahe ausschließlich Mitarbeiter mit einer Anstellung gibt, die tariflich ist. Daher haben wir uns entschieden dieses Merkmal aus dem Datensatz zu löschen.
 ```{r}
