@@ -10,8 +10,8 @@ Deskriptive Analyse der Daten: Was beschreiben die Daten, was sind die Datentype
 ```{r}
 library(readxl)
 library(ggplot2)
-
-df <- read_xlsx("Markdowns/20211209_raw_dataset.xlsx")
+df <- read_xlsx("20211209_raw_dataset.xlsx")
+#df <- read_xlsx("Markdowns/20211209_raw_dataset.xlsx")
 ```
 #### Years in Numerisch umwandeln
 ```{r}
@@ -55,7 +55,8 @@ sum(is.na(df$Nationality))
 ```
 
 ### YearsOfService_BASFBerlin
-Dieses Merkmal beschreibt, wie lange die Person im Unternehmen bisher tätig war (nur Berlin).
+Dieses Merkmal beschreibt, wie lange die Person im Unternehmen bisher tätig war in Jahren (nur Berliner Standort).
+Dabei wird aufgerundet. Das Symbol "#" gilt für eine Unternehmenszugehörigkeit unter einem Jahr.
 ```{r}
 unique(df$YearsOfService_BASFBerlin)
 summary(df$YearsOfService_BASFBerlin)
@@ -64,7 +65,8 @@ qplot(df$YearsOfService_BASFBerlin)
 ```
 
 ### Position text
-Dieses Merkmal beschreibt in welcher Position die Person tätig ist bzw. zuletzt war.
+Dieses Merkmal beschreibt in welcher Position die Person tätig ist bzw. zuletzt war. 
+Es kann auch als Planstelle bezeichnet werden.
 ```{r}
 unique(df$`Position text`)
 summary(df$`Position text`)
@@ -108,7 +110,13 @@ qplot(df$YearsOfService_BASFall)
 ```
 
 ### Employee Subgroup text
-Dieses Merkmal beschreibt ???
+Dieses Merkmal beschreibt welcher Mitarbeitergruppe die Person zugeordnet ist/war.
+
+Aufgrund der Verteilung ist eine Einstufung nur in die Gruppen "exempt" (außertarfilich beschäftigt)
+und "non exempt" (tariflich beschäftigt).
+"exempt" umfasst: "exempt", "exempt higher level", "senior executive"
+"non exempt": "non-exempt (white)",  "working student whit", "apprentice"
+
 ```{r}
 unique(df$`Employee Subgroup text`)
 summary(df$`Employee Subgroup text`)
@@ -117,15 +125,17 @@ qplot(df$`Employee Subgroup text`)
 ```
 
 ### Cost Center long
-Dieses Merkmal beschreibt ???
+Dieses Merkmal beschreibt die Kostenstelle inclusive der Zuordnung der Region und dem Unternehmen.
 ```{r}
 # unique(df$`Cost Center long`)
 summary(df$`Cost Center long`)
 sum(is.na(df$`Cost Center long`))
+
+df$`Name on Dashboard` <-  NULL
 ```
 
 ### Cost Center text
-Dieses Merkmal beschreibt ???
+Dieses Merkmal beschreibt den Namen der Kostenstelle.
 ```{r}
 # unique(df$`Cost Center text`)
 summary(df$`Cost Center text`)
@@ -141,7 +151,9 @@ sum(is.na(df$`LastActive_Calendar Year/Month`))
 ```
 
 ### TEC
-Dieses Merkmal beschreibt ???
+Dieses Merkmal beschreibt ob die Person einen vollumfänglichen Vertrag mit dem Standort Berlin hat.
+Beispielsweise haben Praktikanten oder Leasingkräfte keinen solchen Vertrag. Im Fokus der Analyse
+sollten deswegen die TEC-Kräfte stehen, da diese auch nur im Personal-Reporting berücksichtigt werden.
 ```{r}
 unique(df$TEC)
 summary(df$TEC)
@@ -149,7 +161,7 @@ sum(is.na(df$TEC))
 ```
 
 ### Stelle (SAP)
-Dieses Merkmal beschreibt ???
+Dieses Merkmal beschreibt die Position der Person, wie sie in SAP (Quellsystem) gepflegt ist.
 ```{r}
 unique(df$`Stelle (SAP)`)
 summary(df$`Stelle (SAP)`)
@@ -158,7 +170,7 @@ sum(is.na(df$`Stelle (SAP)`))
 ```
 
 ### In Dashboard
-Dieses Merkmal beschreibt ???
+Dieses Merkmal beschreibt die Position der Person in Klustern. Dabei wird sich an den Gehaltsbändern orientiert.
 ```{r}
 unique(df$`In Dashboard`)
 summary(df$`In Dashboard`)
@@ -168,7 +180,9 @@ sum(is.na(df$`In Dashboard`))
 Beschreibung
 
 ### Name on Dashboard
-Dieses Merkmal beschreibt ???
+Dieses Merkmal beschreibt die Position der Person in Klustern. Dabei wird sich an den Gehaltsbändern orientiert und in Oberbegriffe untergliedert
+Da der Wertebereich noch relativ hoch ist, könnte eine zusätzliche Gruppierung, die sich noch näher an die Gehaltsbänder anpasst, 
+verfolgt werden.
 ```{r}
 unique(df$`Name on Dashboard`)
 summary(df$`Name on Dashboard`)
@@ -178,7 +192,8 @@ sum(is.na(df$`Name on Dashboard`))
 Beschreibung
 
 ### Classification
-Dieses Merkmal beschreibt ???
+Dieses Merkmal beschreibt die Einteilung in Mitarbeitergruppen in der Logik des Reportings am Standort Berlin.
+Die "Employee Subgroup" sollte bevorzugt eingesetzt werden in einer vergleichsweisen Gruppierung.
 ```{r}
 unique(df$Classification)
 summary(df$Classification)
@@ -198,7 +213,10 @@ sum(is.na(df$`Date of Birth`))
 Beschreibung
 
 ### Last_Development_Calendar Year/Month
-Dieses Merkmal beschreibt ???
+Dieses Merkmal beschreibt, wann sich die Person das zum letzten Mal horizontal oder vertikal oder von tariflich beschäftigt zu außertariflich 
+beschäftigt entwickelt hat. 
+Leere Werte deuten darauf hin, dass sich die Person noch nicht entwickelt hat. In solchen Fällen ist das Startdatum der Person als 
+Berechnungsgrundlage zu wählen.
 ```{r}
 # todo: in Date umwandeln
 unique(df$`Last_Development_Calendar Year/Month`)
@@ -208,7 +226,8 @@ sum(is.na(df$`Last_Development_Calendar Year/Month`))
 Beschreibung
 
 ### development to exempt
-Dieses Merkmal beschreibt ???
+Dieses Merkmal beschreibt die Entwicklung einer Person von tariflich beschäftigr zu außer tariflich beschäftigt.
+Diese Entwicklung ist oft im Zusammenhang mit der Beförderung in eine Experten- oder Managerfunktion zu beobachten.
 ```{r}
 unique(df$`development to exempt`)
 summary(df$`development to exempt`)
