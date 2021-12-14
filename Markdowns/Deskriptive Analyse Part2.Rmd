@@ -174,7 +174,31 @@ unique(df$`In Dashboard`)
 summary(df$`In Dashboard`)
 sum(is.na(df$`In Dashboard`))
 # qplot(df$`In Dashboard`)
+
+df$`Paybands`<- df$`In Dashboard`
+df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Apprentice / Apprentice BA","A")
+df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Student Trainee / Trainee" ,"B")
+df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Assistant" ,"C")
+df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Officer / Team Assistant","C")
+df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Accountant/Advisor/Buyer/Specialist und Senior Officer","D")
+df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Senior Accountant/Advisor/Buyer/Specialist","D")
+df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Executive Accountant/Advisor/Buyer/Specialist/Assistant","E")
+df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Teamspecialist / Knowledge Coordinator" ,"F")
+df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Manager","G")
+df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Manager","G")
+df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Project Manager / Expert","G")
+df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Head of","H")
+df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Apprentice / Apprentice BA","H")
+df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Apprentice / Apprentice BA","H")
+df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Apprentice / Apprentice BA","H")
+
+
 ```
+
+### Paybands
+Dieses Merkmal beschreibt die Position der Person in Klustern. Dabei wird sich an den Gehaltsbändern orientiert.
+
+
 Beschreibung
 
 ### Name on Dashboard
@@ -182,11 +206,12 @@ Dieses Merkmal beschreibt die Position der Person in Klustern. Dabei wird sich a
 Da der Wertebereich noch relativ hoch ist, könnte eine zusätzliche Gruppierung, die sich noch näher an die Gehaltsbänder anpasst, 
 verfolgt werden.
 ```{r}
-unique(df$`Name on Dashboard`)
-summary(df$`Name on Dashboard`)
-sum(is.na(df$`Name on Dashboard`))
-# qplot(df$`Name on Dashboard`)
-df$`Name on Dashboard <- NULL
+#unique(df$`Name on Dashboard`)
+
+#summary(df$`Name on Dashboard`)
+#sum(is.na(df$`Name on Dashboard`))
+
+df$`Name on Dashboard` <- NULL
 ```
 Beschreibung
 
@@ -205,9 +230,8 @@ Beschreibung
 Dieses Merkmal beschreibt den Geburtstag der Person.
 ```{r}
 # todo: in Date umwandeln + in AGE umwandeln
-unique(df$`Date of Birth`)
-summary(df$`Date of Birth`)
-sum(is.na(df$`Date of Birth`))
+summary(df$'Date of Birth')
+sum(is.na(df$'Date of Birth'))
 ```
 Beschreibung
 
@@ -218,9 +242,8 @@ Leere Werte deuten darauf hin, dass sich die Person noch nicht entwickelt hat. I
 Berechnungsgrundlage zu wählen.
 ```{r}
 # todo: in Date umwandeln
-unique(df$`Last_Development_Calendar Year/Month`)
-summary(df$`Last_Development_Calendar Year/Month`)
-sum(is.na(df$`Last_Development_Calendar Year/Month`))
+summary(df$'Last_Development_Calendar Year/Month')
+sum(is.na(df$'Last_Development_Calendar Year/Month'))
 ```
 Beschreibung
 
@@ -228,10 +251,10 @@ Beschreibung
 Dieses Merkmal beschreibt die Entwicklung einer Person von tariflich beschäftigr zu außer tariflich beschäftigt.
 Diese Entwicklung ist oft im Zusammenhang mit der Beförderung in eine Experten- oder Managerfunktion zu beobachten.
 ```{r}
-unique(df$`development to exempt`)
-summary(df$`development to exempt`)
-sum(is.na(df$`development to exempt`))
-qplot(df$`development to exempt`)
+unique(df$'development to exempt')
+summary(df$'development to exempt')
+sum(is.na(df$'development to exempt'))
+qplot(df$'development to exempt')
 ```
 Beschreibung
 
@@ -252,8 +275,8 @@ unique(df$'start_Calendar Year/Month')
 summary(df$'start_Calendar Year/Month')
 sum(is.na(df$'start_Calendar Year/Month'))
 qplot(df$'start_Calendar Year/Month')
-#hier nach Jahren und eventuell Monaten splitten, dann könnte man ne Abhängigkeit zeigen, dass z.B. Menschen die Monat Januar anfangen schneller aussteigen als im März :D
-df <- df %>% drop_na(`start_Calendar Year/Month`)
+#hier nach Jahren und eventuell Monaten splitten, dann könnte man ne Abhängigkeit zeigen, dass z.B. Menschen die Monat Januar anfangen schneller aussteigen als #im März :D
+df <- df %>% drop_na('start_Calendar Year/Month')
 ```
 ##### nach Berechnung der Gesamtdauer im unternhemen könnte es gelöscht werden oder???
 
@@ -276,8 +299,7 @@ qplot(df$'start_Part time mark')
 ##### Wir haben uns entschieden das Merkmal der Halbtagsanstellung nicht weiter zu berücksichtigen, da die Menge der in Teilzeit Angestellten auf die gesamt Menge vernachlässigbar gering ist. Daher entfernen wir dieses Merkmal aus dem Datensatz
 
 ```{r}
-df$`start_Part time mark` <- NULL
-View(df)
+df$'start_Part time mark' <- NULL
 ```
 
 
