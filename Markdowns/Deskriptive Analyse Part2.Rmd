@@ -8,10 +8,12 @@ output: html_document
 Deskriptive Analyse der Daten: Was beschreiben die Daten, was sind die Datentypen und Wertebereiche, fehlen Daten, gibt es falsche Werte, gibt es Korrelationen zwischen Merkmalen (Features, Spalten)? Benutzen Sie Visualisierungen, wenn es sinnvoll erscheint. Was können wir aus dieser deskriptiven Analyse über das Problem lernen?
 
 ```{r}
+install.packages(lubridate)
 library(readxl)
 library(ggplot2)
 library(tidyr)
 library(stringr)
+library(lubridate)
 
 df <- read_xlsx("20211209_raw_dataset.xlsx")
 
@@ -41,6 +43,15 @@ df$`start_Calendar Year/Month` <- as.Date(df$`start_Calendar Year/Month`, '%d.%M
 df$`Last_Development_Calendar Year/Month` <- as.Date(df$`Last_Development_Calendar Year/Month`, '%d.%M.%y')
 df$`LastActive_Calendar Year/Month` <- as.Date(df$`LastActive_Calendar Year/Month`, '%d.%M.%y')
 
+start <- df$`start_Calendar Year/Month`
+end <- df$`Last_Development_Calendar Year/Month`
+
+as.Date.numeric <- function(x) structure(floor(x+.001), class = "Date") 
+sapply(end, function(end) length(seq(start, end, by = "month")))-1
+length(seq(start, end, by="months")) -1
+
+date <- as.integer(ymd(end) - ymd(start))
+date
 ```
 
 

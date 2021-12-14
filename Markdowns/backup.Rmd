@@ -13,6 +13,7 @@ library(ggplot2)
 
 df <- read_xlsx("20211209_raw_dataset.xlsx")
 View(df)
+df$year
 
 ```
 
