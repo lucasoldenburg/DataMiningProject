@@ -11,7 +11,7 @@ Deskriptive Analyse der Daten: Was beschreiben die Daten, was sind die Datentype
 library(readxl)
 library(ggplot2)
 
-df <- read_xlsx("Markdowns/20211205_raw_dataset.xlsx")
+df <- read_xlsx("Markdowns/20211209_raw_dataset.xlsx")
 ```
 #### Years in Numerisch umwandeln
 ```{r}
@@ -35,92 +35,184 @@ df[3] = YearsOfService_BASFBerlin
 df[8] = YearsOfService_BASFall
 
 str(df)
-
 ```
 ### Gender
+Dieses Merkmal beschreibt das Geschlecht der Person.
 ```{r}
 unique(df$Gender)
 summary(df$Gender)
 sum(is.na(df$Gender))
 qplot(df$Gender)
 ```
-Beschreiung
 
 ### Nationality
+Dieses Merkmal beschreibt die Nationalität der Person.
 ```{r}
+# todo: Gruppieren nach DE, EU, NotEU
 unique(df$Nationality)
 summary(df$Nationality)
 sum(is.na(df$Nationality))
 ```
-Beschreiung
 
 ### YearsOfService_BASFBerlin
+Dieses Merkmal beschreibt, wie lange die Person im Unternehmen bisher tätig war (nur Berlin).
 ```{r}
 unique(df$YearsOfService_BASFBerlin)
 summary(df$YearsOfService_BASFBerlin)
 sum(is.na(df$YearsOfService_BASFBerlin))
 qplot(df$YearsOfService_BASFBerlin)
 ```
-Beschreiung
 
 ### Position text
+Dieses Merkmal beschreibt in welcher Position die Person tätig ist bzw. zuletzt war.
 ```{r}
 unique(df$`Position text`)
 summary(df$`Position text`)
 sum(is.na(df$`Position text`))
 ```
-Beschreiung
 
 ### Role
+Dieses Merkmal beschreibt die Rolle der Person.
 ```{r}
 unique(df$Role)
 summary(df$Role)
 sum(is.na(df$Role))
 qplot(df$Role)
 ```
-Beschreiung
 
 ### Part Time Mark
+Dieses Merkmal beschreibt, ob die Person in Teilzeit tätig ist/war.
 ```{r}
 unique(df$`Part Time Mark`)
 summary(df$`Part Time Mark`)
 sum(is.na(df$`Part Time Mark`))
 qplot(df$`Part Time Mark`)
 ```
-Beschreiung
 
 ### Global contract type
+Dieses Merkmal beschreibt die Vertragsart der Person.
 ```{r}
 unique(df$`Global contract type`)
 summary(df$`Global contract type`)
 sum(is.na(df$`Global contract type`))
 qplot(df$`Global contract type`)
 ```
-Vertragsart beim verlassen des Unternehmens
 
 ### YearsOfService_BASFall
+Dieses Merkmal beschreibt, wie lange die Person im Unternehmen bisher tätig war.
 ```{r}
 unique(df$YearsOfService_BASFall)
 summary(df$YearsOfService_BASFall)
 sum(is.na(df$YearsOfService_BASFall))
 qplot(df$YearsOfService_BASFall)
 ```
-Beschreibung
 
 ### Employee Subgroup text
+Dieses Merkmal beschreibt ???
 ```{r}
 unique(df$`Employee Subgroup text`)
 summary(df$`Employee Subgroup text`)
 sum(is.na(df$`Employee Subgroup text`))
 qplot(df$`Employee Subgroup text`)
 ```
-Beschreibung
 
-### Employee Subgroup text
+### Cost Center long
+Dieses Merkmal beschreibt ???
 ```{r}
-unique(df$`Cost Center long`)
+# unique(df$`Cost Center long`)
 summary(df$`Cost Center long`)
 sum(is.na(df$`Cost Center long`))
-qplot(df$`Cost Center long`)
+```
+
+### Cost Center text
+Dieses Merkmal beschreibt ???
+```{r}
+# unique(df$`Cost Center text`)
+summary(df$`Cost Center text`)
+sum(is.na(df$`Cost Center text`))
+```
+
+### LastActive_Calendar Year/Montht
+Dieses Merkmal beschreibt, wann die Person das letzte Mal aktiv war.
+```{r}
+# unique(df$`LastActive_Calendar Year/Month`)
+summary(df$`LastActive_Calendar Year/Month`)
+sum(is.na(df$`LastActive_Calendar Year/Month`))
+```
+
+### TEC
+Dieses Merkmal beschreibt ???
+```{r}
+unique(df$TEC)
+summary(df$TEC)
+sum(is.na(df$TEC))
+```
+
+### Stelle (SAP)
+Dieses Merkmal beschreibt ???
+```{r}
+unique(df$`Stelle (SAP)`)
+summary(df$`Stelle (SAP)`)
+sum(is.na(df$`Stelle (SAP)`))
+# qplot(df$`Stelle (SAP)`)
+```
+
+### In Dashboard
+Dieses Merkmal beschreibt ???
+```{r}
+unique(df$`In Dashboard`)
+summary(df$`In Dashboard`)
+sum(is.na(df$`In Dashboard`))
+# qplot(df$`In Dashboard`)
+```
+Beschreibung
+
+### Name on Dashboard
+Dieses Merkmal beschreibt ???
+```{r}
+unique(df$`Name on Dashboard`)
+summary(df$`Name on Dashboard`)
+sum(is.na(df$`Name on Dashboard`))
+# qplot(df$`Name on Dashboard`)
+```
+Beschreibung
+
+### Classification
+Dieses Merkmal beschreibt ???
+```{r}
+unique(df$Classification)
+summary(df$Classification)
+sum(is.na(df$Classification))
+qplot(df$Classification)
+```
+Beschreibung
+
+### Date of Birth
+Dieses Merkmal beschreibt den Geburtstag der Person.
+```{r}
+# todo: in Date umwandeln + in AGE umwandeln
+unique(df$`Date of Birth`)
+summary(df$`Date of Birth`)
+sum(is.na(df$`Date of Birth`))
+```
+Beschreibung
+
+### Last_Development_Calendar Year/Month
+Dieses Merkmal beschreibt ???
+```{r}
+# todo: in Date umwandeln
+unique(df$`Last_Development_Calendar Year/Month`)
+summary(df$`Last_Development_Calendar Year/Month`)
+sum(is.na(df$`Last_Development_Calendar Year/Month`))
+```
+Beschreibung
+
+### development to exempt
+Dieses Merkmal beschreibt ???
+```{r}
+unique(df$`development to exempt`)
+summary(df$`development to exempt`)
+sum(is.na(df$`development to exempt`))
+qplot(df$`development to exempt`)
 ```
 Beschreibung
