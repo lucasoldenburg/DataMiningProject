@@ -1,0 +1,237 @@
+---
+title: "Deskriptive Analyse"
+output: html_document
+---
+
+## Dekriptive Analyse der Daten
+
+Deskriptive Analyse der Daten: Was beschreiben die Daten, was sind die Datentypen und Wertebereiche, fehlen Daten, gibt es falsche Werte, gibt es Korrelationen zwischen Merkmalen (Features, Spalten)? Benutzen Sie Visualisierungen, wenn es sinnvoll erscheint. Was können wir aus dieser deskriptiven Analyse über das Problem lernen?
+
+```{r}
+library(readxl)
+library(ggplot2)
+df <- read_xlsx("20211209_raw_dataset.xlsx")
+#df <- read_xlsx("Markdowns/20211209_raw_dataset.xlsx")
+```
+#### Years in Numerisch umwandeln
+```{r}
+#all Chars in numeric 
+  #Years of Service Berlin
+data_chars_as_num <- df
+
+YearsOfService_BASFBerlin <- df[3]
+data_chars_as_num[ ,  "YearsOfService_BASFBerlin"] <- 
+  as.data.frame(apply(data_chars_as_num[ , "YearsOfService_BASFBerlin"], 2, as.numeric))
+
+  #Years Service all
+YearsOfService_BASFall <- df[8]
+data_chars_as_num[ ,  "YearsOfService_BASFall"] <- 
+  as.data.frame(apply(data_chars_as_num[ , "YearsOfService_BASFall"], 2, as.numeric))
+
+YearsOfService_BASFBerlin <- data_chars_as_num[3]
+YearsOfService_BASFall <- data_chars_as_num[8]
+
+df[3] = YearsOfService_BASFBerlin
+df[8] = YearsOfService_BASFall
+
+str(df)
+```
+### Gender
+Dieses Merkmal beschreibt das Geschlecht der Person.
+```{r}
+unique(df$Gender)
+summary(df$Gender)
+sum(is.na(df$Gender))
+qplot(df$Gender)
+```
+
+### Nationality
+Dieses Merkmal beschreibt die Nationalität der Person.
+```{r}
+# todo: Gruppieren nach DE, EU, NotEU
+unique(df$Nationality)
+summary(df$Nationality)
+sum(is.na(df$Nationality))
+```
+
+### YearsOfService_BASFBerlin
+Dieses Merkmal beschreibt, wie lange die Person im Unternehmen bisher tätig war in Jahren (nur Berliner Standort).
+Dabei wird aufgerundet. Das Symbol "#" gilt für eine Unternehmenszugehörigkeit unter einem Jahr.
+```{r}
+unique(df$YearsOfService_BASFBerlin)
+summary(df$YearsOfService_BASFBerlin)
+sum(is.na(df$YearsOfService_BASFBerlin))
+qplot(df$YearsOfService_BASFBerlin)
+```
+
+### Position text
+Dieses Merkmal beschreibt in welcher Position die Person tätig ist bzw. zuletzt war. 
+Es kann auch als Planstelle bezeichnet werden.
+```{r}
+unique(df$`Position text`)
+summary(df$`Position text`)
+sum(is.na(df$`Position text`))
+```
+
+### Role
+Dieses Merkmal beschreibt die Rolle der Person.
+```{r}
+unique(df$Role)
+summary(df$Role)
+sum(is.na(df$Role))
+qplot(df$Role)
+```
+
+### Part Time Mark
+Dieses Merkmal beschreibt, ob die Person in Teilzeit tätig ist/war.
+```{r}
+unique(df$`Part Time Mark`)
+summary(df$`Part Time Mark`)
+sum(is.na(df$`Part Time Mark`))
+qplot(df$`Part Time Mark`)
+```
+
+### Global contract type
+Dieses Merkmal beschreibt die Vertragsart der Person.
+```{r}
+unique(df$`Global contract type`)
+summary(df$`Global contract type`)
+sum(is.na(df$`Global contract type`))
+qplot(df$`Global contract type`)
+```
+
+### YearsOfService_BASFall
+Dieses Merkmal beschreibt, wie lange die Person im Unternehmen bisher tätig war.
+```{r}
+unique(df$YearsOfService_BASFall)
+summary(df$YearsOfService_BASFall)
+sum(is.na(df$YearsOfService_BASFall))
+qplot(df$YearsOfService_BASFall)
+```
+
+### Employee Subgroup text
+Dieses Merkmal beschreibt welcher Mitarbeitergruppe die Person zugeordnet ist/war.
+
+Aufgrund der Verteilung ist eine Einstufung nur in die Gruppen "exempt" (außertarfilich beschäftigt)
+und "non exempt" (tariflich beschäftigt).
+"exempt" umfasst: "exempt", "exempt higher level", "senior executive"
+"non exempt": "non-exempt (white)",  "working student whit", "apprentice"
+
+```{r}
+unique(df$`Employee Subgroup text`)
+summary(df$`Employee Subgroup text`)
+sum(is.na(df$`Employee Subgroup text`))
+qplot(df$`Employee Subgroup text`)
+```
+
+### Cost Center long
+Dieses Merkmal beschreibt die Kostenstelle inclusive der Zuordnung der Region und dem Unternehmen.
+```{r}
+# unique(df$`Cost Center long`)
+summary(df$`Cost Center long`)
+sum(is.na(df$`Cost Center long`))
+
+df$`Name on Dashboard` <-  NULL
+```
+
+### Cost Center text
+Dieses Merkmal beschreibt den Namen der Kostenstelle.
+```{r}
+# unique(df$`Cost Center text`)
+summary(df$`Cost Center text`)
+sum(is.na(df$`Cost Center text`))
+```
+
+### LastActive_Calendar Year/Montht
+Dieses Merkmal beschreibt, wann die Person das letzte Mal aktiv war.
+```{r}
+# unique(df$`LastActive_Calendar Year/Month`)
+summary(df$`LastActive_Calendar Year/Month`)
+sum(is.na(df$`LastActive_Calendar Year/Month`))
+```
+
+### TEC
+Dieses Merkmal beschreibt ob die Person einen vollumfänglichen Vertrag mit dem Standort Berlin hat.
+Beispielsweise haben Praktikanten oder Leasingkräfte keinen solchen Vertrag. Im Fokus der Analyse
+sollten deswegen die TEC-Kräfte stehen, da diese auch nur im Personal-Reporting berücksichtigt werden.
+```{r}
+unique(df$TEC)
+summary(df$TEC)
+sum(is.na(df$TEC))
+```
+
+### Stelle (SAP)
+Dieses Merkmal beschreibt die Position der Person, wie sie in SAP (Quellsystem) gepflegt ist.
+```{r}
+unique(df$`Stelle (SAP)`)
+summary(df$`Stelle (SAP)`)
+sum(is.na(df$`Stelle (SAP)`))
+# qplot(df$`Stelle (SAP)`)
+```
+
+### In Dashboard
+Dieses Merkmal beschreibt die Position der Person in Klustern. Dabei wird sich an den Gehaltsbändern orientiert.
+```{r}
+unique(df$`In Dashboard`)
+summary(df$`In Dashboard`)
+sum(is.na(df$`In Dashboard`))
+# qplot(df$`In Dashboard`)
+```
+Beschreibung
+
+### Name on Dashboard
+Dieses Merkmal beschreibt die Position der Person in Klustern. Dabei wird sich an den Gehaltsbändern orientiert und in Oberbegriffe untergliedert
+Da der Wertebereich noch relativ hoch ist, könnte eine zusätzliche Gruppierung, die sich noch näher an die Gehaltsbänder anpasst, 
+verfolgt werden.
+```{r}
+unique(df$`Name on Dashboard`)
+summary(df$`Name on Dashboard`)
+sum(is.na(df$`Name on Dashboard`))
+# qplot(df$`Name on Dashboard`)
+```
+Beschreibung
+
+### Classification
+Dieses Merkmal beschreibt die Einteilung in Mitarbeitergruppen in der Logik des Reportings am Standort Berlin.
+Die "Employee Subgroup" sollte bevorzugt eingesetzt werden in einer vergleichsweisen Gruppierung.
+```{r}
+unique(df$Classification)
+summary(df$Classification)
+sum(is.na(df$Classification))
+qplot(df$Classification)
+```
+Beschreibung
+
+### Date of Birth
+Dieses Merkmal beschreibt den Geburtstag der Person.
+```{r}
+# todo: in Date umwandeln + in AGE umwandeln
+unique(df$`Date of Birth`)
+summary(df$`Date of Birth`)
+sum(is.na(df$`Date of Birth`))
+```
+Beschreibung
+
+### Last_Development_Calendar Year/Month
+Dieses Merkmal beschreibt, wann sich die Person das zum letzten Mal horizontal oder vertikal oder von tariflich beschäftigt zu außertariflich 
+beschäftigt entwickelt hat. 
+Leere Werte deuten darauf hin, dass sich die Person noch nicht entwickelt hat. In solchen Fällen ist das Startdatum der Person als 
+Berechnungsgrundlage zu wählen.
+```{r}
+# todo: in Date umwandeln
+unique(df$`Last_Development_Calendar Year/Month`)
+summary(df$`Last_Development_Calendar Year/Month`)
+sum(is.na(df$`Last_Development_Calendar Year/Month`))
+```
+Beschreibung
+
+### development to exempt
+Dieses Merkmal beschreibt die Entwicklung einer Person von tariflich beschäftigr zu außer tariflich beschäftigt.
+Diese Entwicklung ist oft im Zusammenhang mit der Beförderung in eine Experten- oder Managerfunktion zu beobachten.
+```{r}
+unique(df$`development to exempt`)
+summary(df$`development to exempt`)
+sum(is.na(df$`development to exempt`))
+qplot(df$`development to exempt`)
+```
+Beschreibung

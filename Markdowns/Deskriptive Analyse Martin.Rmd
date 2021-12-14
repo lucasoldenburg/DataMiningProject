@@ -1,0 +1,31 @@
+---
+title: "Deskriptive Analyse"
+output: html_document
+---
+
+## Dekriptive Analyse der Daten
+
+Deskriptive Analyse der Daten: Was beschreiben die Daten, was sind die Datentypen und Wertebereiche, fehlen Daten, gibt es falsche Werte, gibt es Korrelationen zwischen Merkmalen (Features, Spalten)? Benutzen Sie Visualisierungen, wenn es sinnvoll erscheint. Was können wir aus dieser deskriptiven Analyse über das Problem lernen?
+
+```{r}
+library(readxl)
+library(ggplot2)
+
+df <- read_xlsx("20211209_raw_dataset.xlsx")
+View(df)
+
+```
+
+### Vertical_Horizontal_Developments = Beförderungen innerhalb des Unternehmens
+Dieser Wert sagt aus, wie oft der Mitarbeiter vertikal und horizontal im Unternhemen befördert wurde.
+
+```{r}
+unique(df$Vertical_Horizontal_Developments)
+summary(df$Vertical_Horizontal_Developments)
+sum(is.na(df$Vertical_Horizontal_Developments))
+qplot(df$Vertical_Horizontal_Developments)
+```
+#### -> hier könnten wir auch sagen, dass wir 2 oder 3 Kategorien machen -> 0 Beförderungen und dann entweder 1-2 und mehr als 3 oder direkt mehr als 0. Weil gibt echt wenig mit mehr als 1   -> 0 , 1, 2, >=3
+
+
+
