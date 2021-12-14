@@ -14,9 +14,36 @@ library(tidyr)
 library(stringr)
 
 df <- read_xlsx("20211209_raw_dataset.xlsx")
-View(df)
+
+#Years in Numerisch umwandeln
+#all Chars in numeric 
+  #Years of Service Berlin
+data_chars_as_num <- df
+
+YearsOfService_BASFBerlin <- df[3]
+data_chars_as_num[ ,  "YearsOfService_BASFBerlin"] <- 
+  as.data.frame(apply(data_chars_as_num[ , "YearsOfService_BASFBerlin"], 2, as.numeric))
+
+  #Years Service all
+YearsOfService_BASFall <- df[8]
+data_chars_as_num[ ,  "YearsOfService_BASFall"] <- 
+  as.data.frame(apply(data_chars_as_num[ , "YearsOfService_BASFall"], 2, as.numeric))
+
+YearsOfService_BASFBerlin <- data_chars_as_num[3]
+YearsOfService_BASFall <- data_chars_as_num[8]
+
+df[3] = YearsOfService_BASFBerlin
+df[8] = YearsOfService_BASFall
+
+
+df$`Date of Birth` <- as.Date(df$`Date of Birth`, '%d.%M.%y')
+df$`start_Calendar Year/Month` <- as.Date(df$`start_Calendar Year/Month`, '%d.%M.%y')
+df$`Last_Development_Calendar Year/Month` <- as.Date(df$`Last_Development_Calendar Year/Month`, '%d.%M.%y')
+df$`LastActive_Calendar Year/Month` <- as.Date(df$`LastActive_Calendar Year/Month`, '%d.%M.%y')
 
 ```
+
+
 
 ### Gender
 Dieses Merkmal beschreibt das Geschlecht der Person.
@@ -39,11 +66,13 @@ sum(is.na(df$Nationality))
 ### YearsOfService_BASFBerlin
 Dieses Merkmal beschreibt, wie lange die Person im Unternehmen bisher tätig war in Jahren (nur Berliner Standort).
 Dabei wird aufgerundet. Das Symbol "#" gilt für eine Unternehmenszugehörigkeit unter einem Jahr.
+Aus diesem Grund wird die Unternehmenszugehörigkeit manuell berechnet aus dem Startdatum und dem letzten Aktivitätsdatum.
+Zusätzlich wird neben den Jahren auch die Monate angegeben.
 ```{r}
 unique(df$YearsOfService_BASFBerlin)
 summary(df$YearsOfService_BASFBerlin)
 sum(is.na(df$YearsOfService_BASFBerlin))
-qplot(df$YearsOfService_BASFBerlin)
+qplot(sort(df$YearsOfService_BASFBerlin))
 ```
 
 ### Position text
@@ -89,6 +118,8 @@ unique(df$YearsOfService_BASFall)
 summary(df$YearsOfService_BASFall)
 sum(is.na(df$YearsOfService_BASFall))
 qplot(df$YearsOfService_BASFall)
+
+
 ```
 
 ### Employee Subgroup text
@@ -169,6 +200,7 @@ sum(is.na(df$`Stelle (SAP)`))
 
 ### In Dashboard
 Dieses Merkmal beschreibt die Position der Person in Klustern. Dabei wird sich an den Gehaltsbändern orientiert.
+xxx Positionen Cluster
 ```{r}
 unique(df$`In Dashboard`)
 summary(df$`In Dashboard`)
@@ -188,17 +220,21 @@ df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Manager","G")
 df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Manager","G")
 df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Project Manager / Expert","G")
 df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Head of","H")
-df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Apprentice / Apprentice BA","H")
-df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Apprentice / Apprentice BA","H")
-df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Apprentice / Apprentice BA","H")
-
+df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Senior Expert / Senior Project Manager / Senior Manager/ Finance Manager","H")
+df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Senior Executive","H")
+df
 
 ```
 
 ### Paybands
 Dieses Merkmal beschreibt die Position der Person in Klustern. Dabei wird sich an den Gehaltsbändern orientiert.
+```{r}
+unique(df$`Paybands`)
+summary(df$`Paybands`)
+sum(is.na(df$`Paybands`))
+# qplot(df$`Paybands`)
 
-
+```
 Beschreibung
 
 ### Name on Dashboard
@@ -206,9 +242,9 @@ Dieses Merkmal beschreibt die Position der Person in Klustern. Dabei wird sich a
 Da der Wertebereich noch relativ hoch ist, könnte eine zusätzliche Gruppierung, die sich noch näher an die Gehaltsbänder anpasst, 
 verfolgt werden.
 ```{r}
-#unique(df$`Name on Dashboard`)
+unique(df$`Name on Dashboard`)
 
-#summary(df$`Name on Dashboard`)
+summary(df$`Name on Dashboard`)
 #sum(is.na(df$`Name on Dashboard`))
 
 df$`Name on Dashboard` <- NULL
@@ -223,6 +259,8 @@ unique(df$Classification)
 summary(df$Classification)
 sum(is.na(df$Classification))
 qplot(df$Classification)
+
+df$Classification <- NULL
 ```
 Beschreibung
 
@@ -232,6 +270,7 @@ Dieses Merkmal beschreibt den Geburtstag der Person.
 # todo: in Date umwandeln + in AGE umwandeln
 summary(df$'Date of Birth')
 sum(is.na(df$'Date of Birth'))
+
 ```
 Beschreibung
 
@@ -241,20 +280,22 @@ beschäftigt entwickelt hat.
 Leere Werte deuten darauf hin, dass sich die Person noch nicht entwickelt hat. In solchen Fällen ist das Startdatum der Person als 
 Berechnungsgrundlage zu wählen.
 ```{r}
-# todo: in Date umwandeln
+# todo: in Date umwandeln, falls leer mit Start-Datum ersetzen - in Monaten
 summary(df$'Last_Development_Calendar Year/Month')
 sum(is.na(df$'Last_Development_Calendar Year/Month'))
 ```
 Beschreibung
 
 ### development to exempt
-Dieses Merkmal beschreibt die Entwicklung einer Person von tariflich beschäftigr zu außer tariflich beschäftigt.
+Dieses Merkmal beschreibt die Entwicklung einer Person von tariflich beschäftigt zu außer-tariflich beschäftigt.
 Diese Entwicklung ist oft im Zusammenhang mit der Beförderung in eine Experten- oder Managerfunktion zu beobachten.
 ```{r}
 unique(df$'development to exempt')
 summary(df$'development to exempt')
 sum(is.na(df$'development to exempt'))
 qplot(df$'development to exempt')
+
+#replace 2 mit 1
 ```
 Beschreibung
 
@@ -266,6 +307,8 @@ unique(df$Vertical_Horizontal_Developments)
 summary(df$Vertical_Horizontal_Developments)
 sum(is.na(df$Vertical_Horizontal_Developments))
 qplot(df$Vertical_Horizontal_Developments)
+
+#0, 1-2, =>3
 ```
 #### -> hier könnten wir auch sagen, dass wir 2 oder 3 Kategorien machen -> 0 Beförderungen und dann entweder 1-2 und mehr als 3 oder direkt mehr als 0. Weil gibt echt wenig mit mehr als 1   -> 0 , 1, 2, >=3
 
@@ -274,11 +317,11 @@ qplot(df$Vertical_Horizontal_Developments)
 unique(df$'start_Calendar Year/Month')
 summary(df$'start_Calendar Year/Month')
 sum(is.na(df$'start_Calendar Year/Month'))
-qplot(df$'start_Calendar Year/Month')
 #hier nach Jahren und eventuell Monaten splitten, dann könnte man ne Abhängigkeit zeigen, dass z.B. Menschen die Monat Januar anfangen schneller aussteigen als #im März :D
 df <- df %>% drop_na('start_Calendar Year/Month')
+
+#Monat
 ```
-##### nach Berechnung der Gesamtdauer im unternhemen könnte es gelöscht werden oder???
 
 
 ### start_contract type = Hat der Mitarbeiter bei Anstellung einen temporären oder dauerhaften Vertrag bekommen?
@@ -296,11 +339,6 @@ summary(df$'start_Part time mark')
 sum(is.na(df$'start_Part time mark'))
 qplot(df$'start_Part time mark')
 ```
-##### Wir haben uns entschieden das Merkmal der Halbtagsanstellung nicht weiter zu berücksichtigen, da die Menge der in Teilzeit Angestellten auf die gesamt Menge vernachlässigbar gering ist. Daher entfernen wir dieses Merkmal aus dem Datensatz
-
-```{r}
-df$'start_Part time mark' <- NULL
-```
 
 
 ### start_employee subgroup detail = Vertragsart bei Anstellung
@@ -310,11 +348,7 @@ summary(df$'start_employee subgroup detail')
 sum(is.na(df$'start_employee subgroup detail'))
 qplot(df$'start_employee subgroup detail')
 
-
-```
-##### Hier ist erkennbar, dass es beinahe ausschließlich Mitarbeiter mit einer Anstellung gibt, die tariflich ist. Daher haben wir uns entschieden dieses Merkmal aus dem Datensatz zu löschen.
-```{r}
-df$`start_employee subgroup detail` <- NULL
+#cluster in exampt and non exempt
 ```
 
 
@@ -342,6 +376,8 @@ unique(df$'start_Employee group')
 summary(df$'start_Employee group')
 sum(is.na(df$'start_Employee groupl'))
 qplot(df$'start_Employee group')
+
+df$'start_Employee group' <- NULL
 ```
 
 ### Cost Center = Kostenstelle
@@ -374,6 +410,8 @@ unique(df$'decrease_Sub-category')
 summary(df$'decrease_Sub-category')
 sum(is.na(df$'decrease_Sub-category'))
 qplot(df$'decrease_Sub-category')
+
+df$'decrease_Sub-category' <- NULL
 ```
 
 
@@ -383,6 +421,8 @@ unique(df$'decrease_SDU Name for ExR')
 summary(df$'decrease_SDU Name for ExR')
 sum(is.na(df$'decrease_SDU Name for ExR'))
 qplot(df$'decrease_SDU Name for ExR')
+
+df$'decrease_SDU Name for ExR' <- NULL
 ```
 
 ### decrease_SDU = Interner Name/Abkürzung der Abteilung beim Verlassen des Unternehmens
@@ -403,6 +443,8 @@ unique(df$'decrease_Service Stream')
 summary(df$'decrease_Service Stream')
 sum(is.na(df$'decrease_Service Stream'))
 qplot(df$'decrease_Service Stream')
+
+df$'decrease_Service Stream' <- NULL
 ```
 
 ### start_Category = 
@@ -452,8 +494,8 @@ unique(df$'start_Service Stream')
 summary(df$'start_Service Stream')
 sum(is.na(df$'start_Service Stream'))
 qplot(df$'start_Service Stream')
+df
 
-View(df)
 ```
 
 L
