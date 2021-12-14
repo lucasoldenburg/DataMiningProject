@@ -14,6 +14,10 @@ library(ggplot2)
 library(tidyr)
 library(stringr)
 library(lubridate)
+library(mltools)
+library(data.table)
+
+
 
 df <- read_xlsx("20211209_raw_dataset.xlsx")
 
@@ -47,11 +51,19 @@ start <- df$`start_Calendar Year/Month`
 end <- df$`Last_Development_Calendar Year/Month`
 
 as.Date.numeric <- function(x) structure(floor(x+.001), class = "Date") 
-sapply(end, function(end) length(seq(start, end, by = "month")))-1
-length(seq(start, end, by="months")) -1
+#sapply(end, function(end) length(seq(start, end, by = "month")))-1
+#length(seq(start, end, by="months")) -1
 
 date <- as.integer(ymd(end) - ymd(start))
 date
+
+names(df)
+```
+
+```{r}
+#irgendwas macht die Datumstransformation hier falsch
+unique(df$`LastActive_Calendar Year/Month`)
+
 ```
 
 
@@ -59,6 +71,10 @@ date
 ### Gender
 Dieses Merkmal beschreibt das Geschlecht der Person.
 ```{r}
+df$Gender <- replace(df$Gender,df$Gender== "Male","0")
+df$Gender <- replace(df$Gender,df$Gender== "Female","1")
+df$Gender <- as.factor(df$Gender)
+
 unique(df$Gender)
 summary(df$Gender)
 sum(is.na(df$Gender))
@@ -84,38 +100,52 @@ unique(df$YearsOfService_BASFBerlin)
 summary(df$YearsOfService_BASFBerlin)
 sum(is.na(df$YearsOfService_BASFBerlin))
 qplot(sort(df$YearsOfService_BASFBerlin))
+
 ```
 
 ### Position text
 Dieses Merkmal beschreibt in welcher Position die Person tätig ist bzw. zuletzt war. 
-Es kann auch als Planstelle bezeichnet werden.
+Es kann auch als Planstelle bezeichnet werden. Aufgrund der Menge an Merkmalsausprägungen
+werden diese im weiteren Verlauf in Clustern zusammengefasst (Paybands).
 ```{r}
 unique(df$`Position text`)
 summary(df$`Position text`)
 sum(is.na(df$`Position text`))
+
+df$`Position text` <- NULL
 ```
 
 ### Role
 Dieses Merkmal beschreibt die Rolle der Person.
+Aufgrund der Menge an Merkmalsausprägungen und der weniger verbreiteten Anwendung
+im Unternehmenskontext wird dieses Merkmal entfernt. Die Informationen sind allerdings in 
+vergleichbarer Art im Paybands-Merkmal enthalten.
 ```{r}
 unique(df$Role)
 summary(df$Role)
 sum(is.na(df$Role))
 qplot(df$Role)
+
+df$Role <- NULL
 ```
 
 ### Part Time Mark
-Dieses Merkmal beschreibt, ob die Person in Teilzeit tätig ist/war.
+Dieses Merkmal beschreibt, ob die Person zum Zeitpunkt der letzten Aktivität 
+in Teilzeit tätig ist/war.
 ```{r}
 unique(df$`Part Time Mark`)
 summary(df$`Part Time Mark`)
 sum(is.na(df$`Part Time Mark`))
 qplot(df$`Part Time Mark`)
+
+
 ```
 
 ### Global contract type
 Dieses Merkmal beschreibt die Vertragsart der Person.
 ```{r}
+df$`Global contract type` <- replace(df$`Global contract type`,df$`Global contract type`== "apprentice","non exempt")
+
 unique(df$`Global contract type`)
 summary(df$`Global contract type`)
 sum(is.na(df$`Global contract type`))
@@ -506,7 +536,9 @@ summary(df$'start_Service Stream')
 sum(is.na(df$'start_Service Stream'))
 qplot(df$'start_Service Stream')
 df
+names(df)
 
 ```
 
-L
+
+
