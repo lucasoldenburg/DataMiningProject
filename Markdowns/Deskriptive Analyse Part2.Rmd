@@ -647,7 +647,7 @@ Das hier von uns erzeugte und gezeigte Merkmal beschreibt die Dauer zwischen der
 Hier gibt es falsche Werte. Diese sind negative Zeiten. Diese falschen Werte sind entstanden, wenn ein Mitarbeiter eine Beförderung erhalten, danach das Unternhemen verlassen und später wieder in das Unternehmen als Mitarbeiter aufgenommen wurde. Diese falschen Werte ersetzten wir durch 0.
 ```{r}
 #ändert alle negativen Werte in 0
-test <- pmax(df$`Months Since Last Development`, 0)
+df$`Months Since Last Development` <- pmax(df$`Months Since Last Development`, 0)
 
 summary(df$`Months Since Last Development`)
 sum(is.na(df$`Months Since Last Development`))
