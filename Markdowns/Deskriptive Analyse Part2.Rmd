@@ -645,7 +645,11 @@ qplot(df$`Month Of Service`)
 
 ### Month Since Last Development
 Das hier von uns erzeugte und gezeigte Merkmal beschreibt die Dauer zwischen der letzten Beförderung und dem Austritt aus dem Unternehmen. Sollte der Mitarbeiter noch aktiv sein, bezieht sich die Dauer auf die letzte Beförderung und das aktuelle Datum.
+Hier gibt es falsche Werte. Diese sind negative Zeiten. Diese falschen Werte sind entstanden, wenn ein Mitarbeiter eine Beförderung erhalten, danach das Unternhemen verlassen und später wieder in das Unternehmen als Mitarbeiter aufgenommen wurde. Diese falschen Werte ersetzten wir durch 0.
 ```{r}
+#ändert alle negativen Werte in 0
+df$`Months Since Last Development` <- pmax(df$`Months Since Last Development`, 0)
+
 summary(df$`Months Since Last Development`)
 sum(is.na(df$`Months Since Last Development`))
 qplot(df$`Months Since Last Development`)
@@ -653,7 +657,6 @@ qplot(df$`Months Since Last Development`)
 
 Umwandeln qualitativer Merkmal in für die algorithmen lesbare dichotome Merkmale (0 und 1).
 ```{r}
-names(df)
 one_hot(as.data.table(df))
 
 ```
