@@ -20,7 +20,7 @@ library(data.table)
 
 
 df <- read_xlsx("20211209_raw_dataset.xlsx")
-
+names(df)
 #Years in Numerisch umwandeln
 #all Chars in numeric 
   #Years of Service Berlin
@@ -61,11 +61,21 @@ names(df)
 ```
 
 ```{r}
-#irgendwas macht die Datumstransformation hier falsch
+#irgendwas macht die Datumstransformation hier falsch - nur erstes Datum für alle weitergeschrieben
 unique(df$`LastActive_Calendar Year/Month`)
 
 ```
 
+
+### EmployeeChurned
+Dies ist das Ziel-Merkmal und beschreibt, ob die Person das Unternehmen verlassen hat (1) oder
+noch aktiv ist (0).
+```{r}
+unique(df$EmployeeChurned)
+summary(df$EmployeeChurned)
+sum(is.na(df$EmployeeChurned))
+qplot(df$EmployeeChurned)
+```
 
 
 ### Gender
@@ -73,7 +83,6 @@ Dieses Merkmal beschreibt das Geschlecht der Person.
 ```{r}
 df$Gender <- replace(df$Gender,df$Gender== "Male","0")
 df$Gender <- replace(df$Gender,df$Gender== "Female","1")
-df$Gender <- as.factor(df$Gender)
 
 unique(df$Gender)
 summary(df$Gender)
@@ -88,6 +97,17 @@ Dieses Merkmal beschreibt die Nationalität der Person.
 unique(df$Nationality)
 summary(df$Nationality)
 sum(is.na(df$Nationality))
+```
+
+### Nationality_Classification
+Dieses Merkmal beschreibt die Nationalität der Person klassiert in "German", "EU" und "Other".
+```{r}
+unique(df$Nationality_Classification)
+summary(df$Nationality_Classification)
+sum(is.na(df$Nationality_Classification))
+qplot(sort(df$Nationality_Classification))
+
+df$Nationality_Classification <- as.factor(df$Nationality_Classification)
 ```
 
 ### YearsOfService_BASFBerlin
@@ -131,18 +151,21 @@ df$Role <- NULL
 
 ### Part Time Mark
 Dieses Merkmal beschreibt, ob die Person zum Zeitpunkt der letzten Aktivität 
-in Teilzeit tätig ist/war.
+in Teilzeit tätig ist/war (1) oder nicht (0).
 ```{r}
 unique(df$`Part Time Mark`)
 summary(df$`Part Time Mark`)
 sum(is.na(df$`Part Time Mark`))
 qplot(df$`Part Time Mark`)
 
-
+df$`Part Time Mark` <- replace(df$`Part Time Mark`,df$`Part Time Mark`== "no","0")
+df$`Part Time Mark` <- replace(df$`Part Time Mark`,df$`Part Time Mark`== "yes","1")
 ```
 
 ### Global contract type
 Dieses Merkmal beschreibt die Vertragsart der Person.
+0 - permanent staff (unbefristet)
+1 - temporary personnel (befristet)
 ```{r}
 df$`Global contract type` <- replace(df$`Global contract type`,df$`Global contract type`== "apprentice","non exempt")
 
@@ -150,6 +173,9 @@ unique(df$`Global contract type`)
 summary(df$`Global contract type`)
 sum(is.na(df$`Global contract type`))
 qplot(df$`Global contract type`)
+
+df$`Global contract type` <- replace(df$`Global contract type`,df$`Global contract type`== "permanent staff","0")
+df$`Global contract type` <- replace(df$`Global contract type`,df$`Global contract type`== "temporary personnel","1")
 ```
 
 ### YearsOfService_BASFall
@@ -168,8 +194,8 @@ Dieses Merkmal beschreibt welcher Mitarbeitergruppe die Person zugeordnet ist/wa
 
 Aufgrund der Verteilung ist eine Einstufung nur in die Gruppen "exempt" (außertarfilich beschäftigt)
 und "non exempt" (tariflich beschäftigt).
-"exempt" umfasst: "exempt", "exempt higher level", "senior executive"
-"non exempt": "non-exempt (white)",  "working student whit", "apprentice"
+0 - "exempt" umfasst: "exempt", "exempt higher level", "senior executive"
+1 - "non exempt": "non-exempt (white)",  "working student whit", "apprentice"
 
 ```{r}
 unique(df$`Employee Subgroup text`)
@@ -177,13 +203,14 @@ summary(df$`Employee Subgroup text`)
 sum(is.na(df$`Employee Subgroup text`))
 qplot(df$`Employee Subgroup text`)
 
-df$'Employee Subgoup text clustered' <- df$`Employee Subgroup text`
-df$`Employee Subgoup text clustered` <- replace(df$`Employee Subgoup text clustered`,df$`Employee Subgoup text clustered`== "exempt higher level","non exempt")
-df$`Employee Subgoup text clustered` <- replace(df$`Employee Subgoup text clustered`,df$`Employee Subgoup text clustered`== "senior executive","non exempt")
-df$`Employee Subgoup text clustered` <- replace(df$`Employee Subgoup text clustered`,df$`Employee Subgoup text clustered`== "non-exempt (white)","non exempt")
-df$`Employee Subgoup text clustered` <- replace(df$`Employee Subgoup text clustered`,df$`Employee Subgoup text clustered`== "working student whit","non exempt")
-df$`Employee Subgoup text clustered` <- replace(df$`Employee Subgoup text clustered`,df$`Employee Subgoup text clustered`== "apprentice","non exempt")
-df
+df$`Employee Subgoup text clustered` <- df$`Employee Subgroup text`
+df$`Employee Subgoup text clustered` <- replace(df$`Employee Subgoup text clustered`,df$`Employee Subgoup text clustered`== "exempt","0")
+df$`Employee Subgoup text clustered` <- replace(df$`Employee Subgoup text clustered`,df$`Employee Subgoup text clustered`== "exempt higher level","0")
+df$`Employee Subgoup text clustered` <- replace(df$`Employee Subgoup text clustered`,df$`Employee Subgoup text clustered`== "senior executive","0")
+df$`Employee Subgoup text clustered` <- replace(df$`Employee Subgoup text clustered`,df$`Employee Subgoup text clustered`== "non-exempt (white)","1")
+df$`Employee Subgoup text clustered` <- replace(df$`Employee Subgoup text clustered`,df$`Employee Subgoup text clustered`== "working student whit","1")
+df$`Employee Subgoup text clustered` <- replace(df$`Employee Subgoup text clustered`,df$`Employee Subgoup text clustered`== "apprentice","1")
+df$`Employee Subgoup text clustered` <- as.factor(df$`Employee Subgoup text clustered`)
 
 unique(df$'Employee Subgoup text clustered')
 summary(df$'Employee Subgoup text clustered')
@@ -208,6 +235,8 @@ Dieses Merkmal beschreibt den Namen der Kostenstelle.
 # unique(df$`Cost Center text`)
 summary(df$`Cost Center text`)
 sum(is.na(df$`Cost Center text`))
+
+df$`Cost Center text` <- NULL
 ```
 
 ### LastActive_Calendar Year/Montht
@@ -237,10 +266,12 @@ unique(df$`Stelle (SAP)`)
 summary(df$`Stelle (SAP)`)
 sum(is.na(df$`Stelle (SAP)`))
 # qplot(df$`Stelle (SAP)`)
+
+df$`Stelle (SAP)` <- NULL
 ```
 
 ### In Dashboard
-Dieses Merkmal beschreibt die Position der Person in Klustern. Dabei wird sich an den Gehaltsbändern orientiert.
+Dieses Merkmal beschreibt die Position der Person in Clustern. Dabei wird sich an den Gehaltsbändern orientiert.
 xxx Positionen Cluster
 ```{r}
 unique(df$`In Dashboard`)
@@ -263,7 +294,8 @@ df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Project Manager / Expert
 df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Head of","H")
 df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Senior Expert / Senior Project Manager / Senior Manager/ Finance Manager","H")
 df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Senior Executive","H")
-df
+
+df$`Paybands` <- as.factor(df$`Paybands`)
 
 ```
 
@@ -328,15 +360,18 @@ sum(is.na(df$'Last_Development_Calendar Year/Month'))
 Beschreibung
 
 ### development to exempt
-Dieses Merkmal beschreibt die Entwicklung einer Person von tariflich beschäftigt zu außer-tariflich beschäftigt.
+Dieses Merkmal beschreibt die Entwicklung einer Person von tariflich beschäftigt zu außer-tariflich beschäftigt (1)
+oder nicht (0).
 Diese Entwicklung ist oft im Zusammenhang mit der Beförderung in eine Experten- oder Managerfunktion zu beobachten.
+Die zweifache Entwicklung zum außertariflichen Beschäftigungsverhältnis kann auf einen Eingabefehler zurück-
+geführt werden und wird in diesem Schritt in eine "1" umgewandelt.
 ```{r}
 unique(df$'development to exempt')
 summary(df$'development to exempt')
 sum(is.na(df$'development to exempt'))
 qplot(df$'development to exempt')
 
-#replace 2 mit 1
+df$`development to exempt` <- replace(df$`development to exempt`,df$`development to exempt`== "2","1")
 ```
 Beschreibung
 
@@ -349,9 +384,18 @@ summary(df$Vertical_Horizontal_Developments)
 sum(is.na(df$Vertical_Horizontal_Developments))
 qplot(df$Vertical_Horizontal_Developments)
 
-#0, 1-2, =>3
+df$Vertical_Horizontal_Developments <- replace(df$Vertical_Horizontal_Developments,df$Vertical_Horizontal_Developments== "1","1-2")
+df$Vertical_Horizontal_Developments <- replace(df$Vertical_Horizontal_Developments,df$Vertical_Horizontal_Developments== "2","1-2")
+df$Vertical_Horizontal_Developments <- replace(df$Vertical_Horizontal_Developments,df$Vertical_Horizontal_Developments== "3",">= 3")
+df$Vertical_Horizontal_Developments <- replace(df$Vertical_Horizontal_Developments,df$Vertical_Horizontal_Developments== "4",">= 3")
+df$Vertical_Horizontal_Developments <- replace(df$Vertical_Horizontal_Developments,df$Vertical_Horizontal_Developments== "5",">= 3")
+df$Vertical_Horizontal_Developments <- replace(df$Vertical_Horizontal_Developments,df$Vertical_Horizontal_Developments== "6",">= 3")
+df$Vertical_Horizontal_Developments <- replace(df$Vertical_Horizontal_Developments,df$Vertical_Horizontal_Developments== "7",">= 3")
+df$Vertical_Horizontal_Developments <- replace(df$Vertical_Horizontal_Developments,df$Vertical_Horizontal_Developments== "8",">= 3")
+
+df$Vertical_Horizontal_Developments <- as.factor(df$Vertical_Horizontal_Developments)
+
 ```
-#### -> hier könnten wir auch sagen, dass wir 2 oder 3 Kategorien machen -> 0 Beförderungen und dann entweder 1-2 und mehr als 3 oder direkt mehr als 0. Weil gibt echt wenig mit mehr als 1   -> 0 , 1, 2, >=3
 
 ### start_Calendar Year/Month = Anstellungsdatum
 ```{r}
@@ -371,6 +415,8 @@ unique(df$'start_contract type')
 summary(df$'start_contract type')
 sum(is.na(df$'start_contract type'))
 qplot(df$'start_contract type')
+
+
 ```
 
 ### start_Part time mark = Zu Beginn der Anstellung in Teilzeit angestellt
@@ -540,5 +586,9 @@ names(df)
 
 ```
 
+Umwandeln qualitativer Merkmal in für die algorithmen lesbare dichotome Merkmale (0 und 1).
+```{r}
+one_hot(as.data.table(df))
+```
 
 
