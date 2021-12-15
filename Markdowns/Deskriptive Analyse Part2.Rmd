@@ -3,7 +3,46 @@ title: "Deskriptive Analyse"
 output: html_document
 ---
 
-## Dekriptive Analyse der Daten
+## Employee Churn
+Wahrscheinlichkeit der Mitarbeiterfluktuation im BASF Service Hub Berlin
+
+
+Das BASF Service Hub Berlin ist ein Shared Service Center. Seit 2005 erbringt es
+Dienstleistungen für Gruppengesellschaften der BASF sowie dem Mutterkonzern, der BASF SE. Die BASF ist nach Umsatz das global führende Chemie-Unternehmen mit circa 115.000 Mitarbeitern weltweit.
+Die angebotenen Dienstleistungen umfassen Aktivitäten in den Bereichen Personalwesen, internes und externes Rechnungswesen, Einkauf, Supply Chain. Zudem bestehen kleinere Teams, die an digitalen Lösungen in der Landwirtschaft arbeiten oder im Feld der Produktsicherheit tätig sind. 
+
+Als Service Hub ist die Fluktuation, die Mitarbeiterabwanderung, höher als an den
+Produktionsstandorten der BASF und liegt im Durchschnitt bei 12-13% jährlich.
+Dies hat zur Folge, dass stetig rekrutiert werden muss, was einen Aufwand für die
+Recrutierungsabteilung und die Manager darstellt, die neue Kandidaten finden müssen.
+Zudem stellt das Onboarding einen zeitlichen Aufwand für die Teams dar und bis eine
+neue Arbeitskraft vollumfänglich eingearbeitet ist, muss das Tagesgeschäft von 
+den Kollegen:innen weiterhin gestemmt werden.
+
+Um die Fluktuationsrate zu senken, können Manager frühzeitig Maßnahmen einleiten.
+Dazu zählen beispielsweise Weiterbildungsangebote, Beförderungen, Job-Rotation oder -Enlargement.
+
+Dass die Wahrscheinlichkeit, dass eine Arbeitskraft das Unternehmen verlassen wird hoch ist, müssen die Manager erkennen. Dies ist jedoch in der Regel eine subjektive Einschätzung.
+
+"Data to Dialouge" - Mittels datengestützter Analysen soll eine zusätzliche Sicht auf die mögliche Fluktuation der Arbeitskräfte gelegt werden. Die aus den Daten gewonnenen Erkenntnisse können die Führungskräfte ihren eigenen Wahrnehmungen gegenüberstellen und abwägen, ob sie mit der Arbeitskraft ins Gespräch gehen und möglicherweise Maßnahmen zum Halten der Person einleiten.
+
+Das Ziel ist es demnach, vorherzusagen, wie wahrscheinlich es ist, dass eine Arbeitskraft zu einem Zeitpunkt das Unternehmen verlassen wird. Diese Informationen können dann in die bereits bestehende Reportinglandschaft (Dashboards) eingebettet werden.
+
+Im Rahmen der Arbeit betrachtete Abgänge sind dabei: Kündigung (von Mitarbeitenden oder Arbeitgeber veranlasst), Aufhebungsverträge (Einigungen das Arbeitsverhältnis vorzeitig zu beenden entweder von Mitarbeitenden oder Arbeitgeber veranlasst), Kündigung in der Probezeit und keine Verlängerung befristeter Arbeitsverhältnisse. Letzteres könnte in der Verfeinerung aus dem Modell entfernt werden. Es ist aufgrund der Bemühung genügend Datenpunkte zu erhalten im ersten Schritt nicht entfernt worden. 
+
+Für die Datengrundlage sind eine Reihe an Tabellen aus dem SAP Data Warehouse System im Einsatz. Orientiert wird sich dabei an Phasen, die eine Arbeitskraft im Zuge der Tätigkeit für ein Unternehmen durchläuft. Besonderer Fokus liegt dabei auf den Informationen über die Arbeitskraft zu Beginn der Arbeitstätigkeit und dem Zeitpunkt der letzten Aktivität sowie der Entwicklung. Im Detail werden im Weiteren die Merkmale einzeln beschrieben und analysiert, bei Bedarf klassiert (bei vielen Merkmalsausprägungen qualitativer Merkmale).
+Die Abgänge seit Januar 2016 bis Oktober 2021 sowie die derzeit aktiven Mitarbeitenden werden in dieser Arbeit betrachtet. 
+
+Zur Vorhersage, ob eine Arbeitskraft wahrscheinlich das Unternehmen verlässt, kommen Algorithmen des überwachten maschinellen Lernens zum Einsatz. Es handelt sich um eine Klassifizierung zwischen zwei Klassen. Neben einem Entscheidungsbaum und Tree-Ensambles (Boosting, Bagging, Einsatz von XGBoost) wird die logistische Regression eingesetzt. Im dritten Modell soll die Vorhersage mittels einer Support Vector Maschine oder einem Naive-Bayes-Ansatz durchgeführt werden.
+
+Die Ergebnisse der unterschiedlichen Modelle werden mittels einer Confusion-Matrix miteinander verglichen. Zusätzlich zur Accuracy soll die Balanced Accuracy untersucht werden.
+
+Um die einzelne Modelle der Realität anzupassen soll mit einer Kostenfunktion optimiert werden, welche Falsch-Positive-Werte und Falsch-Negative-Werte unterschiedlich bestraft.
+Falsch-Positive-Werte (Arbeitskraft verlässt das Unternehmen, aber Modell hat als nicht-riskant klassifiziert) sorgen für Kosten in der Rekrutierung von neuem Personal und verursachen eine erhöhte Belastung für die Teams.
+Falsch-Negative-Werte (Arbeitskraft plant Unternehmen nicht zu verlassen, aber Modell hat als riskant klassifiziert) führen zu Kosten durch Aufwand für den Manager und die besagte Arbeitskraft, da diese in den Austausch gehen. Zusätzlich kann es zu möglicherweise vermeidbaren Kosten kommen, die im Zuge des Versuchs die Arbeitskraft zu halten, entstehen (Weiterbildung, Gehaltserhöhung). 
+Diese Kosten jedoch zu verallgemeinern, führt zu ungenauen und potenziell falschen Ergebnissen. Zudem ist für eine genaue Schätzung ein hoher Grad an Verständnis in dem Spezialbereich nötig. Dafür ist der Austausch mit den Experten der lokalen Personalabteilung des BASF Service Hubs Berlin geplant.
+
+### Aufgabenstellung
 
 Deskriptive Analyse der Daten: Was beschreiben die Daten, was sind die Datentypen und Wertebereiche, fehlen Daten, gibt es falsche Werte, gibt es Korrelationen zwischen Merkmalen (Features, Spalten)? Benutzen Sie Visualisierungen, wenn es sinnvoll erscheint. Was können wir aus dieser deskriptiven Analyse über das Problem lernen?
 
@@ -36,8 +75,8 @@ YearsOfService_BASFall <- df[8]
 data_chars_as_num[ ,  "YearsOfService_BASFall"] <- 
   as.data.frame(apply(data_chars_as_num[ , "YearsOfService_BASFall"], 2, as.numeric))
 
-df$'YearsOfService_BASFBerlin' <- data_chars_as_num[3]
-df$'YearsOfService_BASFall' <- data_chars_as_num[8]
+df[3] <- data_chars_as_num[3]
+df[8] <- data_chars_as_num[8]
 
 
 df$`start_Calendar Year/Month` <- as.Date(df$`start_Calendar Year/Month`, "%d.%M.%y")
@@ -238,7 +277,7 @@ Dieses Merkmal beschreibt die Kostenstelle inclusive der Zuordnung der Region un
 summary(df$`Cost Center long`)
 sum(is.na(df$`Cost Center long`))
 
-df$`Name on Dashboard` <-  NULL
+df$`Cost Center long` <-  NULL
 ```
 
 ### Cost Center text
@@ -308,7 +347,7 @@ df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Senior Expert / Senior P
 df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Senior Executive","H")
 
 df$`Paybands` <- as.factor(df$`Paybands`)
-
+qplot(df$Paybands)
 ```
 
 ### Paybands
@@ -579,7 +618,7 @@ Aus diesem Grund müssen diese (NaN) aus dem Datenset entfernt werden.
 unique(df$'start_Category')
 summary(df$'start_Category')
 sum(is.na(df$'start_Category'))
-qplot(df$'start_Category')
+# qplot(df$'start_Category')
 
 df$'start_Category' <- as.factor(df$'start_Category')
 ```
@@ -643,7 +682,7 @@ ggplot(df, aes(EmployeeChurned, Age)) +
   geom_boxplot(aes(colour = EmployeeChurned), alpha=0.2)
 ```
 \
-
+Es lässt sich erkennen, dass jüngere Mitarbeiter eher dazu tendieren das Unternehmen zu verlassen.
 ### Month Of Service
 Dieses Merkmal haben wir erstellt, um die Anstellungszeit genauer darstellen zu können. Die Aufteilung in Jahre ist zu unspezidfisch 
 für unsere Analyse, da dieses merkmal auf Grund der Problemstellung eine wichtige Rolle in unserem Projetk spielen wird. 
@@ -658,6 +697,8 @@ qplot(df$`Month Of Service`)
 ggplot(df, aes(EmployeeChurned, `Month Of Service`)) + 
   geom_boxplot(aes(colour = EmployeeChurned), alpha=0.2)
 ```
+\
+Es lässt sich erkennen, dass Mitarbeitende mit längerer Anstellungszeit eher im Unternehmen bleiben, als weniger lang angestellte Mitarbeitende.
 
 ### Month Since Last Development
 Das hier von uns erzeugte und gezeigte Merkmal beschreibt die Dauer zwischen der letzten Beförderung und dem Austritt aus dem Unternehmen. Sollte der Mitarbeiter noch aktiv sein, bezieht sich die Dauer auf die letzte Beförderung und das aktuelle Datum.
@@ -669,8 +710,11 @@ df$`Months Since Last Development` <- pmax(df$`Months Since Last Development`, 0
 summary(df$`Months Since Last Development`)
 sum(is.na(df$`Months Since Last Development`))
 qplot(df$`Months Since Last Development`)
+ggplot(df, aes(EmployeeChurned, `Months Since Last Development`)) + 
+  geom_boxplot(aes(colour = EmployeeChurned), alpha=0.2)
 ```
-
+\
+Auf den ersten Blick gibt es keinen erkennbaren Zusammenhang zwischen der Zielvariable EmployeeChurned und Month Since Last Development.
 
 ### Korrelation der Numerischen Merkmale
 Die roten Punkte bedeuten, dass der Mitarbeiter nicht mehr im Unternehmen ist.
@@ -682,7 +726,7 @@ pairs(df_cor, col = df_cor$df.EmployeeChurned)
 
 ```
 \
-Im nächsten Schritt wird versucht, Zusammenhänge zwischen verschiedenen Merkmalen und der Abwanderung zu Vidualisieren.
+Im nächsten Schritt wird beispielhaft versucht, Zusammenhänge zwischen verschiedenen Merkmalen und der Abwanderung zu Visualisieren.
 ```{r}
 # df$Gender <- as.factor(df$Gender)
 ggplot(df, aes(`Month Of Service`, Gender)) +
@@ -698,6 +742,7 @@ geom_jitter(aes(colour = EmployeeChurned), alpha=0.2, height = 0.3)
 ggplot(df, aes(`Month Of Service`, `Part Time Mark`)) +
 geom_jitter(aes(colour = EmployeeChurned), alpha=0.2, height = 0.3)
 names(df)
+str(df)
 ```
 
 Umwandeln qualitativer Merkmal in für die algorithmen lesbare dichotome Merkmale (0 und 1).
