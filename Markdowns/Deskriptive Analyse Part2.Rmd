@@ -62,13 +62,13 @@ end <- df$`LastActive_Calendar Year/Month`
 
 
 df$`Month Of Service` <- round(difftime(end, start, units = "days")/30)
-head(df$`month Of Service`)
+df$`Month Of Service` <- as.numeric(df$`Month Of Service`)
 # Age
 df$Age <- round(difftime(end, df$`Date of Birth`, units = "days") /365)
-head(df$age)
+df$Age <- as.numeric(df$Age)
 # Time since last development
 df$'Months Since Last Development' <- round(difftime(end, df$`Last_Development_Calendar Year/Month`, units = "days")/30)
-head(df$`Months Since Last Development`)
+df$`Months Since Last Development` <- as.numeric(df$`Months Since Last Development`)
 
 df$YearsOfService_BASFBerlin <- NULL
 df$YearsOfService_BASFBerlin <- NULL
@@ -669,7 +669,8 @@ one_hot(as.data.table(df))
 ```
 
 ```{r}
-# df1 <- data.frame(df$Age, df$EmployeeChurned)
+# str(df)
+# df1 <- data.frame(df$Age, df$mo  df$EmployeeChurned)
 # # df1$age <- df$Age
 # # df1$bla <- df$EmployeeChurned
 # df$EmployeeChurned <- as.numeric(df$EmployeeChurned)
