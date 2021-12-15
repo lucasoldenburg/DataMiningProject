@@ -38,8 +38,8 @@ Zur Vorhersage, ob eine Arbeitskraft wahrscheinlich das Unternehmen verlässt, k
 Die Ergebnisse der unterschiedlichen Modelle werden mittels einer Confusion-Matrix miteinander verglichen. Zusätzlich zur Accuracy soll die Balanced Accuracy untersucht werden.
 
 Um die einzelne Modelle der Realität anzupassen soll mit einer Kostenfunktion optimiert werden, welche Falsch-Positive-Werte und Falsch-Negative-Werte unterschiedlich bestraft.
-Falsch-Positive-Werte (Arbeitskraft verlässt das Unternehmen, aber Modell hat als nicht-riskant klassifiziert) sorgen für Kosten in der Rekrutierung von neuem Personal und verursachen eine erhöhte Belastung für die Teams.
-Falsch-Negative-Werte (Arbeitskraft plant Unternehmen nicht zu verlassen, aber Modell hat als riskant klassifiziert) führen zu Kosten durch Aufwand für den Manager und die besagte Arbeitskraft, da diese in den Austausch gehen. Zusätzlich kann es zu möglicherweise vermeidbaren Kosten kommen, die im Zuge des Versuchs die Arbeitskraft zu halten, entstehen (Weiterbildung, Gehaltserhöhung). 
+Falsch-Negative-Werte (Arbeitskraft verlässt das Unternehmen, aber Modell hat als nicht-riskant klassifiziert) sorgen für Kosten in der Rekrutierung von neuem Personal und verursachen eine erhöhte Belastung für die Teams.
+Falsch-Positive-Werte (Arbeitskraft plant Unternehmen nicht zu verlassen, aber Modell hat als riskant klassifiziert) führen zu Kosten durch Aufwand für den Manager und die besagte Arbeitskraft, da diese in den Austausch gehen. Zusätzlich kann es zu möglicherweise vermeidbaren Kosten kommen, die im Zuge des Versuchs die Arbeitskraft zu halten, entstehen (Weiterbildung, Gehaltserhöhung). 
 Diese Kosten jedoch zu verallgemeinern, führt zu ungenauen und potenziell falschen Ergebnissen. Zudem ist für eine genaue Schätzung ein hoher Grad an Verständnis in dem Spezialbereich nötig. Dafür ist der Austausch mit den Experten der lokalen Personalabteilung des BASF Service Hubs Berlin geplant.
 
 ### Aufgabenstellung
