@@ -7,8 +7,10 @@ output: html_document
 
 Deskriptive Analyse der Daten: Was beschreiben die Daten, was sind die Datentypen und Wertebereiche, fehlen Daten, gibt es falsche Werte, gibt es Korrelationen zwischen Merkmalen (Features, Spalten)? Benutzen Sie Visualisierungen, wenn es sinnvoll erscheint. Was können wir aus dieser deskriptiven Analyse über das Problem lernen?
 
+### Set-Up 
+Zu erst laden wir die benötigten Bibliotheken. Die Daten werden anschließend aus einer .xlsx-Datei geladen. Anschließend wandeln wir die Zahlenwerte in das Format Numeric um und die Datumwerte in das Format Datum. 
+
 ```{r}
-install.packages(lubridate)
 library(readxl)
 library(ggplot2)
 library(tidyr)
@@ -18,9 +20,7 @@ library(mltools)
 library(data.table)
 
 
-
 df <- read_xlsx("20211209_raw_dataset.xlsx")
-names(df)
 #Years in Numerisch umwandeln
 #all Chars in numeric 
   #Years of Service Berlin
@@ -35,34 +35,44 @@ YearsOfService_BASFall <- df[8]
 data_chars_as_num[ ,  "YearsOfService_BASFall"] <- 
   as.data.frame(apply(data_chars_as_num[ , "YearsOfService_BASFall"], 2, as.numeric))
 
-YearsOfService_BASFBerlin <- data_chars_as_num[3]
-YearsOfService_BASFall <- data_chars_as_num[8]
-
-df[3] = YearsOfService_BASFBerlin
-df[8] = YearsOfService_BASFall
+df$'YearsOfService_BASFBerlin' <- data_chars_as_num[3]
+df$'YearsOfService_BASFall' <- data_chars_as_num[8]
 
 
+df$`start_Calendar Year/Month` <- as.Date(df$`start_Calendar Year/Month`, "%d.%M.%y")
 df$`Date of Birth` <- as.Date(df$`Date of Birth`, '%d.%M.%y')
-df$`start_Calendar Year/Month` <- as.Date(df$`start_Calendar Year/Month`, '%d.%M.%y')
 df$`Last_Development_Calendar Year/Month` <- as.Date(df$`Last_Development_Calendar Year/Month`, '%d.%M.%y')
 df$`LastActive_Calendar Year/Month` <- as.Date(df$`LastActive_Calendar Year/Month`, '%d.%M.%y')
 
-start <- df$`start_Calendar Year/Month`
-end <- df$`Last_Development_Calendar Year/Month`
-
-as.Date.numeric <- function(x) structure(floor(x+.001), class = "Date") 
-#sapply(end, function(end) length(seq(start, end, by = "month")))-1
-#length(seq(start, end, by="months")) -1
-
-date <- as.integer(ymd(end) - ymd(start))
-date
-
-names(df)
 ```
 
+### Bereiniegen der Grunddaten und erzeugen neuer wichtiger Features
+Auf Grund der damaliegen Umstellung des Systems ist das Startdatum von 158 Mitarbeitern nicht bekannt. Diese entfernen wir aus unserem Datensatz, da wir für diese Mitarbeiter keine Anstellungsdauer berechnen können. 
+
+Folgend berechnen wir die Anstellungsdauer in Monaten, das Alter und die Zeit zwischen letztem Arbeitstag und letzter Beförderung der Mitarbeiter und legen diese jeweils in einer neuen Spalte ab. 
+Die Spalten 'YearsOfService_BASfall' 'YearsOfService_BASFBerlin', 'Last_Development_Calendar Year/Month' und 'Date of Birth' werden gelöscht, da wir diese durch 'month Of Service', 'Months Since Last Development' und 'age'.
+
 ```{r}
-#irgendwas macht die Datumstransformation hier falsch - nur erstes Datum für alle weitergeschrieben
-unique(df$`LastActive_Calendar Year/Month`)
+df <- df %>% drop_na('start_Calendar Year/Month')
+sum(is.na(df$`start_Calendar Year/Month`))
+
+start <- df$`start_Calendar Year/Month`
+end <- df$`LastActive_Calendar Year/Month`
+
+
+df$`month Of Service` <- round(difftime(end, start, units = "days")/30)
+head(df$`month Of Service`)
+# Age
+df$age <- round(difftime(end, df$`Date of Birth`, units = "days") /365)
+head(df$age)
+# Time since last development
+df$'Months Since Last Development' <- round(difftime(end, df$`Last_Development_Calendar Year/Month`, units = "days")/30)
+head(df$`Months Since Last Development`)
+
+df$YearsOfService_BASFBerlin <- NULL
+df$YearsOfService_BASFBerlin <- NULL
+df$`Last_Development_Calendar Year/Month` <- NULL
+df$`Date of Birth` <- NULL
 
 ```
 
@@ -119,7 +129,7 @@ Zusätzlich wird neben den Jahren auch die Monate angegeben.
 unique(df$YearsOfService_BASFBerlin)
 summary(df$YearsOfService_BASFBerlin)
 sum(is.na(df$YearsOfService_BASFBerlin))
-qplot(sort(df$YearsOfService_BASFBerlin))
+#qplot(df$YearsOfService_BASFBerlin)
 
 ```
 
@@ -184,7 +194,7 @@ Dieses Merkmal beschreibt, wie lange die Person im Unternehmen bisher tätig war
 unique(df$YearsOfService_BASFall)
 summary(df$YearsOfService_BASFall)
 sum(is.na(df$YearsOfService_BASFall))
-qplot(df$YearsOfService_BASFall)
+#qplot(df$YearsOfService_BASFall)
 
 
 ```
@@ -375,7 +385,7 @@ df$`development to exempt` <- replace(df$`development to exempt`,df$`development
 ```
 Beschreibung
 
-### Vertical_Horizontal_Developments = Beförderungen innerhalb des Unternehmens
+### Vertical_Horizontal_Developments 
 Dieser Wert sagt aus, wie oft der Mitarbeiter vertikal und horizontal im Unternhemen befördert wurde.
 
 ```{r}
@@ -397,21 +407,23 @@ df$Vertical_Horizontal_Developments <- as.factor(df$Vertical_Horizontal_Developm
 
 ```
 
-### start_Calendar Year/Month = Anstellungsdatum
+### start_Calendar Year/Month 
+Ist das Datum an dem der Mitarbeiter im Unternhemen angefangen hat.
+
 ```{r}
 unique(df$'start_Calendar Year/Month')
 summary(df$'start_Calendar Year/Month')
 sum(is.na(df$'start_Calendar Year/Month'))
 #hier nach Jahren und eventuell Monaten splitten, dann könnte man ne Abhängigkeit zeigen, dass z.B. Menschen die Monat Januar anfangen schneller aussteigen als #im März :D
-df <- df %>% drop_na('start_Calendar Year/Month')
+
 
 #Monat
 ```
 
 
-### start_contract type = Hat der Mitarbeiter bei Anstellung einen temporären oder dauerhaften Vertrag bekommen?
-Dieses Merkmal beschreibt die Vertragsart der Person zum Start im Unternehmen.
-Diese unterscheidet sich leicht zur Ausprägung "Global contract type".
+### start_contract type 
+Hat der Mitarbeiter bei Anstellung einen temporären oder dauerhaften Vertrag bekommen? Dieses Merkmal beschreibt 
+die Vertragsart der Person zum Start im Unternehmen. Diese unterscheidet sich leicht zur Ausprägung "Global contract type".
 ```{r}
 unique(df$'start_contract type')
 summary(df$'start_contract type')
@@ -421,9 +433,9 @@ qplot(df$'start_contract type')
 df$'start_contract type' <- as.factor(df$'start_contract type')
 ```
 
-### start_Part time mark = Zu Beginn der Anstellung in Teilzeit angestellt
-Dieses Merkmal beschreibt, ob die Person zum Zeitpunkt der ersten Aktivität 
-in Teilzeit tätig ist/war (1) oder nicht (0).
+### start_Part time mark 
+Zu Beginn der Anstellung in Teilzeit angestellt. Dieses Merkmal beschreibt, ob die Person zum Zeitpunkt
+der ersten Aktivität in Teilzeit tätig ist/war (1) oder nicht (0).
 ```{r}
 unique(df$'start_Part time mark')
 summary(df$'start_Part time mark')
@@ -435,7 +447,9 @@ df$'start_Part time mark' <- replace(df$'start_Part time mark',df$'start_Part ti
 ```
 
 
-### start_employee subgroup detail = Vertragsart bei Anstellung
+### start_employee subgroup detail 
+Beschreibt Vertragsart bei Anstellung
+
 ```{r}
 unique(df$'start_employee subgroup detail')
 summary(df$'start_employee subgroup detail')
@@ -456,15 +470,12 @@ df$'start_employee subgroup detail clustered' <- as.factor(df$'start_employee su
 ```
 
 
-### start_Cost Center2 = Die Rechnungsstelle bei Anstellungsbeginn als Abkürzung
+### start_Cost Center2 
 Dieses Merkmal beschreibt die Kostenstelle zum Start am Standort Berlin.
 ```{r}
 unique(df$'start_Cost Center2')
 summary(df$'start_Cost Center2')
 sum(is.na(df$'start_Cost Center2'))
-qplot(df$'start_Cost Center2')
-
-df$'start_Cost Center2'<- NULL
 
 ```
 ##### Da es sehr viele unterschiedliche Ausprägungen bei diesem Merkmal gibt und die interne Rechnungstelle für uns in keinem sichtbaren Zusammenhang mit dem Mitarbeiter sthet, da dies keinen Einfluss auf den Mitarbeiter an sich hat, haben wir uns entschieden dieses Merkmal nicht weiter zu berücksichtiegen.
@@ -486,7 +497,7 @@ qplot(df$'start_Employee group')
 df$'start_Employee group' <- NULL
 ```
 
-### Cost Center = Kostenstelle
+### Cost Center
 Dieses Merkmal beschreibt die Kostenstelle der Person zum letzten aktiven Zeitpunkt.
 ```{r}
 unique(df$'Cost Center')
@@ -501,18 +512,20 @@ df$`Cost Center` <- NULL
 ```
 
 
-### decrease_Category = Funktionsbereich beim Verlassen des Unternehmens
+### decrease_Category 
+Funktionsbereich beim Verlassen des Unternehmens
 ```{r}
 unique(df$'decrease_Category')
 summary(df$'decrease_Category')
 sum(is.na(df$'decrease_Category'))
 qplot(df$'decrease_Category')
 
-df$'decrease_Category' <- as.factors(df$'decrease_Category')
+df$'decrease_Category' <- as.factor(df$'decrease_Category')
 ```
 
 
-### decrease_Sub-category = Abteilung beim Verlassen des Unternehmens
+### decrease_Sub-category 
+Abteilung beim Verlassen des Unternehmens
 ```{r}
 unique(df$'decrease_Sub-category')
 summary(df$'decrease_Sub-category')
@@ -523,7 +536,8 @@ df$'decrease_Sub-category' <- NULL
 ```
 
 
-### decrease_SDU Name for ExR = Offizieller Name der Abteilung beim Verlassen des Unternehmens
+### decrease_SDU Name for ExR 
+Offizieller Name der Abteilung beim Verlassen des Unternehmens
 ```{r}
 unique(df$'decrease_SDU Name for ExR')
 summary(df$'decrease_SDU Name for ExR')
@@ -533,19 +547,21 @@ qplot(df$'decrease_SDU Name for ExR')
 df$'decrease_SDU Name for ExR' <- NULL
 ```
 
-### decrease_SDU = Interner Name/Abkürzung der Abteilung beim Verlassen des Unternehmens
+### decrease_SDU 
+Interner Name/Abkürzung der Abteilung beim Verlassen des Unternehmens
+
 ```{r}
 unique(df$'decrease_SDU')
 summary(df$'decrease_SDU')
 sum(is.na(df$'decrease_SDU'))
-qplot(df$'decrease_SDU')
 ```
 ##### Da wir bereits den offiziellen namen der SDU betrachtet werden wir die gleichen Daten auf Grund von redundanz aus dem Datensatz entfernen
 ```{r}
 df$decrease_SDU <- NULL
 ```
 
-### decrease_Service Stream = Fachbereich beim verlassen des Unternehmens
+### decrease_Service Stream 
+Fachbereich beim verlassen des Unternehmens.
 ```{r}
 unique(df$'decrease_Service Stream')
 summary(df$'decrease_Service Stream')
@@ -555,7 +571,7 @@ qplot(df$'decrease_Service Stream')
 df$'decrease_Service Stream' <- NULL
 ```
 
-### start_Category = 
+### start_Category 
 Fachbereich in dem der Mitarbeiter anfangs eingestellt wurde.
 Das Quellsystem ist erst Zeit Oktober 2006 im Einsatz. Alle Mitarbeiter, die vorher begonnen haben, werden nicht berücksichtigt.
 Aus diesem Grund müssen diese (NaN) aus dem Datenset entfernt werden.
@@ -569,7 +585,8 @@ df$'start_Category' <- as.factor(df$'start_Category')
 ```
 
 
-### start_Sub-category = Abteilung in dem der Mitarbeiter anfangs eingestellt wurde
+### start_Sub-category 
+Abteilung in dem der Mitarbeiter anfangs eingestellt wurde.
 ```{r}
 unique(df$'start_Sub-category')
 summary(df$'start_Sub-category')
@@ -579,7 +596,8 @@ qplot(df$'start_Sub-category')
 df$df$'start_Sub-category' <- NULL
 ```
 
-### start_SDU Name for ExR =  Offizieller Name der Abteilung beim Eintritt in das Unternehmen
+### start_SDU Name for ExR 
+Offizieller Name der Abteilung beim Eintritt in das Unternehmen.
 ```{r}
 unique(df$'start_SDU Name for ExR')
 summary(df$'start_SDU Name for ExR')
@@ -590,19 +608,20 @@ df$'start_SDU Name for ExR' <- NULL
 ```
 
 
-### start_SDU = Interner Name der Abteilung beim Eintritt in das Unternehmen
+### start_SDU 
+Interner Name der Abteilung beim Eintritt in das Unternehmen.
 ```{r}
 unique(df$'start_SDU')
 summary(df$'start_SDU')
 sum(is.na(df$'start_SDU'))
-qplot(df$'start_SDU')
 ```
 ##### Da wir bereits den offiziellen namen der SDU werden wir die gleichen Daten auf Grund von redundanz aus dem Datensatz entfernen
 ```{r}
 df$start_SDU <- NULL
 ```
 
-### start_Service Stream = Fachbereich beim Eintritt in das Unternehmen
+### start_Service Stream 
+Fachbereich beim Eintritt in das Unternehmen.
 ```{r}
 unique(df$'start_Service Stream')
 summary(df$'start_Service Stream')
@@ -615,6 +634,7 @@ df$'start_Service Stream' <- NULL
 Umwandeln qualitativer Merkmal in für die algorithmen lesbare dichotome Merkmale (0 und 1).
 ```{r}
 one_hot(as.data.table(df))
+
 ```
 
 
