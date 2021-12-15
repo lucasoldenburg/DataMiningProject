@@ -60,10 +60,10 @@ start <- df$`start_Calendar Year/Month`
 end <- df$`LastActive_Calendar Year/Month`
 
 
-df$`month Of Service` <- round(difftime(end, start, units = "days")/30)
+df$`Month Of Service` <- round(difftime(end, start, units = "days")/30)
 head(df$`month Of Service`)
 # Age
-df$age <- round(difftime(end, df$`Date of Birth`, units = "days") /365)
+df$Age <- round(difftime(end, df$`Date of Birth`, units = "days") /365)
 head(df$age)
 # Time since last development
 df$'Months Since Last Development' <- round(difftime(end, df$`Last_Development_Calendar Year/Month`, units = "days")/30)
@@ -318,7 +318,7 @@ sum(is.na(df$`Paybands`))
 # qplot(df$`Paybands`)
 
 ```
-Beschreibung
+
 
 ### Name on Dashboard
 Dieses Merkmal beschreibt die Position der Person in Klustern. Dabei wird sich an den Gehaltsbändern orientiert und in Oberbegriffe untergliedert
@@ -332,7 +332,7 @@ summary(df$`Name on Dashboard`)
 
 df$`Name on Dashboard` <- NULL
 ```
-Beschreibung
+
 
 ### Classification
 Dieses Merkmal beschreibt die Einteilung in Mitarbeitergruppen in der Logik des Reportings am Standort Berlin.
@@ -345,17 +345,9 @@ qplot(df$Classification)
 
 df$Classification <- NULL
 ```
-Beschreibung
 
-### Date of Birth
-Dieses Merkmal beschreibt den Geburtstag der Person.
-```{r}
-# todo: in Date umwandeln + in AGE umwandeln
-summary(df$'Date of Birth')
-sum(is.na(df$'Date of Birth'))
 
-```
-Beschreibung
+
 
 ### Last_Development_Calendar Year/Month
 Dieses Merkmal beschreibt, wann sich die Person das zum letzten Mal horizontal oder vertikal oder von tariflich beschäftigt zu außertariflich 
@@ -367,7 +359,6 @@ Berechnungsgrundlage zu wählen.
 summary(df$'Last_Development_Calendar Year/Month')
 sum(is.na(df$'Last_Development_Calendar Year/Month'))
 ```
-Beschreibung
 
 ### development to exempt
 Dieses Merkmal beschreibt die Entwicklung einer Person von tariflich beschäftigt zu außer-tariflich beschäftigt (1)
@@ -383,7 +374,6 @@ qplot(df$'development to exempt')
 
 df$`development to exempt` <- replace(df$`development to exempt`,df$`development to exempt`== "2","1")
 ```
-Beschreibung
 
 ### Vertical_Horizontal_Developments 
 Dieser Wert sagt aus, wie oft der Mitarbeiter vertikal und horizontal im Unternhemen befördert wurde.
@@ -630,9 +620,39 @@ qplot(df$'start_Service Stream')
 
 df$'start_Service Stream' <- NULL
 ```
+### Age
+Dies ist das selbst berechnete Merkmal, welches das aktuelle Alter aller aktiven Mitarbeiter oder das Alter der Mitarbeiter
+bei Ihrem Ausstieg in Jahren anzeigt. 
+```{r}
+unique(df$Age)
+summary(df$Age)
+sum(is.na(df$Age))
+qplot(df$Age)
+```
+### Month Of Service
+Dieses Merkmal haben wir erstellt, um die Anstellungszeit genauer darstellen zu können. Die Aufteilung in Jahre ist zu unspezidfisch 
+für unsere Analyse, da dieses merkmal auf Grund der Problemstellung eine wichtige Rolle in unserem Projetk spielen wird. 
+
+```{r}
+summary(df$`Month Of Service`)
+
+sum(is.na(df$`Month Of Service`))
+#Bei der Berechnung wurden bereits alle "NA"-Werte gelöscht, daher sind diese hier nicht mehr vorhanden. 
+
+qplot(df$`Month Of Service`)
+```
+
+### Month Since Last Development
+Das hier von uns erzeugte und gezeigte Merkmal beschreibt die Dauer zwischen der letzten Beförderung und dem Austritt aus dem Unternehmen. Sollte der Mitarbeiter noch aktiv sein, bezieht sich die Dauer auf die letzte Beförderung und das aktuelle Datum.
+```{r}
+summary(df$`Months Since Last Development`)
+sum(is.na(df$`Months Since Last Development`))
+qplot(df$`Months Since Last Development`)
+```
 
 Umwandeln qualitativer Merkmal in für die algorithmen lesbare dichotome Merkmale (0 und 1).
 ```{r}
+names(df)
 one_hot(as.data.table(df))
 
 ```
