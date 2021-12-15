@@ -21,6 +21,7 @@ library(data.table)
 
 
 df <- read_xlsx("20211209_raw_dataset.xlsx")
+
 #Years in Numerisch umwandeln
 #all Chars in numeric 
   #Years of Service Berlin
@@ -154,7 +155,7 @@ vergleichbarer Art im Paybands-Merkmal enthalten.
 unique(df$Role)
 summary(df$Role)
 sum(is.na(df$Role))
-qplot(df$Role)
+# qplot(df$Role)
 
 df$Role <- NULL
 ```
@@ -211,7 +212,7 @@ und "non exempt" (tariflich beschäftigt).
 unique(df$`Employee Subgroup text`)
 summary(df$`Employee Subgroup text`)
 sum(is.na(df$`Employee Subgroup text`))
-qplot(df$`Employee Subgroup text`)
+# qplot(df$`Employee Subgroup text`)
 
 df$`Employee Subgoup text clustered` <- df$`Employee Subgroup text`
 df$`Employee Subgoup text clustered` <- replace(df$`Employee Subgoup text clustered`,df$`Employee Subgoup text clustered`== "exempt","0")
@@ -367,12 +368,12 @@ Diese Entwicklung ist oft im Zusammenhang mit der Beförderung in eine Experten-
 Die zweifache Entwicklung zum außertariflichen Beschäftigungsverhältnis kann auf einen Eingabefehler zurück-
 geführt werden und wird in diesem Schritt in eine "1" umgewandelt.
 ```{r}
+df$`development to exempt` <- replace(df$`development to exempt`,df$`development to exempt`== "2","1")
 unique(df$'development to exempt')
 summary(df$'development to exempt')
 sum(is.na(df$'development to exempt'))
 qplot(df$'development to exempt')
 
-df$`development to exempt` <- replace(df$`development to exempt`,df$`development to exempt`== "2","1")
 ```
 
 ### Vertical_Horizontal_Developments 
@@ -655,6 +656,14 @@ Umwandeln qualitativer Merkmal in für die algorithmen lesbare dichotome Merkmal
 names(df)
 one_hot(as.data.table(df))
 
+```
+
+```{r}
+# df1 <- data.frame(df$Age, df$EmployeeChurned)
+# # df1$age <- df$Age
+# # df1$bla <- df$EmployeeChurned
+# df$EmployeeChurned <- as.numeric(df$EmployeeChurned)
+# pairs(df1, col = df1$EmployeeChurned)
 ```
 
 
