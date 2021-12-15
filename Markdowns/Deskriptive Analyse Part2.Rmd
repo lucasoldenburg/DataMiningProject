@@ -71,7 +71,7 @@ df$'Months Since Last Development' <- round(difftime(end, df$`Last_Development_C
 df$`Months Since Last Development` <- as.numeric(df$`Months Since Last Development`)
 
 df$YearsOfService_BASFBerlin <- NULL
-df$YearsOfService_BASFBerlin <- NULL
+df$YearsOfService_BASFall <- NULL
 df$`Last_Development_Calendar Year/Month` <- NULL
 df$`Date of Birth` <- NULL
 
@@ -108,6 +108,7 @@ Dieses Merkmal beschreibt die Nationalität der Person.
 unique(df$Nationality)
 summary(df$Nationality)
 sum(is.na(df$Nationality))
+df$Nationality <- NULL
 ```
 
 ### Nationality_Classification
@@ -462,6 +463,8 @@ df$'start_employee subgroup detail clustered' <- as.factor(df$'start_employee su
 df$'start_employee subgroup detail clustered' <- as.factor(df$'start_employee subgroup detail clustered')
 
 qplot(df$`start_employee subgroup detail clustered`)
+df$`start_employee subgroup detail` <- NULL
+
 ```
 
 
@@ -590,7 +593,7 @@ summary(df$'start_Sub-category')
 sum(is.na(df$'start_Sub-category'))
 # qplot(df$'start_Sub-category')
 
-df$df$'start_Sub-category' <- NULL
+df$'start_Sub-category' <- NULL
 ```
 
 ### start_SDU Name for ExR 
@@ -599,7 +602,7 @@ Offizieller Name der Abteilung beim Eintritt in das Unternehmen.
 unique(df$'start_SDU Name for ExR')
 summary(df$'start_SDU Name for ExR')
 sum(is.na(df$'start_SDU Name for ExR'))
-qplot(df$'start_SDU Name for ExR')
+# qplot(df$'start_SDU Name for ExR')
 
 df$'start_SDU Name for ExR' <- NULL
 ```
@@ -636,7 +639,11 @@ unique(df$Age)
 summary(df$Age)
 sum(is.na(df$Age))
 qplot(df$Age)
+ggplot(df, aes(EmployeeChurned, Age)) + 
+  geom_boxplot(aes(colour = EmployeeChurned), alpha=0.2)
 ```
+\
+
 ### Month Of Service
 Dieses Merkmal haben wir erstellt, um die Anstellungszeit genauer darstellen zu können. Die Aufteilung in Jahre ist zu unspezidfisch 
 für unsere Analyse, da dieses merkmal auf Grund der Problemstellung eine wichtige Rolle in unserem Projetk spielen wird. 
@@ -648,6 +655,8 @@ sum(is.na(df$`Month Of Service`))
 #Bei der Berechnung wurden bereits alle "NA"-Werte gelöscht, daher sind diese hier nicht mehr vorhanden. 
 
 qplot(df$`Month Of Service`)
+ggplot(df, aes(EmployeeChurned, `Month Of Service`)) + 
+  geom_boxplot(aes(colour = EmployeeChurned), alpha=0.2)
 ```
 
 ### Month Since Last Development
@@ -662,19 +671,39 @@ sum(is.na(df$`Months Since Last Development`))
 qplot(df$`Months Since Last Development`)
 ```
 
-Umwandeln qualitativer Merkmal in für die algorithmen lesbare dichotome Merkmale (0 und 1).
-```{r}
-one_hot(as.data.table(df))
 
+### Korrelation der Numerischen Merkmale
+Die roten Punkte bedeuten, dass der Mitarbeiter nicht mehr im Unternehmen ist.
+```{r}
+str(df)
+df$EmployeeChurned <- as.factor(df$EmployeeChurned)
+df_cor <- data.frame(df$Age, df$`Month Of Service`, df$`Months Since Last Development`, df$`Employee Subgoup text clustered`, df$Paybands, df$`start_employee subgroup detail clustered`,  df$EmployeeChurned)
+pairs(df_cor, col = df_cor$df.EmployeeChurned)
+
+```
+\
+Im nächsten Schritt wird versucht, Zusammenhänge zwischen verschiedenen Merkmalen und der Abwanderung zu Vidualisieren.
+```{r}
+# df$Gender <- as.factor(df$Gender)
+ggplot(df, aes(`Month Of Service`, Gender)) +
+geom_jitter(aes(colour = EmployeeChurned), alpha=0.2, height = 0.3)
 ```
 
 ```{r}
-# str(df)
-# df1 <- data.frame(df$Age, df$mo  df$EmployeeChurned)
-# # df1$age <- df$Age
-# # df1$bla <- df$EmployeeChurned
-# df$EmployeeChurned <- as.numeric(df$EmployeeChurned)
-# pairs(df1, col = df1$EmployeeChurned)
+ggplot(df, aes(`Month Of Service`, `start_Part time mark`)) +
+geom_jitter(aes(colour = EmployeeChurned), alpha=0.2, height = 0.3)
+```
+
+```{r}
+ggplot(df, aes(`Month Of Service`, `Part Time Mark`)) +
+geom_jitter(aes(colour = EmployeeChurned), alpha=0.2, height = 0.3)
+names(df)
+```
+
+Umwandeln qualitativer Merkmal in für die algorithmen lesbare dichotome Merkmale (0 und 1).
+```{r}
+hot_df <- one_hot(as.data.table(df))
+
 ```
 
 
