@@ -402,7 +402,7 @@ df$Vertical_Horizontal_Developments <- as.factor(df$Vertical_Horizontal_Developm
 Ist das Datum an dem der Mitarbeiter im Unternhemen angefangen hat.
 
 ```{r}
-unique(df$'start_Calendar Year/Month')
+# unique(df$'start_Calendar Year/Month')
 summary(df$'start_Calendar Year/Month')
 sum(is.na(df$'start_Calendar Year/Month'))
 #hier nach Jahren und eventuell Monaten splitten, dann könnte man ne Abhängigkeit zeigen, dass z.B. Menschen die Monat Januar anfangen schneller aussteigen als #im März :D
@@ -440,31 +440,35 @@ df$'start_Part time mark' <- replace(df$'start_Part time mark',df$'start_Part ti
 
 ### start_employee subgroup detail 
 Beschreibt Vertragsart bei Anstellung
-
+Aufgrund der Verteilung ist eine Einstufung nur in die Gruppen "exempt" (außertarfilich beschäftigt)
+und "non exempt" (tariflich beschäftigt).
+0 - "exempt" umfasst: "exempt", "exempt higher level", "senior executive"
+1 - "non exempt": "non-exempt (white)",  "working student whit", "apprentice"
 ```{r}
 unique(df$'start_employee subgroup detail')
 summary(df$'start_employee subgroup detail')
 sum(is.na(df$'start_employee subgroup detail'))
-qplot(df$'start_employee subgroup detail')
 
 #cluster in exampt and non exempt
 df$'start_employee subgroup detail clustered' <- df$'start_employee subgroup detail'
 df$'start_employee subgroup detail clustered' <- replace(df$'start_employee subgroup detail clustered',df$'start_employee subgroup detail clustered'== "exempt","0")
 df$'start_employee subgroup detail clustered' <- replace(df$'start_employee subgroup detail clustered',df$'start_employee subgroup detail clustered'== "exempt higher level","0")
-df$'start_employee subgroup detail clustered' <- replace(df$'start_employee subgroup detail clustered',df$df$'start_employee subgroup detail clustered'== "senior executive","0")
-df$'start_employee subgroup detail clustered' <- replace(df$'start_employee subgroup detail clustered',df$df$'start_employee subgroup detail clustered'== "non-exempt (white)","1")
-df$'start_employee subgroup detail clustered' <- replace(df$'start_employee subgroup detail clustered',df$df$'start_employee subgroup detail clustered'== "working student whit","1")
-df$'start_employee subgroup detail clustered' <- replace(df$'start_employee subgroup detail clustered',df$df$'start_employee subgroup detail clustered'== "apprentice","1")
+df$'start_employee subgroup detail clustered' <- replace(df$'start_employee subgroup detail clustered',df$'start_employee subgroup detail clustered'== "senior executive","0")
+df$'start_employee subgroup detail clustered' <- replace(df$'start_employee subgroup detail clustered',df$'start_employee subgroup detail clustered'== "non-exempt (white)","1")
+df$'start_employee subgroup detail clustered' <- replace(df$'start_employee subgroup detail clustered',df$'start_employee subgroup detail clustered'== "working student whit","1")
+df$'start_employee subgroup detail clustered' <- replace(df$'start_employee subgroup detail clustered',df$'start_employee subgroup detail clustered'== "apprentice","1")
 df$'start_employee subgroup detail clustered' <- as.factor(df$'start_employee subgroup detail clustered')
 
 df$'start_employee subgroup detail clustered' <- as.factor(df$'start_employee subgroup detail clustered')
+
+qplot(df$`start_employee subgroup detail clustered`)
 ```
 
 
 ### start_Cost Center2 
 Dieses Merkmal beschreibt die Kostenstelle zum Start am Standort Berlin.
 ```{r}
-unique(df$'start_Cost Center2')
+# unique(df$'start_Cost Center2')
 summary(df$'start_Cost Center2')
 sum(is.na(df$'start_Cost Center2'))
 
@@ -491,13 +495,14 @@ df$'start_Employee group' <- NULL
 ### Cost Center
 Dieses Merkmal beschreibt die Kostenstelle der Person zum letzten aktiven Zeitpunkt.
 ```{r}
-unique(df$'Cost Center')
+# unique(df$'Cost Center')
 summary(df$'Cost Center')
 sum(is.na(df$'Cost Center'))
-qplot(df$'Cost Center')
+# qplot(df$'Cost Center')
 
 ```
-##### Wie oben bereits erläutert hat die Kostenstelle keinen Einfluss auf die Mitarbeiter, da dies intern geschieht und mögliche Zusammenhänge kausal ausgeschlossen sind, werden wir dieses Merkmal nicht weiter berücksichtigen
+\
+Wie oben bereits erläutert hat die Kostenstelle keinen Einfluss auf die Mitarbeiter, da dies intern geschieht und mögliche Zusammenhänge kausal ausgeschlossen sind, werden wir dieses Merkmal nicht weiter berücksichtigen
 ```{r}
 df$`Cost Center` <- NULL
 ```
@@ -509,7 +514,7 @@ Funktionsbereich beim Verlassen des Unternehmens
 unique(df$'decrease_Category')
 summary(df$'decrease_Category')
 sum(is.na(df$'decrease_Category'))
-qplot(df$'decrease_Category')
+# qplot(df$'decrease_Category')
 
 df$'decrease_Category' <- as.factor(df$'decrease_Category')
 ```
@@ -521,7 +526,7 @@ Abteilung beim Verlassen des Unternehmens
 unique(df$'decrease_Sub-category')
 summary(df$'decrease_Sub-category')
 sum(is.na(df$'decrease_Sub-category'))
-qplot(df$'decrease_Sub-category')
+# qplot(df$'decrease_Sub-category')
 
 df$'decrease_Sub-category' <- NULL
 ```
@@ -533,7 +538,7 @@ Offizieller Name der Abteilung beim Verlassen des Unternehmens
 unique(df$'decrease_SDU Name for ExR')
 summary(df$'decrease_SDU Name for ExR')
 sum(is.na(df$'decrease_SDU Name for ExR'))
-qplot(df$'decrease_SDU Name for ExR')
+# qplot(df$'decrease_SDU Name for ExR')
 
 df$'decrease_SDU Name for ExR' <- NULL
 ```
@@ -546,7 +551,8 @@ unique(df$'decrease_SDU')
 summary(df$'decrease_SDU')
 sum(is.na(df$'decrease_SDU'))
 ```
-##### Da wir bereits den offiziellen namen der SDU betrachtet werden wir die gleichen Daten auf Grund von redundanz aus dem Datensatz entfernen
+\
+Da wir bereits den offiziellen namen der SDU betrachtet werden wir die gleichen Daten auf Grund von redundanz aus dem Datensatz entfernen
 ```{r}
 df$decrease_SDU <- NULL
 ```
@@ -557,7 +563,7 @@ Fachbereich beim verlassen des Unternehmens.
 unique(df$'decrease_Service Stream')
 summary(df$'decrease_Service Stream')
 sum(is.na(df$'decrease_Service Stream'))
-qplot(df$'decrease_Service Stream')
+# qplot(df$'decrease_Service Stream')
 
 df$'decrease_Service Stream' <- NULL
 ```
@@ -582,7 +588,7 @@ Abteilung in dem der Mitarbeiter anfangs eingestellt wurde.
 unique(df$'start_Sub-category')
 summary(df$'start_Sub-category')
 sum(is.na(df$'start_Sub-category'))
-qplot(df$'start_Sub-category')
+# qplot(df$'start_Sub-category')
 
 df$df$'start_Sub-category' <- NULL
 ```
@@ -606,7 +612,8 @@ unique(df$'start_SDU')
 summary(df$'start_SDU')
 sum(is.na(df$'start_SDU'))
 ```
-##### Da wir bereits den offiziellen namen der SDU werden wir die gleichen Daten auf Grund von redundanz aus dem Datensatz entfernen
+\
+Da wir bereits den offiziellen namen der SDU werden wir die gleichen Daten auf Grund von redundanz aus dem Datensatz entfernen
 ```{r}
 df$start_SDU <- NULL
 ```
@@ -617,7 +624,7 @@ Fachbereich beim Eintritt in das Unternehmen.
 unique(df$'start_Service Stream')
 summary(df$'start_Service Stream')
 sum(is.na(df$'start_Service Stream'))
-qplot(df$'start_Service Stream')
+# qplot(df$'start_Service Stream')
 
 df$'start_Service Stream' <- NULL
 ```
