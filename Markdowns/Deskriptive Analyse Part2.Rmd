@@ -323,7 +323,7 @@ df$`Stelle (SAP)` <- NULL
 
 ### In Dashboard
 Dieses Merkmal beschreibt die Position der Person in Clustern. Dabei wird sich an den Gehaltsbändern orientiert.
-xxx Positionen Cluster
+Payband "A" ist dabei das niedrigste und Payband "H" das höchste.
 ```{r}
 unique(df$`In Dashboard`)
 summary(df$`In Dashboard`)
@@ -745,7 +745,35 @@ names(df)
 str(df)
 ```
 
-Umwandeln qualitativer Merkmal in für die algorithmen lesbare dichotome Merkmale (0 und 1).
+
+
+```{r}
+ggplot(df, aes(Paybands)) +
+  geom_bar(aes(colour = EmployeeChurned), alpha=0.2)
+
+```
+Fokus auf Paybands "C" und "D", da hohe Zahl an Mitarbeitenden sowie Mitarbeiterabwanderung. 
+Speziell das Payband "C" weißt eine hohe Mitarbeiterabwanderung auf.
+
+Das Payband "A" umfasst die Auszubildenden, von denen laut der Daten keiner das Unternehmen
+während der Ausbildung verlassen hat. 
+
+
+```{r}
+ggplot(df, aes(Paybands, `Month Of Service`)) + 
+  geom_boxplot()
+
+ggplot(df, aes(Paybands, `Month Of Service`)) + 
+  geom_boxplot(aes(colour = EmployeeChurned), alpha=0.2)
+```
+Mitarbeitende in höheren Paybands zum Zeitpunkt der letzten Aktivität sind länger im 
+Unternehmen, als in unteren. 
+Mitarbeitende, die das Unternehmen verlassen haben, waren in fast allen Paybands länger im
+Unternehmen als die aktiven. Dies kann auch daran liegen, dass solche Positionen auch
+nachbesetzt werden müssen, zum Teil von extern oder es rücken Mitarbeitende nach.
+
+
+## Umwandeln qualitativer Merkmal in für die algorithmen lesbare dichotome Merkmale (0 und 1).
 ```{r}
 hot_df <- one_hot(as.data.table(df))
 
