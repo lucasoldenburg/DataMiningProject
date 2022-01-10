@@ -51,6 +51,7 @@ Zu erst laden wir die benötigten Bibliotheken. Die Daten werden anschließend a
 
 ```{r}
 library(readxl)
+library(writexl)
 library(ggplot2)
 library(tidyr)
 library(stringr)
@@ -772,11 +773,15 @@ Mitarbeitende, die das Unternehmen verlassen haben, waren in fast allen Paybands
 Unternehmen als die aktiven. Dies kann auch daran liegen, dass solche Positionen auch
 nachbesetzt werden müssen, zum Teil von extern oder es rücken Mitarbeitende nach.
 
+```{r}
+write_xlsx(df,"20220110_dataPrepped_beforeOneHot.xlsx")
+```
+
 
 ## Umwandeln qualitativer Merkmal in für die algorithmen lesbare dichotome Merkmale (0 und 1).
 ```{r}
 hot_df <- one_hot(as.data.table(df))
-
+write_xlsx(hot_df,"20220110_dataPrepped_afterOneHot.xlsx")
 ```
 
 

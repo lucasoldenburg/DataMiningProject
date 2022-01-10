@@ -1,0 +1,43 @@
+---
+title: "Deskriptive Analyse"
+output: html_document
+---
+
+## Employee Churn
+# Prediction Martin
+
+
+```{r}
+library(readxl)
+library(ggplot2)
+library(tidyr)
+library(stringr)
+library(lubridate)
+library(mltools)
+library(data.table)
+
+prepped_df <- read_xlsx("20220110_dataPrepped_beforeOneHot.xlsx")
+
+df <- subset(prepped_df, 
+                  select = -c(`start_Calendar Year/Month`,
+                              `LastActive_Calendar Year/Month`,
+                              `start_Cost center`))
+head(df)
+```
+## Umwandeln qualitativer Merkmal in für die algorithmen lesbare dichotome Merkmale (0 und 1).
+```{r}
+hot_df <- read_xlsx("20220110_dataPrepped_afterOneHot.xlsx")
+hot_df <- subset(hot_df, 
+                  select = -c(`start_Calendar Year/Month`,
+                              `LastActive_Calendar Year/Month`,
+                              `start_Cost center`,
+                              EmployeeChurned_1))
+head(hot_df)
+```
+
+## Decision Tree
+```{r}
+
+```
+
+
