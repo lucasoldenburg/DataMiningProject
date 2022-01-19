@@ -19,11 +19,12 @@ library(tidyverse)
 library(magrittr)
 
 #tree
-library(tree)
+
 library(caret)
 library(caretEnsemble)
-library(rpart)
-library(rpart.plot)
+library(h2o)
+h2o.init()
+
 ```
 
 
@@ -31,7 +32,9 @@ library(rpart.plot)
 ```{r}
 hot_df <- read_xlsx("20220110_dataPrepped_afterOneHot.xlsx")
 hot_df <- subset(hot_df, 
-                  select = -c(EmployeeChurned_1, `start_Cost center`))
+                  select = -c(EmployeeChurned_1, `start_Cost center`,
+                              `start_Calendar Year/Month`,
+                              `LastActive_Calendar Year/Month`))
 
 
 colnames(hot_df)[colnames(hot_df) == "EmployeeChurned_0"] <- "EmployeeChurned"
@@ -81,52 +84,76 @@ factorCols <- c("Gender",
 hot_df %<>% mutate_at(factorCols, factor)
 
 #Indexspalte
-hot_df$index <- 1:nrow(hot_df)
+#hot_df$index <- 1:nrow(hot_df)
 str(hot_df)
 
 ```
 
-## Train Test Split 
+## Train Test Split (Caret)
 ```{r}
-#tree.hot_df=tree(EmployeeChurned_0)
-#hot_df.seed()
-
-hot_df$EmployeeChurned <- as.factor(hot_df$EmployeeChurned)
-hot_df$Gender <- as.factor(hot_df$Gender)
-hot_df$Gender <- as.factor(hot_df$Gender)
-hot_df$decrease_Category_People <- as.factor(hot_df$decrease_Category_People)
-
-
 head(hot_df)
+#stratified random split (caret)
 inTrain <- createDataPartition(y=hot_df$EmployeeChurned, p = .75, list=FALSE)
 
 training <- hot_df[ inTrain,]
 testing  <- hot_df[-inTrain,]
 
+str(training)
 str(testing)
 ```
-#tree simple
+
+## Train Test Split (sample)
 ```{r}
-simpleTreeFit <- tree(EmployeeChurned ~ 
-                        training$`Vertical_Horizontal_Developments_1-2` +
-                        training$Vertical_Horizontal_Developments_0 +
-                        training$Gender +
-                        training$`Months Since Last Development` +
-                        training$`Part Time Mark` +
-                        training$`Month Of Service`, data = training)
+sortedDF <- sort(sample(nrow(hot_df), nrow(hot_df)*.7))
+trainSample<-hot_df[sortedDF,]
+testSample<-hot_df[-sortedDF,]
+```
+
+## Train Test Split (h2o)
+```{r}
+hot_dfH2O <- as.h2o(hot_df)
+splits <- h2o.splitFrame(data =  hot_dfH2O, ratios = 0.75, seed = 1234)
+trainH2O <- splits[[1]]
+testH2O <- splits[[2]]
+```
+
+# Find Features
+```{r}
+#https://docs.h2o.ai/h2o/latest-stable/h2o-docs/data-science/model_selection.html
+
+#automl
+#https://docs.h2o.ai/h2o/latest-stable/h2o-docs/automl.html
+
+#Grid Search
+#Hyperparameter
+```
+
+
+
+# Einfacher Baum
+```{r}
+library(tree)
+
+simpleTreeFit <- tree(trainSample$EmployeeChurned ~., data = trainSample)   #why?! Punkt funktioniert nicht... überall trainSample$... davor
+
 plot(simpleTreeFit)
 text(simpleTreeFit, pretty = 0)
 
-#nur metrische Werte
 ```
 
 
 #rpart initial
 ```{r}
+library(rpart)
+library(rpart.plot)
+
 rpartInitial <- rpart(EmployeeChurned ~ Gender + 
                         `Month Of Service` +
                         `Months Since Last Development`,
-                      data=training,
+                      data=trainSample,
+                      control= rpart.control(cp=0.01))
+
+rpartInitial <- rpart(EmployeeChurned ~. -index,
                       control= rpart.control(cp=0.01))
 
 printcp(rpartInitial)
@@ -142,25 +169,18 @@ rpart.plot(rpartFit)
 ```
 
 
-#h2o
+#h2o Distributed Random Forest
 ```{r}
-library(h2o)
-h2o.init()
-
-#import as h2o dataframe
-#20220110_dataPrepped_afterOneHot.xlsx
-#iris_path <- "../smalldata/iris/iris_wheader.csv"
-#iris_path <- "20220110_dataPrepped_afterOneHot.xlsx"
-#iris <- h2o.uploadFile(path = iris_path)
+# Umwandlung in h2o-Dataframe
 trainingH2O <- as.h2o(training)
 testingH2O <- as.h2o(testing)
 
+#predictors <- setdiff(colnames(titanic), colnames(titanic)[2:3])
 predictors <- c("Gender", "Month Of Service" ,
                 "Months Since Last Development",
                 "Part Time Mark",
                 "Paybands_A", "Paybands_B", "Paybands_C", "Paybands_D")
 response <- "EmployeeChurned"
-
 
 
 h2oFit <- h2o.randomForest(x = predictors,
@@ -172,25 +192,23 @@ h2oFit <- h2o.randomForest(x = predictors,
                              calibrate_model = FALSE,
                              binomial_double_trees = TRUE,
                              training_frame = trainingH2O,
-                             nfolds = 5)
-
-#validation_frame = testingH2O,
-#calibration_frame = testingH2O,
+                             nfolds = 6)
 
 
+# Güte im Trainingsset
 perf <- h2o.performance(h2oFit)
 perf
-h2o.confusionMatrix(h2oFit) #or perf
+h2o.confusionMatrix(h2oFit)
 
-perf <- h2o.performance(h2oFit, testingH2O)
-h2o.confusionMatrix(perf)
-
-
+# Anwendung auf Testset
 predict <- h2o.predict(h2oFit, newdata = testingH2O)
 head(predict, 100)
-perfPredict <- h2o.performance(predict)
 
-curve_data <- data.frame(perf@metrics$thresholds_and_metric_scores) %>% select(c(tpr,fpr))
+# Güte anhand Testset
+perfTest <- h2o.performance(h2oFit, testingH2O)
+h2o.confusionMatrix(perfTest)
+
+curve_data <- data.frame(perfTest@metrics$thresholds_and_metric_scores) %>% select(c(tpr,fpr))
 
 ggplot(curve_data, aes(x = fpr, y = tpr)) +
     geom_point() +
@@ -206,14 +224,16 @@ ggplot(curve_data, aes(x = fpr, y = tpr)) +
     theme_bw()
 
 
-#h2o.confusionMatrix(perf)  -> for predict
-
-#h2o_drl_auc <- h2oFit.multinomial_auc_table(trainingH2O)
-library(pROC)
-auc(testingH2O)
-
-
 #https://docs.h2o.ai/h2o/latest-stable/h2o-docs/performance-and-prediction.html?highlight=confusion%20matrix
+```
+#h2o XGBoost
+```{r}
+xgbFit <- h2o.xgboost(x = predictors,
+                           y = response,
+                           training_frame = trainingH2O,
+                           booster = "dart",
+                           normalize_type = "tree",
+                           seed = 1234)
 ```
 
 

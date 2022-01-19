@@ -272,6 +272,8 @@ summary(df$'NonExempt')
 sum(is.na(df$'NonExempt'))
 qplot(df$'NonExempt')
 
+df$`Employee Subgroup text` <- NULL
+
 ```
 
 ### Cost Center long
@@ -728,7 +730,8 @@ Die roten Punkte bedeuten, dass der Mitarbeiter nicht mehr im Unternehmen ist.
 str(df)
 df$EmployeeChurned <- as.factor(df$EmployeeChurned)
 df_cor <- data.frame(df$Age, df$`Month Of Service`, df$`Months Since Last Development`, df$NonExempt, df$Paybands, df$start_NonExempt,  df$EmployeeChurned)
-df_cor$NonExempt <- as.factor(df_cor$NonExempt)
+df_cor$df.NonExempt <- as.factor(df_cor$df.NonExempt)
+df_cor$df.start_NonExempt <- as.factor(df_cor$df.start_NonExempt)
 pairs(df_cor, col = df_cor$df.EmployeeChurned)
 ```
 \
