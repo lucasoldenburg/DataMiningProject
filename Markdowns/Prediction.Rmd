@@ -45,7 +45,8 @@ factorCols <- c("Gender",
                 "TemporaryPersonel",
                 "Part Time Mark",
                 "NonExempt",
-                "start_NonExempt"
+                "start_NonExempt",
+                "development to exempt"
                 )
 
 # Umwandlung in kategorische Variablen
