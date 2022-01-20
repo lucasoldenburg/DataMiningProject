@@ -53,6 +53,7 @@ Zu erst laden wir die benötigten Bibliotheken. Die Daten werden anschließend a
 
 ```{r}
 library(readxl)
+library(writexl)
 library(ggplot2)
 library(tidyr)
 library(stringr)
@@ -120,8 +121,7 @@ df$`Date of Birth` <- NULL
 
 
 ### EmployeeChurned
-Dies ist das Ziel-Merkmal und beschreibt, ob die Person das Unternehmen verlassen hat (1) oder
-noch aktiv ist (0).
+Dies ist das Ziel-Merkmal und beschreibt, ob die Person das Unternehmen verlassen hat (1) oder noch aktiv ist (0).
 ```{r}
 unique(df$EmployeeChurned)
 summary(df$EmployeeChurned)
@@ -220,7 +220,7 @@ Dieses Merkmal beschreibt die Vertragsart der Person zum Zeitpunkt der letzten A
 0 - permanent staff (unbefristet)
 1 - temporary personnel (befristet)
 ```{r}
-df$`Global contract type` <- replace(df$`Global contract type`,df$`Global contract type`== "apprentice","non exempt")
+df$`Global contract type` <- replace(df$`Global contract type`,df$`Global contract type`== "apprentice","1")
 
 unique(df$`Global contract type`)
 summary(df$`Global contract type`)
@@ -229,6 +229,9 @@ qplot(df$`Global contract type`)
 
 df$`Global contract type` <- replace(df$`Global contract type`,df$`Global contract type`== "permanent staff","0")
 df$`Global contract type` <- replace(df$`Global contract type`,df$`Global contract type`== "temporary personnel","1")
+
+colnames(df)[which(names(df) == "Global contract type")] <- "TemporaryPersonel"
+qplot(df$`TemporaryPersonel`)
 ```
 
 ### YearsOfService_BASFall
@@ -263,12 +266,15 @@ df$`Employee Subgoup text clustered` <- replace(df$`Employee Subgoup text cluste
 df$`Employee Subgoup text clustered` <- replace(df$`Employee Subgoup text clustered`,df$`Employee Subgoup text clustered`== "non-exempt (white)","1")
 df$`Employee Subgoup text clustered` <- replace(df$`Employee Subgoup text clustered`,df$`Employee Subgoup text clustered`== "working student whit","1")
 df$`Employee Subgoup text clustered` <- replace(df$`Employee Subgoup text clustered`,df$`Employee Subgoup text clustered`== "apprentice","1")
-df$`Employee Subgoup text clustered` <- as.factor(df$`Employee Subgoup text clustered`)
 
-unique(df$'Employee Subgoup text clustered')
-summary(df$'Employee Subgoup text clustered')
-sum(is.na(df$'Employee Subgoup text clustered'))
-qplot(df$'Employee Subgoup text clustered')
+colnames(df)[which(names(df) == "Employee Subgoup text clustered")] <- "NonExempt"
+
+unique(df$'NonExempt')
+summary(df$'NonExempt')
+sum(is.na(df$'NonExempt'))
+qplot(df$'NonExempt')
+
+df$`Employee Subgroup text` <- NULL
 
 ```
 
@@ -325,7 +331,7 @@ df$`Stelle (SAP)` <- NULL
 
 ### In Dashboard
 Dieses Merkmal beschreibt die Position der Person in Clustern. Dabei wird sich an den Gehaltsbändern orientiert.
-xxx Positionen Cluster
+Payband "A" ist dabei das niedrigste und Payband "H" das höchste.
 ```{r}
 unique(df$`In Dashboard`)
 summary(df$`In Dashboard`)
@@ -350,6 +356,7 @@ df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Senior Executive","H")
 
 df$`Paybands` <- as.factor(df$`Paybands`)
 qplot(df$Paybands)
+df$`In Dashboard` <- NULL
 ```
 
 ### Paybands
@@ -499,11 +506,10 @@ df$'start_employee subgroup detail clustered' <- replace(df$'start_employee subg
 df$'start_employee subgroup detail clustered' <- replace(df$'start_employee subgroup detail clustered',df$'start_employee subgroup detail clustered'== "non-exempt (white)","1")
 df$'start_employee subgroup detail clustered' <- replace(df$'start_employee subgroup detail clustered',df$'start_employee subgroup detail clustered'== "working student whit","1")
 df$'start_employee subgroup detail clustered' <- replace(df$'start_employee subgroup detail clustered',df$'start_employee subgroup detail clustered'== "apprentice","1")
-df$'start_employee subgroup detail clustered' <- as.factor(df$'start_employee subgroup detail clustered')
 
-df$'start_employee subgroup detail clustered' <- as.factor(df$'start_employee subgroup detail clustered')
+colnames(df)[colnames(df) == "start_employee subgroup detail clustered"] <- "start_NonExempt"
 
-qplot(df$`start_employee subgroup detail clustered`)
+qplot(df$start_NonExempt)
 df$`start_employee subgroup detail` <- NULL
 
 ```
@@ -558,7 +564,7 @@ Funktionsbereich beim Verlassen des Unternehmens
 unique(df$'decrease_Category')
 summary(df$'decrease_Category')
 sum(is.na(df$'decrease_Category'))
-# qplot(df$'decrease_Category')
+#qplot(df$'decrease_Category')
 
 df$'decrease_Category' <- as.factor(df$'decrease_Category')
 ```
@@ -615,14 +621,16 @@ df$'decrease_Service Stream' <- NULL
 ### start_Category 
 Fachbereich in dem der Mitarbeiter anfangs eingestellt wurde.
 Das Quellsystem ist erst Zeit Oktober 2006 im Einsatz. Alle Mitarbeiter, die vorher begonnen haben, werden nicht berücksichtigt.
-Aus diesem Grund müssen diese (NaN) aus dem Datenset entfernt werden.
+Aus diesem Grund müssen diese (NaN) aus dem Datenset entfernt werden. Da es 895 
+dieser Fälle gibt, wird dieses Merkmal als Ganzes nicht weiter betrachet.
 ```{r}
 unique(df$'start_Category')
 summary(df$'start_Category')
 sum(is.na(df$'start_Category'))
 # qplot(df$'start_Category')
 
-df$'start_Category' <- as.factor(df$'start_Category')
+df$start_Category <- NULL
+#df$'start_Category' <- as.factor(df$'start_Category')
 ```
 
 
@@ -723,9 +731,10 @@ Die roten Punkte bedeuten, dass der Mitarbeiter nicht mehr im Unternehmen ist.
 ```{r}
 str(df)
 df$EmployeeChurned <- as.factor(df$EmployeeChurned)
-df_cor <- data.frame(df$Age, df$`Month Of Service`, df$`Months Since Last Development`, df$`Employee Subgoup text clustered`, df$Paybands, df$`start_employee subgroup detail clustered`,  df$EmployeeChurned)
+df_cor <- data.frame(df$Age, df$`Month Of Service`, df$`Months Since Last Development`, df$NonExempt, df$Paybands, df$start_NonExempt,  df$EmployeeChurned)
+df_cor$df.NonExempt <- as.factor(df_cor$df.NonExempt)
+df_cor$df.start_NonExempt <- as.factor(df_cor$df.start_NonExempt)
 pairs(df_cor, col = df_cor$df.EmployeeChurned)
-
 ```
 \
 Im nächsten Schritt wird beispielhaft versucht, Zusammenhänge zwischen verschiedenen Merkmalen und der Abwanderung zu Visualisieren.
@@ -747,10 +756,44 @@ names(df)
 str(df)
 ```
 
-Umwandeln qualitativer Merkmal in für die algorithmen lesbare dichotome Merkmale (0 und 1).
+
+
+```{r}
+ggplot(df, aes(Paybands)) +
+  geom_bar(aes(colour = EmployeeChurned), alpha=0.2)
+
+```
+Fokus auf Paybands "C" und "D", da hohe Zahl an Mitarbeitenden sowie Mitarbeiterabwanderung. 
+Speziell das Payband "C" weißt eine hohe Mitarbeiterabwanderung auf.
+
+Das Payband "A" umfasst die Auszubildenden, von denen laut der Daten keiner das Unternehmen
+während der Ausbildung verlassen hat. 
+
+
+```{r}
+ggplot(df, aes(Paybands, `Month Of Service`)) + 
+  geom_boxplot()
+
+ggplot(df, aes(Paybands, `Month Of Service`)) + 
+  geom_boxplot(aes(colour = EmployeeChurned), alpha=0.2)
+```
+Mitarbeitende in höheren Paybands zum Zeitpunkt der letzten Aktivität sind länger im 
+Unternehmen, als in unteren. 
+Mitarbeitende, die das Unternehmen verlassen haben, waren in fast allen Paybands länger im
+Unternehmen als die aktiven. Dies kann auch daran liegen, dass solche Positionen auch
+nachbesetzt werden müssen, zum Teil von extern oder es rücken Mitarbeitende nach.
+
+```{r}
+write_xlsx(df,"20220110_dataPrepped_beforeOneHot.xlsx")
+```
+
+
+## Umwandeln qualitativer Merkmal in für die algorithmen lesbare dichotome Merkmale (0 und 1).
 ```{r}
 hot_df <- one_hot(as.data.table(df))
+write_xlsx(hot_df,"20220110_dataPrepped_afterOneHot.xlsx")
 
+str(hot_df)
 ```
 
 
