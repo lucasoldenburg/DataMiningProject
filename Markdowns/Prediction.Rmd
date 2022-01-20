@@ -104,7 +104,7 @@ str(testing)
 
 ## Train Test Split (sample)
 ```{r}
-sortedDF <- sort(sample(nrow(hot_df), nrow(hot_df)*.7))
+sortedDF <- sort(sample(nrow(hot_df), nrow(hot_df)*.75))
 trainSample<-hot_df[sortedDF,]
 testSample<-hot_df[-sortedDF,]
 ```
@@ -126,6 +126,9 @@ testH2O <- splits[[2]]
 
 #Grid Search
 #Hyperparameter
+
+#feature importance
+#one hot or not?
 ```
 
 
@@ -153,7 +156,7 @@ rpartInitial <- rpart(EmployeeChurned ~ Gender +
                       data=trainSample,
                       control= rpart.control(cp=0.01))
 
-rpartInitial <- rpart(EmployeeChurned ~. -index,
+rpartAll <- rpart(hot_df$EmployeeChurned ~ ,
                       control= rpart.control(cp=0.01))
 
 printcp(rpartInitial)
@@ -161,7 +164,7 @@ prp(rpartInitial)
 ```
 
 
-#rpart specifications
+##rpart specifications
 ```{r}
 rpartFit <- rpart(EmployeeChurned ~ . -index, data = training, method = "class",control = rpart.control(maxdepth = 5, minsplit = 5))
 rpart.plot(rpartFit)
@@ -169,19 +172,25 @@ rpart.plot(rpartFit)
 ```
 
 
-#h2o Distributed Random Forest
+##h2o Distributed Random Forest (DRF)
+Im DRF werden eine Reihe an Bäumen erzeugt. Jeder dieser lernt basierend auf einen Teil
+des Datensets (Spalten und Reihen). Für die finale Vorhersage wird dann der Durchschnitt 
+aus den Vorhersagen der einzelnen Bäume berechnet. Das verringert die Varianz.
+Um robuste Bäume zu erhalten werden darüber hinaus auf jedem Level je Baum 
+zufällig die betrachteten Spalten (Features) gewählt. Die Anzahl der verwendeten
+Spalten wird dabei durch die Wurzel aus der Gesamtanzahl der Spalten definiert.
+
+xxx Ausnahme wenn kein one hot encoding, dann 2
+
+F1 Score für Split
+
 ```{r}
 # Umwandlung in h2o-Dataframe
 trainingH2O <- as.h2o(training)
 testingH2O <- as.h2o(testing)
 
-#predictors <- setdiff(colnames(titanic), colnames(titanic)[2:3])
-predictors <- c("Gender", "Month Of Service" ,
-                "Months Since Last Development",
-                "Part Time Mark",
-                "Paybands_A", "Paybands_B", "Paybands_C", "Paybands_D")
+predictors <- c(factorCols, "Month Of Service", "Age", "Months Since Last Development")
 response <- "EmployeeChurned"
-
 
 h2oFit <- h2o.randomForest(x = predictors,
                              y = response,
@@ -193,7 +202,8 @@ h2oFit <- h2o.randomForest(x = predictors,
                              binomial_double_trees = TRUE,
                              training_frame = trainingH2O,
                              nfolds = 6)
-
+#Check: verbose: Print scoring history to the console. For DRF, metrics are per tree. 
+#This option is defaults to false (not enabled).
 
 # Güte im Trainingsset
 perf <- h2o.performance(h2oFit)
@@ -226,14 +236,143 @@ ggplot(curve_data, aes(x = fpr, y = tpr)) +
 
 #https://docs.h2o.ai/h2o/latest-stable/h2o-docs/performance-and-prediction.html?highlight=confusion%20matrix
 ```
-#h2o XGBoost
+
+##h2o Random Forest (Teilset)
 ```{r}
+
+predictorsSmall <- c("Gender", "Month Of Service" ,
+                "Months Since Last Development",
+                "Part Time Mark", "Age",
+                "Paybands_A", "Paybands_B", "Paybands_C", "Paybands_D", "Paybands_E")
+
+response <- "EmployeeChurned"
+
+h2oFitS <- h2o.randomForest(x = predictorsSmall,
+                             y = response,
+                             ntrees = 10,
+                             max_depth = 5,
+                             min_rows = 10,
+                             min_split_improvement = 0.0001,
+                             calibrate_model = FALSE,
+                             binomial_double_trees = TRUE,
+                             training_frame = trainingH2O,
+                             nfolds = 6)
+
+
+# Güte im Trainingsset
+perfS <- h2o.performance(h2oFitS)
+perfS
+h2o.confusionMatrix(h2oFitS)
+
+# Anwendung auf Testset
+predictS <- h2o.predict(h2oFitS, newdata = testingH2O)
+head(predictS, 100)
+
+# Güte anhand Testset
+perfTestS <- h2o.performance(h2oFitS, testingH2O)
+h2o.confusionMatrix(perfTestS)
+
+curve_dataS <- data.frame(perfTestS@metrics$thresholds_and_metric_scores) %>% select(c(tpr,fpr))
+
+ggplot(curve_dataS, aes(x = fpr, y = tpr)) +
+    geom_point() +
+    geom_line() +
+    geom_segment(
+        aes(x = 0, y = 0, xend = 1, yend = 1),
+        linetype = "dotted",
+        color = "grey50"
+        ) +
+    xlab("False Positive Rate") +
+    ylab("True Positive Rate") +
+    ggtitle("ROC Curve") +
+    theme_bw()
+```
+
+##h2o Random Forest und Grid Search (Tuning Hyperparameter)
+```{r}
+predictors <- c(factorCols, "Month Of Service", "Age", "Months Since Last Development")
+response <- "EmployeeChurned"
+
+#https://docs.h2o.ai/h2o/latest-stable/h2o-docs/grid-search.html#grid-search-in-r
+
+
+grid_params <- list(balance_classes = c(TRUE, FALSE),
+                    ntrees = c(30, 50, 70),
+                    max_depth = c(10, 15, 20, 25),
+                    min_split_improvement = c(0.0001, 0.00001, 0.000001),
+                    nfolds = c(4,5,6))
+
+#Hyperparameter
+#balance classes=True or False (Oversample the minority classes to balance the class distribution. 
+#This option is defaults to false (not enabled), and can increase the data frame size. 
+#This option is only applicable for classification.)
+
+#ntrees - default 50
+#max_depth 20 default
+
+#col_sample_rate_per_tree: Specify the column sample rate per tree. This can be a value from 0.0 to 1.0 and defaults to 1. Note that this method is sample without replacement.
+
+#binomial_double_trees: (Binary classification only) Build twice as many trees (one per class). Enabling this option can lead to higher accuracy, while disabling can result in faster model building. This option is defaults to false (not enable
+
+#bins?
+
+                                                                                                                                                                                            #Min_split_improvement
+
+h2oFitGrid <- h2o.randomForest(x = predictors,
+                             y = response,
+                             ntrees = 10,
+                             max_depth = 5,
+                             min_rows = 10,
+                             min_split_improvement = 0.0001,
+                             calibrate_model = FALSE,
+                             binomial_double_trees = TRUE,
+                             training_frame = trainingH2O,
+                             nfolds = 6)
+
+
+# Güte im Trainingsset
+perfGrid <- h2o.performance(h2oFitGrid)
+perfGrid
+h2o.confusionMatrix(h2oFitGrid)
+
+# Anwendung auf Testset
+predictGrid <- h2o.predict(h2oFitGrid, newdata = testingH2O)
+head(predictGrid, 100)
+
+# Güte anhand Testset
+perfTestGrid <- h2o.performance(h2oFitGrid, testingH2O)
+h2o.confusionMatrix(perfTestGrid)
+
+curve_dataGrid <- data.frame(perfTestGrid@metrics$thresholds_and_metric_scores) %>% select(c(tpr,fpr))
+
+ggplot(curve_data, aes(x = fpr, y = tpr)) +
+    geom_point() +
+    geom_line() +
+    geom_segment(
+        aes(x = 0, y = 0, xend = 1, yend = 1),
+        linetype = "dotted",
+        color = "grey50"
+        ) +
+    xlab("False Positive Rate") +
+    ylab("True Positive Rate") +
+    ggtitle("ROC Curve") +
+    theme_bw()
+
+```
+
+
+#h2o XGBoost 
+```{r}
+#nicht mit h2o verwendbar -> xgboost library von r
 xgbFit <- h2o.xgboost(x = predictors,
                            y = response,
                            training_frame = trainingH2O,
                            booster = "dart",
                            normalize_type = "tree",
                            seed = 1234)
+
+
+
 ```
 
 
