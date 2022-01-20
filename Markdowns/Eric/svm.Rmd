@@ -1,0 +1,164 @@
+---
+title: "svm"
+author: "Eric Beier"
+date: "20/01/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+
+```{r}
+library(readxl)
+library(ggplot2)
+library(tidyr)
+library(stringr)
+library(lubridate)
+library(mltools)
+library(data.table)
+library(mlbench)
+library(tidyverse)
+library(magrittr)
+
+library(caret)
+library(e1071) # for SVMs
+
+
+
+```
+## Datenimport und -vorbereitung
+```{r}
+hot_df <- read_xlsx("20220110_dataPrepped_afterOneHot.xlsx")
+hot_df <- subset(hot_df, 
+                  select = -c(EmployeeChurned_1, `start_Cost center`,
+                              `start_Calendar Year/Month`,
+                              `LastActive_Calendar Year/Month`))
+
+colnames(hot_df)[colnames(hot_df) == "EmployeeChurned_0"] <- "EmployeeChurned"
+colnames(hot_df)[colnames(hot_df) == "Temporary_0"] <- "Temporary"
+
+# Kategorische Variablen
+factorCols <- c("Gender",
+                "TemporaryPersonel",
+                "Part Time Mark",
+                "NonExempt",
+                "start_NonExempt",
+                "development to exempt",
+                "Vertical_Horizontal_Developments_>= 3",
+                "Vertical_Horizontal_Developments_0",
+                "Vertical_Horizontal_Developments_1-2",
+                "start_contract type_apprentice",
+                "start_contract type_permanent staff",
+                "start_contract type_temporary personnel",
+                "start_Part time mark",
+                "EmployeeChurned",
+                "decrease_Category_Customer",
+                "decrease_Category_GB Management",
+                "decrease_Category_GBR/N",
+                "decrease_Category_GTU GD",
+                "decrease_Category_Human Resources GBS",
+                "decrease_Category_Intellectual Property",
+                "decrease_Category_IT Service CC",
+                "decrease_Category_People",
+                "decrease_Category_Planning & Development",
+                "decrease_Category_Procurement Services - GP",
+                "decrease_Category_RAA/A Competence",
+                "decrease_Category_Safety",
+                "decrease_Category_Supplier & Reporting",
+                "Nationality_Classification_EU",
+                "Nationality_Classification_German",
+                "Nationality_Classification_Other",
+                "Paybands_A",
+                "Paybands_B",
+                "Paybands_C",
+                "Paybands_D",
+                "Paybands_E",
+                "Paybands_F",
+                "Paybands_G",
+                "Paybands_H")
+
+# Umwandlung in kategorische Variablen
+hot_df %<>% mutate_at(factorCols, factor)
+
+#Indexspalte
+#hot_df$index <- 1:nrow(hot_df)
+str(hot_df)
+
+```
+
+## Train Test Split (Caret)
+```{r}
+df_test <- subset(hot_df, select = c("EmployeeChurned", "development to exempt", "Month Of Service"))
+df <- data.frame(df_test)
+n <- nrow(df)
+names(df)
+names(df_test)
+
+train_indices <- sample(1:n, round(2/3 * n))
+test_train <- df[train_indices,]
+test_test <- df[-train_indices,]
+
+features <- c("development.to.exempt", "Month.Of.Service")
+cols <- c(features, "EmployeeChurned")
+
+set.seed(50)
+ctrl <- trainControl(method="cv", number = 3) # 3-fold cross validation 
+
+# tuneGrid contains the values for k which are tried
+knnfit <- train(EmployeeChurned ~ ., data = df[, cols], method = "knn", trControl = ctrl, 
+                preProcess = c("center","scale"), 
+                tuneGrid = expand.grid(k=3:20)) # try k=3,4, ... 20
+
+#knnfit
+#plot(knnfit)
+
+# predict the classes in the entire data set using the best model
+knnPredict <- predict(knnfit, newdata = df[, cols] )
+
+# Get the confusion matrix to see accuracy value and other quality measures
+#confusionMatrix(knnPredict, df$EmployeeChurned)
+
+# use colour for original class and symbol for predicted class
+#plot(df[,features], col=df$EmployeeChurned, pch=as.numeric(unclass(knnPredict)))
+
+
+
+
+
+```
+```{r}
+
+```
+
+##SVM
+```{r}
+# fit an SVM with linear kernel
+svmfit <- svm(EmployeeChurned ~ ., data = test_train[,cols], kernel = "linear", 
+              cost = 1, scale = TRUE)
+
+# print the results
+print(svmfit)
+
+# more information about the model including the support vectors
+summary(svmfit)
+
+# indices of the support vectors
+svmfit$index
+
+# plot it including the separation lines (hyperplanes)
+plot(svmfit, test_train[,cols])
+
+# predict on the test data set
+prediction <- predict(svmfit, test_test, type = "class")
+
+# confusion matrix with quality measures
+confusionMatrix(prediction, test_test[,"EmployeeChurned"])
+
+
+
+```
+
