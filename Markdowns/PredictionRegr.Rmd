@@ -4,8 +4,7 @@ output: html_document
 ---
 
 ## Employee Churn
-# Prediction Lucas
-
+# Prediction LogRegression
 ```{r}
 library(readxl)
 library(ggplot2)
@@ -87,5 +86,32 @@ hot_df %<>% mutate_at(factorCols, factor)
 str(hot_df)
 
 ```
+
+## Train Test Split (Caret)
+```{r}
+head(hot_df)
+#stratified random split (caret)
+inTrain <- createDataPartition(y=hot_df$EmployeeChurned, p = .75, list=FALSE)
+
+training <- hot_df[ inTrain,]
+testing  <- hot_df[-inTrain,]
+
+str(training)
+str(testing)
+```
+
+## Regression h2o Beispiele (Block später löschen)
+```{r}
+glm1 <- glm(formula = training$Gender ~ training$EmployeeChurned, family = binomial, data = training)
+glm1
+glm2 <- glm(formula = training$`Part Time Mark` ~ training$EmployeeChurned, family = binomial, data = training)
+glm2
+
+predict(glm1)
+
+```
+
+## Links / Quellen
+https://www.geo.fu-berlin.de/en/v/soga/Basics-of-statistics/Logistic-Regression/Logistic-Regression-in-R---An-Example/index.html
 
 
