@@ -95,8 +95,6 @@ str(hot_df)
 df_test <- subset(hot_df, select = c("EmployeeChurned", "development to exempt", "Month Of Service"))
 df <- data.frame(df_test)
 n <- nrow(df)
-names(df)
-names(df_test)
 
 train_indices <- sample(1:n, round(2/3 * n))
 test_train <- df[train_indices,]
@@ -120,17 +118,11 @@ knnfit <- train(EmployeeChurned ~ ., data = df[, cols], method = "knn", trContro
 knnPredict <- predict(knnfit, newdata = df[, cols] )
 
 # Get the confusion matrix to see accuracy value and other quality measures
-#confusionMatrix(knnPredict, df$EmployeeChurned)
+confusionMatrix(knnPredict, df$EmployeeChurned)
 
 # use colour for original class and symbol for predicted class
-#plot(df[,features], col=df$EmployeeChurned, pch=as.numeric(unclass(knnPredict)))
+plot(df[,features], col=df$EmployeeChurned, pch=as.numeric(unclass(knnPredict)))
 
-
-
-
-
-```
-```{r}
 
 ```
 
@@ -159,6 +151,47 @@ prediction <- predict(svmfit, test_test, type = "class")
 confusionMatrix(prediction, test_test[,"EmployeeChurned"])
 
 
+
+```
+
+
+```{r}
+# function to find the best value for the cost parameter
+# assume a column called Species in my_data representing the class to be predicted
+run_iris_svm <- function(my_data, svm_type) {
+
+    # automatically run five-fold cross validation to find the best value for cost
+    # all the code related to the parameter gamma should be ignored by the functions 
+    # if svm_type = "linear", since a linear kernel only requires cost
+    tuned_svm <- tune(svm, EmployeeChurned ~ ., data = my_data, kernel = svm_type, 
+              scale = TRUE, ranges = list(cost = c(0.01, 0.1, 1, 10, 100), 
+                                          gamma = c(0.25, 0.5, 1, 2)), 
+              tunecontrol = tune.control(cross=5))
+    print(tuned_svm)
+    
+    # train on the entire data set using best value for cost
+    best_cost <- tuned_svm$best.parameters[1]
+    best_gamma <- tuned_svm$best.parameters[2] 
+
+        
+    svmfit_best <- svm(EmployeeChurned ~ ., data = my_data, kernel = svm_type, 
+                  cost = best_cost, gamma = best_gamma, scale = TRUE)
+    
+    # plot the result
+   # plot(svmfit_best, my_data)    
+    
+    # confusion matrix with quality measures
+    print(confusionMatrix(svmfit_best$fitted, my_data[,"EmployeeChurned"]))
+    
+}
+
+# learn a linear SVM
+run_iris_svm(df[,cols], "linear")
+
+# learn an SVM with a radial basis function kernel
+# radial requires a value for the parameter gamma
+# which should be optimised as well; we just go for the default here
+run_iris_svm(df[,cols], "radial")
 
 ```
 
