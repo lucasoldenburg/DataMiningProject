@@ -1,0 +1,91 @@
+---
+title: "Prediction Regression"
+output: html_document
+---
+
+## Employee Churn
+# Prediction Lucas
+
+```{r}
+library(readxl)
+library(ggplot2)
+library(tidyr)
+library(stringr)
+library(lubridate)
+library(mltools)
+library(data.table)
+library(mlbench)
+library(tidyverse)
+library(magrittr)
+
+#tree
+
+library(caret)
+library(caretEnsemble)
+library(h2o)
+h2o.init()
+
+```
+
+## Datenimport und -vorbereitung
+```{r}
+hot_df <- read_xlsx("20220110_dataPrepped_afterOneHot.xlsx")
+hot_df <- subset(hot_df, 
+                  select = -c(EmployeeChurned_1, `start_Cost center`,
+                              `start_Calendar Year/Month`,
+                              `LastActive_Calendar Year/Month`))
+
+
+colnames(hot_df)[colnames(hot_df) == "EmployeeChurned_0"] <- "EmployeeChurned"
+colnames(hot_df)[colnames(hot_df) == "Temporary_0"] <- "Temporary"
+
+# Kategorische Variablen
+factorCols <- c("Gender",
+                "TemporaryPersonel",
+                "Part Time Mark",
+                "NonExempt",
+                "start_NonExempt",
+                "development to exempt",
+                "Vertical_Horizontal_Developments_>= 3",
+                "Vertical_Horizontal_Developments_0",
+                "Vertical_Horizontal_Developments_1-2",
+                "start_contract type_apprentice",
+                "start_contract type_permanent staff",
+                "start_contract type_temporary personnel",
+                "start_Part time mark",
+                "EmployeeChurned",
+                "decrease_Category_Customer",
+                "decrease_Category_GB Management",
+                "decrease_Category_GBR/N",
+                "decrease_Category_GTU GD",
+                "decrease_Category_Human Resources GBS",
+                "decrease_Category_Intellectual Property",
+                "decrease_Category_IT Service CC",
+                "decrease_Category_People",
+                "decrease_Category_Planning & Development",
+                "decrease_Category_Procurement Services - GP",
+                "decrease_Category_RAA/A Competence",
+                "decrease_Category_Safety",
+                "decrease_Category_Supplier & Reporting",
+                "Nationality_Classification_EU",
+                "Nationality_Classification_German",
+                "Nationality_Classification_Other",
+                "Paybands_A",
+                "Paybands_B",
+                "Paybands_C",
+                "Paybands_D",
+                "Paybands_E",
+                "Paybands_F",
+                "Paybands_G",
+                "Paybands_H")
+
+# Umwandlung in kategorische Variablen
+hot_df %<>% mutate_at(factorCols, factor)
+
+#Indexspalte
+#hot_df$index <- 1:nrow(hot_df)
+str(hot_df)
+
+```
+
+
