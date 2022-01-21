@@ -17,10 +17,8 @@ library(mlbench)
 library(tidyverse)
 library(magrittr)
 
-#tree
-
+#Regr
 library(caret)
-library(caretEnsemble)
 library(h2o)
 h2o.init()
 
@@ -107,11 +105,27 @@ glm1
 glm2 <- glm(formula = training$`Part Time Mark` ~ training$EmployeeChurned, family = binomial, data = training)
 glm2
 
-predict(glm1)
+pre1 <- predict(glm1, type = 'response')
+
+summary(glm1)
+summary(pre1)
+
 
 ```
 
-## Links / Quellen
-https://www.geo.fu-berlin.de/en/v/soga/Basics-of-statistics/Logistic-Regression/Logistic-Regression-in-R---An-Example/index.html
+```{r}
+# Umwandlung in h2o-Dataframe
+trainingH2O <- as.h2o(training)
+testingH2O <- as.h2o(testing)
+
+predictors <- c(factorCols, "Month Of Service", "Age", "Months Since Last Development")
+response <- "EmployeeChurned"
+
+h2oFit <- h2o.glm(x = predictors,
+                  y = response,
+                  training_frame = trainingH2O)
+
+
+```
 
 
