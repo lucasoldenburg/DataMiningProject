@@ -36,9 +36,7 @@ hot_df <- subset(hot_df,
                               `start_Calendar Year/Month`,
                               `LastActive_Calendar Year/Month`))
 
-
 colnames(hot_df)[colnames(hot_df) == "EmployeeChurned_0"] <- "EmployeeChurned"
-colnames(hot_df)[colnames(hot_df) == "Temporary_0"] <- "Temporary"
 
 # Kategorische Variablen
 factorCols <- c("Gender",
@@ -86,7 +84,6 @@ hot_df %<>% mutate_at(factorCols, factor)
 #Indexspalte
 #hot_df$index <- 1:nrow(hot_df)
 str(hot_df)
-
 ```
 
 ## Train Test Split (Caret)
@@ -95,8 +92,8 @@ head(hot_df)
 #stratified random split (caret)
 inTrain <- createDataPartition(y=hot_df$EmployeeChurned, p = .75, list=FALSE)
 
-training <- hot_df[ inTrain,]
-testing  <- hot_df[-inTrain,]
+trainC <- hot_df[ inTrain,]
+testC <- hot_df[-inTrain,]
 
 str(training)
 str(testing)
@@ -104,9 +101,10 @@ str(testing)
 
 ## Train Test Split (sample)
 ```{r}
-sortedDF <- sort(sample(nrow(hot_df), nrow(hot_df)*.75))
-trainSample<-hot_df[sortedDF,]
-testSample<-hot_df[-sortedDF,]
+df <- data.frame(hot_df)
+sortedDF <- sort(sample(nrow(df), nrow(df)*.75))
+train<-df[sortedDF,]
+test<-df[-sortedDF,]
 ```
 
 ## Train Test Split (h2o)
@@ -137,7 +135,21 @@ testH2O <- splits[[2]]
 ```{r}
 library(tree)
 
-simpleTreeFit <- tree(trainSample$EmployeeChurned ~., data = trainSample)   #why?! Punkt funktioniert nicht... überall trainSample$... davor
+simpleTreeFit <- tree(training$EmployeeChurned ~ training$Gender + 
+                        training$`Vertical_Horizontal_Developments_1-2`+
+                        training$`decrease_Category_Procurement Services - GP`,
+                        data = training)   
+
+simpleTreeFit <- tree(EmployeeChurned ~ Gender + 
+                        `Vertical_Horizontal_Developments_1-2`+
+                        `decrease_Category_Procurement Services - GP`,
+                        data = training) 
+                        
+                        #why?! Punkt funktioniert nicht... überall trainSample$... davor
+
+simpleTreeFit <- tree(EmployeeChurned ~., data = train)
+
+simpleTreeFit <- tree(EmployeeChurned ~., data = train)
 
 plot(simpleTreeFit)
 text(simpleTreeFit, pretty = 0)
@@ -152,15 +164,23 @@ library(rpart.plot)
 
 rpartInitial <- rpart(EmployeeChurned ~ Gender + 
                         `Month Of Service` +
-                        `Months Since Last Development`,
-                      data=trainSample,
+                        `Months Since Last Development`+
+                         `decrease_Category_Procurement Services - GP`,
+                      data=training,
                       control= rpart.control(cp=0.01))
 
-rpartAll <- rpart(hot_df$EmployeeChurned ~ ,
+rpartAll <- rpart(EmployeeChurned ~.,
+                  date=training,
+                      control= rpart.control(cp=0.01))
+
+rpartAll <- rpart(EmployeeChurned ~., data = hot_df2,
                       control= rpart.control(cp=0.01))
 
 printcp(rpartInitial)
 prp(rpartInitial)
+
+printcp(rpartAll)
+prp(rpartAll)
 ```
 
 
@@ -360,8 +380,19 @@ ggplot(curve_data, aes(x = fpr, y = tpr)) +
 
 ```
 
+##h2o Random Forest und Grid Search (Tuning Hyperparameter) ohne One Hot Encoding
+```{r}
 
-#h2o XGBoost 
+
+
+```
+
+
+
+
+
+
+#h2o XGBoost or normal boost
 ```{r}
 #nicht mit h2o verwendbar -> xgboost library von r
 xgbFit <- h2o.xgboost(x = predictors,

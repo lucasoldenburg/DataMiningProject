@@ -1,0 +1,3100 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={Deskriptive Analyse},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifluatex
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+
+\title{Deskriptive Analyse}
+\author{}
+\date{\vspace{-2.5em}}
+
+\begin{document}
+\maketitle
+
+\hypertarget{employee-churn}{%
+\subsection{Employee Churn}\label{employee-churn}}
+
+Wahrscheinlichkeit der Mitarbeiterfluktuation im BASF Service Hub Berlin
+
+Das BASF Service Hub Berlin ist ein Shared Service Center. Seit 2005
+erbringt es Dienstleistungen für Gruppengesellschaften der BASF sowie
+dem Mutterkonzern, der BASF SE. Die BASF ist nach Umsatz das global
+führende Chemie-Unternehmen mit circa 115.000 Mitarbeitern weltweit. Die
+angebotenen Dienstleistungen umfassen Aktivitäten in den Bereichen
+Personalwesen, internes und externes Rechnungswesen, Einkauf, Supply
+Chain. Zudem bestehen kleinere Teams, die an digitalen Lösungen in der
+Landwirtschaft arbeiten oder im Feld der Produktsicherheit tätig sind.
+
+Als Service Hub ist die Fluktuation, die Mitarbeiterabwanderung, höher
+als an den Produktionsstandorten der BASF und liegt im Durchschnitt bei
+12-13\% jährlich. Dies hat zur Folge, dass stetig rekrutiert werden
+muss, was einen Aufwand für die Recrutierungsabteilung und die Manager
+darstellt, die neue Kandidaten finden müssen. Zudem stellt das
+Onboarding einen zeitlichen Aufwand für die Teams dar und bis eine neue
+Arbeitskraft vollumfänglich eingearbeitet ist, muss das Tagesgeschäft
+von den Kollegen:innen weiterhin gestemmt werden.
+
+Um die Fluktuationsrate zu senken, können Manager frühzeitig Maßnahmen
+einleiten. Dazu zählen beispielsweise Weiterbildungsangebote,
+Beförderungen, Job-Rotation oder -Enlargement.
+
+Dass die Wahrscheinlichkeit, dass eine Arbeitskraft das Unternehmen
+verlassen wird hoch ist, müssen die Manager erkennen. Dies ist jedoch in
+der Regel eine subjektive Einschätzung.
+
+``Data to Dialouge'' - Mittels datengestützter Analysen soll eine
+zusätzliche Sicht auf die mögliche Fluktuation der Arbeitskräfte gelegt
+werden. Die aus den Daten gewonnenen Erkenntnisse können die
+Führungskräfte ihren eigenen Wahrnehmungen gegenüberstellen und abwägen,
+ob sie mit der Arbeitskraft ins Gespräch gehen und möglicherweise
+Maßnahmen zum Halten der Person einleiten.
+
+Das Ziel ist es demnach, vorherzusagen, wie wahrscheinlich es ist, dass
+eine Arbeitskraft zu einem Zeitpunkt das Unternehmen verlassen wird.
+Diese Informationen können dann in die bereits bestehende
+Reportinglandschaft (Dashboards) eingebettet werden.
+
+Im Rahmen der Arbeit betrachtete Abgänge sind dabei: Kündigung (von
+Mitarbeitenden oder Arbeitgeber veranlasst), Aufhebungsverträge
+(Einigungen das Arbeitsverhältnis vorzeitig zu beenden entweder von
+Mitarbeitenden oder Arbeitgeber veranlasst), Kündigung in der Probezeit
+und keine Verlängerung befristeter Arbeitsverhältnisse. Letzteres könnte
+in der Verfeinerung aus dem Modell entfernt werden. Es ist aufgrund der
+Bemühung genügend Datenpunkte zu erhalten im ersten Schritt nicht
+entfernt worden.
+
+Für die Datengrundlage sind eine Reihe an Tabellen aus dem SAP Data
+Warehouse System im Einsatz. Orientiert wird sich dabei an Phasen, die
+eine Arbeitskraft im Zuge der Tätigkeit für ein Unternehmen durchläuft.
+Besonderer Fokus liegt dabei auf den Informationen über die Arbeitskraft
+zu Beginn der Arbeitstätigkeit und dem Zeitpunkt der letzten Aktivität
+sowie der Entwicklung. Im Detail werden im Weiteren die Merkmale einzeln
+beschrieben und analysiert, bei Bedarf klassiert (bei vielen
+Merkmalsausprägungen qualitativer Merkmale). Die Abgänge seit Januar
+2016 bis Oktober 2021 sowie die derzeit aktiven Mitarbeitenden werden in
+dieser Arbeit betrachtet.
+
+Zur Vorhersage, ob eine Arbeitskraft wahrscheinlich das Unternehmen
+verlässt, kommen Algorithmen des überwachten maschinellen Lernens zum
+Einsatz. Es handelt sich um eine Klassifizierung zwischen zwei Klassen.
+Neben einem Entscheidungsbaum und Tree-Ensambles (Boosting, Bagging,
+Einsatz von XGBoost) wird die logistische Regression eingesetzt. Im
+dritten Modell soll die Vorhersage mittels einer Support Vector Maschine
+oder einem Naive-Bayes-Ansatz durchgeführt werden.
+
+Die Ergebnisse der unterschiedlichen Modelle werden mittels einer
+Confusion-Matrix miteinander verglichen. Zusätzlich zur Accuracy soll
+die Balanced Accuracy untersucht werden.
+
+Um die einzelne Modelle der Realität anzupassen soll mit einer
+Kostenfunktion optimiert werden, welche Falsch-Positive-Werte und
+Falsch-Negative-Werte unterschiedlich bestraft. Falsch-Negative-Werte
+(Arbeitskraft verlässt das Unternehmen, aber Modell hat als
+nicht-riskant klassifiziert) sorgen für Kosten in der Rekrutierung von
+neuem Personal und verursachen eine erhöhte Belastung für die Teams.
+Falsch-Positive-Werte (Arbeitskraft plant Unternehmen nicht zu
+verlassen, aber Modell hat als riskant klassifiziert) führen zu Kosten
+durch Aufwand für den Manager und die besagte Arbeitskraft, da diese in
+den Austausch gehen. Zusätzlich kann es zu möglicherweise vermeidbaren
+Kosten kommen, die im Zuge des Versuchs die Arbeitskraft zu halten,
+entstehen (Weiterbildung, Gehaltserhöhung). Diese Kosten jedoch zu
+verallgemeinern, führt zu ungenauen und potenziell falschen Ergebnissen.
+Zudem ist für eine genaue Schätzung ein hoher Grad an Verständnis in dem
+Spezialbereich nötig. Dafür ist der Austausch mit den Experten der
+lokalen Personalabteilung des BASF Service Hubs Berlin geplant.
+
+\hypertarget{aufgabenstellung}{%
+\subsubsection{Aufgabenstellung}\label{aufgabenstellung}}
+
+Deskriptive Analyse der Daten: Was beschreiben die Daten, was sind die
+Datentypen und Wertebereiche, fehlen Daten, gibt es falsche Werte, gibt
+es Korrelationen zwischen Merkmalen (Features, Spalten)? Benutzen Sie
+Visualisierungen, wenn es sinnvoll erscheint. Was können wir aus dieser
+deskriptiven Analyse über das Problem lernen?
+
+\hypertarget{set-up}{%
+\subsubsection{Set-Up}\label{set-up}}
+
+Zu erst laden wir die benötigten Bibliotheken. Die Daten werden
+anschließend aus einer .xlsx-Datei geladen. Anschließend wandeln wir die
+Zahlenwerte in das Format Numeric um und die Datumwerte in das Format
+Datum.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(readxl)}
+\FunctionTok{library}\NormalTok{(writexl)}
+\FunctionTok{library}\NormalTok{(ggplot2)}
+\FunctionTok{library}\NormalTok{(tidyr)}
+\FunctionTok{library}\NormalTok{(stringr)}
+\FunctionTok{library}\NormalTok{(lubridate)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Attaching package: 'lubridate'
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:base':
+## 
+##     date, intersect, setdiff, union
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(mltools)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Attaching package: 'mltools'
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:tidyr':
+## 
+##     replace_na
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(data.table)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Attaching package: 'data.table'
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:lubridate':
+## 
+##     hour, isoweek, mday, minute, month, quarter, second, wday, week,
+##     yday, year
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df }\OtherTok{\textless{}{-}} \FunctionTok{read\_xlsx}\NormalTok{(}\StringTok{"20211209\_raw\_dataset.xlsx"}\NormalTok{)}
+
+\CommentTok{\#Years in Numerisch umwandeln}
+\CommentTok{\#all Chars in numeric }
+  \CommentTok{\#Years of Service Berlin}
+\NormalTok{data\_chars\_as\_num }\OtherTok{\textless{}{-}}\NormalTok{ df}
+
+\NormalTok{YearsOfService\_BASFBerlin }\OtherTok{\textless{}{-}}\NormalTok{ df[}\DecValTok{3}\NormalTok{]}
+\NormalTok{data\_chars\_as\_num[ ,  }\StringTok{"YearsOfService\_BASFBerlin"}\NormalTok{] }\OtherTok{\textless{}{-}} 
+  \FunctionTok{as.data.frame}\NormalTok{(}\FunctionTok{apply}\NormalTok{(data\_chars\_as\_num[ , }\StringTok{"YearsOfService\_BASFBerlin"}\NormalTok{], }\DecValTok{2}\NormalTok{, as.numeric))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning in apply(data_chars_as_num[, "YearsOfService_BASFBerlin"], 2,
+## as.numeric): NAs durch Umwandlung erzeugt
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+  \CommentTok{\#Years Service all}
+\NormalTok{YearsOfService\_BASFall }\OtherTok{\textless{}{-}}\NormalTok{ df[}\DecValTok{8}\NormalTok{]}
+\NormalTok{data\_chars\_as\_num[ ,  }\StringTok{"YearsOfService\_BASFall"}\NormalTok{] }\OtherTok{\textless{}{-}} 
+  \FunctionTok{as.data.frame}\NormalTok{(}\FunctionTok{apply}\NormalTok{(data\_chars\_as\_num[ , }\StringTok{"YearsOfService\_BASFall"}\NormalTok{], }\DecValTok{2}\NormalTok{, as.numeric))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning in apply(data_chars_as_num[, "YearsOfService_BASFall"], 2, as.numeric):
+## NAs durch Umwandlung erzeugt
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df[}\DecValTok{3}\NormalTok{] }\OtherTok{\textless{}{-}}\NormalTok{ data\_chars\_as\_num[}\DecValTok{3}\NormalTok{]}
+\NormalTok{df[}\DecValTok{8}\NormalTok{] }\OtherTok{\textless{}{-}}\NormalTok{ data\_chars\_as\_num[}\DecValTok{8}\NormalTok{]}
+
+
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{start\_Calendar Year/Month}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \FunctionTok{as.Date}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{start\_Calendar Year/Month}\StringTok{\textasciigrave{}}\NormalTok{, }\StringTok{"\%d.\%M.\%y"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning in as.POSIXlt.POSIXct(x, tz = tz): unknown timezone '%d.%M.%y'
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Date of Birth}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \FunctionTok{as.Date}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Date of Birth}\StringTok{\textasciigrave{}}\NormalTok{, }\StringTok{\textquotesingle{}\%d.\%M.\%y\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning in as.POSIXlt.POSIXct(x, tz = tz): unknown timezone '%d.%M.%y'
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Last\_Development\_Calendar Year/Month}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \FunctionTok{as.Date}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Last\_Development\_Calendar Year/Month}\StringTok{\textasciigrave{}}\NormalTok{, }\StringTok{\textquotesingle{}\%d.\%M.\%y\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning in as.POSIXlt.POSIXct(x, tz = tz): unknown timezone '%d.%M.%y'
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{LastActive\_Calendar Year/Month}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \FunctionTok{as.Date}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{LastActive\_Calendar Year/Month}\StringTok{\textasciigrave{}}\NormalTok{, }\StringTok{\textquotesingle{}\%d.\%M.\%y\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning in as.POSIXlt.POSIXct(x, tz = tz): unknown timezone '%d.%M.%y'
+\end{verbatim}
+
+\hypertarget{bereiniegen-der-grunddaten-und-erzeugen-neuer-wichtiger-features}{%
+\subsubsection{Bereiniegen der Grunddaten und erzeugen neuer wichtiger
+Features}\label{bereiniegen-der-grunddaten-und-erzeugen-neuer-wichtiger-features}}
+
+Auf Grund der damaliegen Umstellung des Systems ist das Startdatum von
+158 Mitarbeitern nicht bekannt. Diese entfernen wir aus unserem
+Datensatz, da wir für diese Mitarbeiter keine Anstellungsdauer berechnen
+können.
+
+Folgend berechnen wir die Anstellungsdauer in Monaten, das Alter und die
+Zeit zwischen letztem Arbeitstag und letzter Beförderung der Mitarbeiter
+und legen diese jeweils in einer neuen Spalte ab. Die Spalten
+`YearsOfService\_BASfall' `YearsOfService\_BASFBerlin',
+`Last\_Development\_Calendar Year/Month' und `Date of Birth' werden
+gelöscht, da wir diese durch `month Of Service', `Months Since Last
+Development' und `age'.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df }\OtherTok{\textless{}{-}}\NormalTok{ df }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{drop\_na}\NormalTok{(}\StringTok{\textquotesingle{}start\_Calendar Year/Month\textquotesingle{}}\NormalTok{)}
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{start\_Calendar Year/Month}\StringTok{\textasciigrave{}}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{start }\OtherTok{\textless{}{-}}\NormalTok{ df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{start\_Calendar Year/Month}\StringTok{\textasciigrave{}}
+\NormalTok{end }\OtherTok{\textless{}{-}}\NormalTok{ df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{LastActive\_Calendar Year/Month}\StringTok{\textasciigrave{}}
+
+
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Month Of Service}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \FunctionTok{round}\NormalTok{(}\FunctionTok{difftime}\NormalTok{(end, start, }\AttributeTok{units =} \StringTok{"days"}\NormalTok{)}\SpecialCharTok{/}\DecValTok{30}\NormalTok{)}
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Month Of Service}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \FunctionTok{as.numeric}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Month Of Service}\StringTok{\textasciigrave{}}\NormalTok{)}
+\CommentTok{\# Age}
+\NormalTok{df}\SpecialCharTok{$}\NormalTok{Age }\OtherTok{\textless{}{-}} \FunctionTok{round}\NormalTok{(}\FunctionTok{difftime}\NormalTok{(end, df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Date of Birth}\StringTok{\textasciigrave{}}\NormalTok{, }\AttributeTok{units =} \StringTok{"days"}\NormalTok{) }\SpecialCharTok{/}\DecValTok{365}\NormalTok{)}
+\NormalTok{df}\SpecialCharTok{$}\NormalTok{Age }\OtherTok{\textless{}{-}} \FunctionTok{as.numeric}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Age)}
+\CommentTok{\# Time since last development}
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textquotesingle{}Months Since Last Development\textquotesingle{}} \OtherTok{\textless{}{-}} \FunctionTok{round}\NormalTok{(}\FunctionTok{difftime}\NormalTok{(end, df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Last\_Development\_Calendar Year/Month}\StringTok{\textasciigrave{}}\NormalTok{, }\AttributeTok{units =} \StringTok{"days"}\NormalTok{)}\SpecialCharTok{/}\DecValTok{30}\NormalTok{)}
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Months Since Last Development}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \FunctionTok{as.numeric}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Months Since Last Development}\StringTok{\textasciigrave{}}\NormalTok{)}
+
+\NormalTok{df}\SpecialCharTok{$}\NormalTok{YearsOfService\_BASFBerlin }\OtherTok{\textless{}{-}} \ConstantTok{NULL}
+\NormalTok{df}\SpecialCharTok{$}\NormalTok{YearsOfService\_BASFall }\OtherTok{\textless{}{-}} \ConstantTok{NULL}
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Last\_Development\_Calendar Year/Month}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \ConstantTok{NULL}
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Date of Birth}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \ConstantTok{NULL}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{employeechurned}{%
+\subsubsection{EmployeeChurned}\label{employeechurned}}
+
+Dies ist das Ziel-Merkmal und beschreibt, ob die Person das Unternehmen
+verlassen hat (1) oder noch aktiv ist (0).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{unique}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{EmployeeChurned)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "0" "1"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{EmployeeChurned)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Length     Class      Mode 
+##      3869 character character
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{EmployeeChurned))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{qplot}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{EmployeeChurned)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Deskriptive-Analyse-Part2_files/figure-latex/unnamed-chunk-3-1.pdf}
+
+\hypertarget{gender}{%
+\subsubsection{Gender}\label{gender}}
+
+Dieses Merkmal beschreibt das Geschlecht der Person.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df}\SpecialCharTok{$}\NormalTok{Gender }\OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Gender,df}\SpecialCharTok{$}\NormalTok{Gender}\SpecialCharTok{==} \StringTok{"Male"}\NormalTok{,}\StringTok{"0"}\NormalTok{)}
+\NormalTok{df}\SpecialCharTok{$}\NormalTok{Gender }\OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Gender,df}\SpecialCharTok{$}\NormalTok{Gender}\SpecialCharTok{==} \StringTok{"Female"}\NormalTok{,}\StringTok{"1"}\NormalTok{)}
+
+\FunctionTok{unique}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Gender)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "1" "0"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Gender)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Length     Class      Mode 
+##      3869 character character
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Gender))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{qplot}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Gender)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Deskriptive-Analyse-Part2_files/figure-latex/unnamed-chunk-4-1.pdf}
+
+\hypertarget{nationality}{%
+\subsubsection{Nationality}\label{nationality}}
+
+Dieses Merkmal beschreibt die Nationalität der Person.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# todo: Gruppieren nach DE, EU, NotEU}
+\FunctionTok{unique}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Nationality)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   [1] "German"          "Peruvian"        "Lithuanian"      "Finnish"        
+##   [5] "Spanish"         "Italian"         "Mexican"         "Belgian"        
+##   [9] "Israeli"         "French"          "Dutch"           "Guatemalan"     
+##  [13] "Argentinian"     "Brazilian"       "Bulgarian"       "Danish"         
+##  [17] "Hungarian"       "Portuguese"      "Polish"          "Vietnamese"     
+##  [21] "Colombian"       "Russian"         "Ukrainian"       "Algerian"       
+##  [25] "Chinese"         "Senegalese"      "Swedish"         "Indonesian"     
+##  [29] "South African"   "Cypriot"         "Slovak"          "Indian"         
+##  [33] "British"         "Swiss"           "Austrian"        "Estonian"       
+##  [37] "Turkish"         "Azerbaijani"     "Venezuelan"      "Rumanian"       
+##  [41] "Zimbabwean"      "Panamanian"      "Cameroonian"     "Greek"          
+##  [45] "Pakistani"       "Tunisian"        "Kazakh"          "Kyrgyzstani"    
+##  [49] "Burkinabe"       "Singaporean"     "Nicaraguan"      "Serbian"        
+##  [53] "American"        "Slovenian"       "Moroccan"        "Australian"     
+##  [57] "Syrian"          "Croatian"        "Ghanian"         "Uzbekistani"    
+##  [61] "Irish"           "Iranian"         "Malaysian"       "Salvadoran"     
+##  [65] "Japanese"        "Czech"           "Canadian"        "Lebanese"       
+##  [69] "Belarusian"      "Jordanian"       "Norwegian"       "Filipino"       
+##  [73] "Uruguayan"       "Albanian"        "Yemeni"          "Mozambican"     
+##  [77] "Bangladeshi"     "Egyptian"        "Latvian"         "Kenyan"         
+##  [81] "Bosnian"         "Chilean"         "Sudanese"        "Togolese"       
+##  [85] "Ethiopian"       "Korean"          "Not assigned"    "Macedonian"     
+##  [89] "Honduran"        "Nepalese"        "Nigerian"        "Ecuadorian"     
+##  [93] "Armenian"        "Bolivian"        "Georgian"        "Minor Outl.Isl."
+##  [97] "Luxembourgian"   "Moldovan"        "Mongolian"       "Palestine"      
+## [101] "Afghan"          "XK"              "Madagascan"      "Thai"           
+## [105] "Ugandan"         "Tajikistani"     "Congolese"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Nationality)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Length     Class      Mode 
+##      3869 character character
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Nationality))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df}\SpecialCharTok{$}\NormalTok{Nationality }\OtherTok{\textless{}{-}} \ConstantTok{NULL}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{nationality_classification}{%
+\subsubsection{Nationality\_Classification}\label{nationality_classification}}
+
+Dieses Merkmal beschreibt die Nationalität der Person klassiert in
+``German'', ``EU'' und ``Other''.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{unique}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Nationality\_Classification)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "German" "Other"  "EU"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Nationality\_Classification)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Length     Class      Mode 
+##      3869 character character
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Nationality\_Classification))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{qplot}\NormalTok{(}\FunctionTok{sort}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Nationality\_Classification))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Deskriptive-Analyse-Part2_files/figure-latex/unnamed-chunk-6-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df}\SpecialCharTok{$}\NormalTok{Nationality\_Classification }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Nationality\_Classification)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{yearsofservice_basfberlin}{%
+\subsubsection{YearsOfService\_BASFBerlin}\label{yearsofservice_basfberlin}}
+
+Dieses Merkmal beschreibt, wie lange die Person im Unternehmen bisher
+tätig war in Jahren (nur Berliner Standort). Dabei wird aufgerundet. Das
+Symbol ``\#'' gilt für eine Unternehmenszugehörigkeit unter einem Jahr.
+Aus diesem Grund wird die Unternehmenszugehörigkeit manuell berechnet
+aus dem Startdatum und dem letzten Aktivitätsdatum. Zusätzlich wird
+neben den Jahren auch die Monate angegeben.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{unique}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{YearsOfService\_BASFBerlin)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Unknown or uninitialised column: `YearsOfService_BASFBerlin`.
+\end{verbatim}
+
+\begin{verbatim}
+## NULL
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{YearsOfService\_BASFBerlin)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Unknown or uninitialised column: `YearsOfService_BASFBerlin`.
+\end{verbatim}
+
+\begin{verbatim}
+## Length  Class   Mode 
+##      0   NULL   NULL
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{YearsOfService\_BASFBerlin))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Unknown or uninitialised column: `YearsOfService_BASFBerlin`.
+\end{verbatim}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#qplot(df$YearsOfService\_BASFBerlin)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{position-text}{%
+\subsubsection{Position text}\label{position-text}}
+
+Dieses Merkmal beschreibt in welcher Position die Person tätig ist bzw.
+zuletzt war. Es kann auch als Planstelle bezeichnet werden. Aufgrund der
+Menge an Merkmalsausprägungen werden diese im weiteren Verlauf in
+Clustern zusammengefasst (Paybands).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{unique}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Position text}\StringTok{\textasciigrave{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  [1] "Expert"                              
+##  [2] "Teamspecialist"                      
+##  [3] "Executive Specialist"                
+##  [4] "Manager"                             
+##  [5] "Officer"                             
+##  [6] "Head of Project"                     
+##  [7] "Senior Expert"                       
+##  [8] "Senior Project Manager"              
+##  [9] "Specialist"                          
+## [10] "Project Manager"                     
+## [11] "Senior Officer"                      
+## [12] "Senior Advisor"                      
+## [13] "Accountant"                          
+## [14] "Head of Department"                  
+## [15] "Senior Accountant"                   
+## [16] "Advisor"                             
+## [17] "Executive Accountant"                
+## [18] "Teamleader"                          
+## [19] "Assistant"                           
+## [20] "Senior Specialist"                   
+## [21] "Knowledge & Communication Specialist"
+## [22] "Student Trainee"                     
+## [23] "Teamlead"                            
+## [24] "Professional"                        
+## [25] "Apprentice"                          
+## [26] "Apprentice BA"                       
+## [27] "Team Assistant"                      
+## [28] "Senior Buyer"                        
+## [29] "Buyer"                               
+## [30] "Procurement Analyst"                 
+## [31] "Senior Manager"                      
+## [32] "Vice President"                      
+## [33] "Executive Professional"              
+## [34] "Executive Buyer"                     
+## [35] "Senior Procurement Analyst"          
+## [36] "Intern"                              
+## [37] "Senior Professional"                 
+## [38] "Executive Expert"                    
+## [39] "Student trainee"                     
+## [40] "Finance Manager"                     
+## [41] "Trainee"                             
+## [42] "Executive Assistant"                 
+## [43] "Specialist Accounting"               
+## [44] "Specialist ICTP"                     
+## [45] "Senior specialist"                   
+## [46] "Execuitve Professional"              
+## [47] "Teamspecialist (temporär)"           
+## [48] "Knowledge Coordinator"               
+## [49] "SVP Regional Service Delivery EMEA"  
+## [50] "Executive Advisor"                   
+## [51] "Senior Teamleader"                   
+## [52] "Managing Director"                   
+## [53] "Global Head of Department"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Position text}\StringTok{\textasciigrave{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Length     Class      Mode 
+##      3869 character character
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Position text}\StringTok{\textasciigrave{}}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Position text}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \ConstantTok{NULL}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{role}{%
+\subsubsection{Role}\label{role}}
+
+Dieses Merkmal beschreibt die Rolle der Person. Aufgrund der Menge an
+Merkmalsausprägungen und der weniger verbreiteten Anwendung im
+Unternehmenskontext wird dieses Merkmal entfernt. Die Informationen sind
+allerdings in vergleichbarer Art im Paybands-Merkmal enthalten.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{unique}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Role)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  [1] "Specialist"               "Teamleader"              
+##  [3] "Employee Representatives" "Manager"                 
+##  [5] "Officer"                  "Head of"                 
+##  [7] "Employee Representat"     "Apprentices Interns"     
+##  [9] "Not assigned"             "Grouplevel 4"            
+## [11] "Grouplevel 3"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Role)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Length     Class      Mode 
+##      3869 character character
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Role))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# qplot(df$Role)}
+
+\NormalTok{df}\SpecialCharTok{$}\NormalTok{Role }\OtherTok{\textless{}{-}} \ConstantTok{NULL}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{part-time-mark}{%
+\subsubsection{Part Time Mark}\label{part-time-mark}}
+
+Dieses Merkmal beschreibt, ob die Person zum Zeitpunkt der letzten
+Aktivität in Teilzeit tätig ist/war (1) oder nicht (0).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{unique}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Part Time Mark}\StringTok{\textasciigrave{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "yes" "no"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Part Time Mark}\StringTok{\textasciigrave{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Length     Class      Mode 
+##      3869 character character
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Part Time Mark}\StringTok{\textasciigrave{}}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{qplot}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Part Time Mark}\StringTok{\textasciigrave{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Deskriptive-Analyse-Part2_files/figure-latex/unnamed-chunk-10-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Part Time Mark}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Part Time Mark}\StringTok{\textasciigrave{}}\NormalTok{,df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Part Time Mark}\StringTok{\textasciigrave{}}\SpecialCharTok{==} \StringTok{"no"}\NormalTok{,}\StringTok{"0"}\NormalTok{)}
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Part Time Mark}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Part Time Mark}\StringTok{\textasciigrave{}}\NormalTok{,df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Part Time Mark}\StringTok{\textasciigrave{}}\SpecialCharTok{==} \StringTok{"yes"}\NormalTok{,}\StringTok{"1"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{global-contract-type}{%
+\subsubsection{Global contract type}\label{global-contract-type}}
+
+Dieses Merkmal beschreibt die Vertragsart der Person zum Zeitpunkt der
+letzten Aktivität. 0 - permanent staff (unbefristet) 1 - temporary
+personnel (befristet)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Global contract type}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Global contract type}\StringTok{\textasciigrave{}}\NormalTok{,df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Global contract type}\StringTok{\textasciigrave{}}\SpecialCharTok{==} \StringTok{"apprentice"}\NormalTok{,}\StringTok{"1"}\NormalTok{)}
+
+\FunctionTok{unique}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Global contract type}\StringTok{\textasciigrave{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "permanent staff"     "temporary personnel" "1"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Global contract type}\StringTok{\textasciigrave{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Length     Class      Mode 
+##      3869 character character
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Global contract type}\StringTok{\textasciigrave{}}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{qplot}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Global contract type}\StringTok{\textasciigrave{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Deskriptive-Analyse-Part2_files/figure-latex/unnamed-chunk-11-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Global contract type}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Global contract type}\StringTok{\textasciigrave{}}\NormalTok{,df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Global contract type}\StringTok{\textasciigrave{}}\SpecialCharTok{==} \StringTok{"permanent staff"}\NormalTok{,}\StringTok{"0"}\NormalTok{)}
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Global contract type}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Global contract type}\StringTok{\textasciigrave{}}\NormalTok{,df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Global contract type}\StringTok{\textasciigrave{}}\SpecialCharTok{==} \StringTok{"temporary personnel"}\NormalTok{,}\StringTok{"1"}\NormalTok{)}
+
+\FunctionTok{colnames}\NormalTok{(df)[}\FunctionTok{which}\NormalTok{(}\FunctionTok{names}\NormalTok{(df) }\SpecialCharTok{==} \StringTok{"Global contract type"}\NormalTok{)] }\OtherTok{\textless{}{-}} \StringTok{"TemporaryPersonel"}
+\FunctionTok{qplot}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{TemporaryPersonel}\StringTok{\textasciigrave{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Deskriptive-Analyse-Part2_files/figure-latex/unnamed-chunk-11-2.pdf}
+
+\hypertarget{yearsofservice_basfall}{%
+\subsubsection{YearsOfService\_BASFall}\label{yearsofservice_basfall}}
+
+Dieses Merkmal beschreibt, wie lange die Person im Unternehmen bisher
+tätig war.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{unique}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{YearsOfService\_BASFall)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Unknown or uninitialised column: `YearsOfService_BASFall`.
+\end{verbatim}
+
+\begin{verbatim}
+## NULL
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{YearsOfService\_BASFall)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Unknown or uninitialised column: `YearsOfService_BASFall`.
+\end{verbatim}
+
+\begin{verbatim}
+## Length  Class   Mode 
+##      0   NULL   NULL
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{YearsOfService\_BASFall))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Unknown or uninitialised column: `YearsOfService_BASFall`.
+\end{verbatim}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#qplot(df$YearsOfService\_BASFall)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{employee-subgroup-text}{%
+\subsubsection{Employee Subgroup text}\label{employee-subgroup-text}}
+
+Dieses Merkmal beschreibt welcher Mitarbeitergruppe die Person
+zugeordnet ist/war.
+
+Aufgrund der Verteilung ist eine Einstufung nur in die Gruppen
+``exempt'' (außertarfilich beschäftigt) und ``non exempt'' (tariflich
+beschäftigt). 0 - ``exempt'' umfasst: ``exempt'', ``exempt higher
+level'', ``senior executive'' 1 - ``non exempt'': ``non-exempt
+(white)'', ``working student whit'', ``apprentice''
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{unique}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Employee Subgroup text}\StringTok{\textasciigrave{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "exempt"               "non-exempt (white)"   "exempt higher level" 
+## [4] "working student whit" "apprentice"           "senior executive"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Employee Subgroup text}\StringTok{\textasciigrave{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Length     Class      Mode 
+##      3869 character character
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Employee Subgroup text}\StringTok{\textasciigrave{}}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# qplot(df$\textasciigrave{}Employee Subgroup text\textasciigrave{})}
+
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Employee Subgoup text clustered}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}}\NormalTok{ df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Employee Subgroup text}\StringTok{\textasciigrave{}}
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Employee Subgoup text clustered}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Employee Subgoup text clustered}\StringTok{\textasciigrave{}}\NormalTok{,df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Employee Subgoup text clustered}\StringTok{\textasciigrave{}}\SpecialCharTok{==} \StringTok{"exempt"}\NormalTok{,}\StringTok{"0"}\NormalTok{)}
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Employee Subgoup text clustered}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Employee Subgoup text clustered}\StringTok{\textasciigrave{}}\NormalTok{,df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Employee Subgoup text clustered}\StringTok{\textasciigrave{}}\SpecialCharTok{==} \StringTok{"exempt higher level"}\NormalTok{,}\StringTok{"0"}\NormalTok{)}
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Employee Subgoup text clustered}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Employee Subgoup text clustered}\StringTok{\textasciigrave{}}\NormalTok{,df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Employee Subgoup text clustered}\StringTok{\textasciigrave{}}\SpecialCharTok{==} \StringTok{"senior executive"}\NormalTok{,}\StringTok{"0"}\NormalTok{)}
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Employee Subgoup text clustered}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Employee Subgoup text clustered}\StringTok{\textasciigrave{}}\NormalTok{,df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Employee Subgoup text clustered}\StringTok{\textasciigrave{}}\SpecialCharTok{==} \StringTok{"non{-}exempt (white)"}\NormalTok{,}\StringTok{"1"}\NormalTok{)}
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Employee Subgoup text clustered}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Employee Subgoup text clustered}\StringTok{\textasciigrave{}}\NormalTok{,df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Employee Subgoup text clustered}\StringTok{\textasciigrave{}}\SpecialCharTok{==} \StringTok{"working student whit"}\NormalTok{,}\StringTok{"1"}\NormalTok{)}
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Employee Subgoup text clustered}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Employee Subgoup text clustered}\StringTok{\textasciigrave{}}\NormalTok{,df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Employee Subgoup text clustered}\StringTok{\textasciigrave{}}\SpecialCharTok{==} \StringTok{"apprentice"}\NormalTok{,}\StringTok{"1"}\NormalTok{)}
+
+\FunctionTok{colnames}\NormalTok{(df)[}\FunctionTok{which}\NormalTok{(}\FunctionTok{names}\NormalTok{(df) }\SpecialCharTok{==} \StringTok{"Employee Subgoup text clustered"}\NormalTok{)] }\OtherTok{\textless{}{-}} \StringTok{"NonExempt"}
+
+\FunctionTok{unique}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}NonExempt\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "0" "1"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}NonExempt\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Length     Class      Mode 
+##      3869 character character
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}NonExempt\textquotesingle{}}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{qplot}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}NonExempt\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Deskriptive-Analyse-Part2_files/figure-latex/unnamed-chunk-13-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Employee Subgroup text}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \ConstantTok{NULL}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{cost-center-long}{%
+\subsubsection{Cost Center long}\label{cost-center-long}}
+
+Dieses Merkmal beschreibt die Kostenstelle inclusive der Zuordnung der
+Region und dem Unternehmen.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# unique(df$\textasciigrave{}Cost Center long\textasciigrave{})}
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Cost Center long}\StringTok{\textasciigrave{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Length     Class      Mode 
+##      3869 character character
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Cost Center long}\StringTok{\textasciigrave{}}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Cost Center long}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}}  \ConstantTok{NULL}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{cost-center-text}{%
+\subsubsection{Cost Center text}\label{cost-center-text}}
+
+Dieses Merkmal beschreibt den Namen der Kostenstelle.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# unique(df$\textasciigrave{}Cost Center text\textasciigrave{})}
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Cost Center text}\StringTok{\textasciigrave{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Length     Class      Mode 
+##      3869 character character
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Cost Center text}\StringTok{\textasciigrave{}}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Cost Center text}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \ConstantTok{NULL}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{lastactive_calendar-yearmontht}{%
+\subsubsection{LastActive\_Calendar
+Year/Montht}\label{lastactive_calendar-yearmontht}}
+
+Dieses Merkmal beschreibt, wann die Person das letzte Mal aktiv war.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# unique(df$\textasciigrave{}LastActive\_Calendar Year/Month\textasciigrave{})}
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{LastActive\_Calendar Year/Month}\StringTok{\textasciigrave{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##         Min.      1st Qu.       Median         Mean      3rd Qu.         Max. 
+## "2015-12-01" "2020-02-01" "2021-10-01" "2020-10-20" "2021-10-01" "2021-10-01"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{LastActive\_Calendar Year/Month}\StringTok{\textasciigrave{}}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\hypertarget{tec}{%
+\subsubsection{TEC}\label{tec}}
+
+Dieses Merkmal beschreibt ob die Person einen vollumfänglichen Vertrag
+mit dem Standort Berlin hat. Beispielsweise haben Praktikanten oder
+Leasingkräfte keinen solchen Vertrag. Im Fokus der Analyse sollten
+deswegen die TEC-Kräfte stehen, da diese auch nur im Personal-Reporting
+berücksichtigt werden.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{unique}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{TEC)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 1
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{TEC)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##       1       1       1       1       1       1
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{TEC))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df}\SpecialCharTok{$}\NormalTok{TEC }\OtherTok{\textless{}{-}} \ConstantTok{NULL}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{stelle-sap}{%
+\subsubsection{Stelle (SAP)}\label{stelle-sap}}
+
+Dieses Merkmal beschreibt die Position der Person, wie sie in SAP
+(Quellsystem) gepflegt ist.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{unique}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Stelle (SAP)}\StringTok{\textasciigrave{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  [1] "Expert"                              
+##  [2] "Teamspecialist"                      
+##  [3] "Executive Specialist"                
+##  [4] "Manager"                             
+##  [5] "Officer"                             
+##  [6] "Head of Project"                     
+##  [7] "Senior Expert"                       
+##  [8] "Senior Project Manager"              
+##  [9] "Specialist"                          
+## [10] "Project Manager"                     
+## [11] "Senior Officer"                      
+## [12] "Senior Advisor"                      
+## [13] "Accountant"                          
+## [14] "Head of Department"                  
+## [15] "Senior Accountant"                   
+## [16] "Advisor"                             
+## [17] "Executive Accountant"                
+## [18] "Teamleader"                          
+## [19] "Assistant"                           
+## [20] "Senior Specialist"                   
+## [21] "Knowledge & Communication Specialist"
+## [22] "Student Trainee"                     
+## [23] "Teamlead"                            
+## [24] "Professional"                        
+## [25] "Apprentice"                          
+## [26] "Apprentice BA"                       
+## [27] "Team Assistant"                      
+## [28] "Senior Buyer"                        
+## [29] "Buyer"                               
+## [30] "Procurement Analyst"                 
+## [31] "Senior Manager"                      
+## [32] "Vice President"                      
+## [33] "Executive Professional"              
+## [34] NA                                    
+## [35] "Senior Procurement Analyst"          
+## [36] "Intern"                              
+## [37] "Senior Professional"                 
+## [38] "Executive Expert"                    
+## [39] "Finance Manager"                     
+## [40] "Trainee"                             
+## [41] "Executive Assistant"                 
+## [42] "Specialist Accounting"               
+## [43] "Specialist ICTP"                     
+## [44] "Execuitve Professional"              
+## [45] "Teamspecialist (temporär)"           
+## [46] "Knowledge Coordinator"               
+## [47] "SVP Regional Service Delivery EMEA"  
+## [48] "Executive Advisor"                   
+## [49] "Managing Director"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Stelle (SAP)}\StringTok{\textasciigrave{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Length     Class      Mode 
+##      3869 character character
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Stelle (SAP)}\StringTok{\textasciigrave{}}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 6
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# qplot(df$\textasciigrave{}Stelle (SAP)\textasciigrave{})}
+
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Stelle (SAP)}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \ConstantTok{NULL}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{in-dashboard}{%
+\subsubsection{In Dashboard}\label{in-dashboard}}
+
+Dieses Merkmal beschreibt die Position der Person in Clustern. Dabei
+wird sich an den Gehaltsbändern orientiert. Payband ``A'' ist dabei das
+niedrigste und Payband ``H'' das höchste.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{unique}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{In Dashboard}\StringTok{\textasciigrave{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  [1] "Project Manager / Expert"                                                
+##  [2] "Teamspecialist / Knowledge Coordinator"                                  
+##  [3] "Executive Accountant/Advisor/Buyer/Specialist/Assistant"                 
+##  [4] "Manager"                                                                 
+##  [5] "Officer / Team Assistant"                                                
+##  [6] "Head of"                                                                 
+##  [7] "Senior Expert / Senior Project Manager / Senior Manager/ Finance Manager"
+##  [8] "Accountant/Advisor/Buyer/Specialist und Senior Officer"                  
+##  [9] "Senior Accountant/Advisor/Buyer/Specialist"                              
+## [10] "Assistant"                                                               
+## [11] "Student Trainee / Trainee"                                               
+## [12] "Apprentice / Apprentice BA"                                              
+## [13] "Senior Executive"                                                        
+## [14] NA
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{In Dashboard}\StringTok{\textasciigrave{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Length     Class      Mode 
+##      3869 character character
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{In Dashboard}\StringTok{\textasciigrave{}}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 6
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# qplot(df$\textasciigrave{}In Dashboard\textasciigrave{})}
+
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}}\OtherTok{\textless{}{-}}\NormalTok{ df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{In Dashboard}\StringTok{\textasciigrave{}}
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}}\NormalTok{,df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}}\SpecialCharTok{==} \StringTok{"Apprentice / Apprentice BA"}\NormalTok{,}\StringTok{"A"}\NormalTok{)}
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}}\NormalTok{,df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}}\SpecialCharTok{==} \StringTok{"Student Trainee / Trainee"}\NormalTok{ ,}\StringTok{"B"}\NormalTok{)}
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}}\NormalTok{,df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}}\SpecialCharTok{==} \StringTok{"Assistant"}\NormalTok{ ,}\StringTok{"C"}\NormalTok{)}
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}}\NormalTok{,df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}}\SpecialCharTok{==} \StringTok{"Officer / Team Assistant"}\NormalTok{,}\StringTok{"C"}\NormalTok{)}
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}}\NormalTok{,df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}}\SpecialCharTok{==} \StringTok{"Accountant/Advisor/Buyer/Specialist und Senior Officer"}\NormalTok{,}\StringTok{"D"}\NormalTok{)}
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}}\NormalTok{,df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}}\SpecialCharTok{==} \StringTok{"Senior Accountant/Advisor/Buyer/Specialist"}\NormalTok{,}\StringTok{"D"}\NormalTok{)}
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}}\NormalTok{,df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}}\SpecialCharTok{==} \StringTok{"Executive Accountant/Advisor/Buyer/Specialist/Assistant"}\NormalTok{,}\StringTok{"E"}\NormalTok{)}
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}}\NormalTok{,df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}}\SpecialCharTok{==} \StringTok{"Teamspecialist / Knowledge Coordinator"}\NormalTok{ ,}\StringTok{"F"}\NormalTok{)}
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}}\NormalTok{,df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}}\SpecialCharTok{==} \StringTok{"Manager"}\NormalTok{,}\StringTok{"G"}\NormalTok{)}
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}}\NormalTok{,df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}}\SpecialCharTok{==} \StringTok{"Manager"}\NormalTok{,}\StringTok{"G"}\NormalTok{)}
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}}\NormalTok{,df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}}\SpecialCharTok{==} \StringTok{"Project Manager / Expert"}\NormalTok{,}\StringTok{"G"}\NormalTok{)}
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}}\NormalTok{,df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}}\SpecialCharTok{==} \StringTok{"Head of"}\NormalTok{,}\StringTok{"H"}\NormalTok{)}
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}}\NormalTok{,df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}}\SpecialCharTok{==} \StringTok{"Senior Expert / Senior Project Manager / Senior Manager/ Finance Manager"}\NormalTok{,}\StringTok{"H"}\NormalTok{)}
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}}\NormalTok{,df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}}\SpecialCharTok{==} \StringTok{"Senior Executive"}\NormalTok{,}\StringTok{"H"}\NormalTok{)}
+
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}}\NormalTok{)}
+\FunctionTok{qplot}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Paybands)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Deskriptive-Analyse-Part2_files/figure-latex/unnamed-chunk-19-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{In Dashboard}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \ConstantTok{NULL}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{paybands}{%
+\subsubsection{Paybands}\label{paybands}}
+
+Dieses Merkmal beschreibt die Position der Person in Klustern. Dabei
+wird sich an den Gehaltsbändern orientiert.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{unique}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] G    F    E    C    H    D    B    A    <NA>
+## Levels: A B C D E F G H
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    A    B    C    D    E    F    G    H NA's 
+##   93  118  951 1805  273  230  298   95    6
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Paybands}\StringTok{\textasciigrave{}}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 6
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# qplot(df$\textasciigrave{}Paybands\textasciigrave{})}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{name-on-dashboard}{%
+\subsubsection{Name on Dashboard}\label{name-on-dashboard}}
+
+Dieses Merkmal beschreibt die Position der Person in Klustern. Dabei
+wird sich an den Gehaltsbändern orientiert und in Oberbegriffe
+untergliedert Da der Wertebereich noch relativ hoch ist, könnte eine
+zusätzliche Gruppierung, die sich noch näher an die Gehaltsbänder
+anpasst, verfolgt werden.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{unique}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Name on Dashboard}\StringTok{\textasciigrave{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  [1] "PM/Expert"                "TS/KCS"                  
+##  [3] "Executive Specialist"     "Manager"                 
+##  [5] "Officer/Team Assistant"   "Head of"                 
+##  [7] "Sr. Expert/PM/Manager"    "Specialist & Sr. Officer"
+##  [9] "Sr. Specialist"           "Assistant"               
+## [11] "Student Trainee"          "Apprentice"              
+## [13] "Senior Executive"         NA
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Name on Dashboard}\StringTok{\textasciigrave{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Length     Class      Mode 
+##      3869 character character
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#sum(is.na(df$\textasciigrave{}Name on Dashboard\textasciigrave{}))}
+
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Name on Dashboard}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \ConstantTok{NULL}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{classification}{%
+\subsubsection{Classification}\label{classification}}
+
+Dieses Merkmal beschreibt die Einteilung in Mitarbeitergruppen in der
+Logik des Reportings am Standort Berlin. Die ``Employee Subgroup''
+sollte bevorzugt eingesetzt werden in einer vergleichsweisen
+Gruppierung.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{unique}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Classification)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Exempt"     "Non-Exempt" "Student"    NA
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Classification)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Length     Class      Mode 
+##      3869 character character
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Classification))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 6
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{qplot}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Classification)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Deskriptive-Analyse-Part2_files/figure-latex/unnamed-chunk-22-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df}\SpecialCharTok{$}\NormalTok{Classification }\OtherTok{\textless{}{-}} \ConstantTok{NULL}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{last_development_calendar-yearmonth}{%
+\subsubsection{Last\_Development\_Calendar
+Year/Month}\label{last_development_calendar-yearmonth}}
+
+Dieses Merkmal beschreibt, wann sich die Person das zum letzten Mal
+horizontal oder vertikal oder von tariflich beschäftigt zu
+außertariflich beschäftigt entwickelt hat. Leere Werte deuten darauf
+hin, dass sich die Person noch nicht entwickelt hat. In solchen Fällen
+ist das Startdatum der Person als Berechnungsgrundlage zu wählen.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# todo: in Date umwandeln, falls leer mit Start{-}Datum ersetzen {-} in Monaten}
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}Last\_Development\_Calendar Year/Month\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Unknown or uninitialised column: `Last_Development_Calendar Year/
+## Month`.
+\end{verbatim}
+
+\begin{verbatim}
+## Length  Class   Mode 
+##      0   NULL   NULL
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}Last\_Development\_Calendar Year/Month\textquotesingle{}}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Unknown or uninitialised column: `Last_Development_Calendar Year/
+## Month`.
+\end{verbatim}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\hypertarget{development-to-exempt}{%
+\subsubsection{development to exempt}\label{development-to-exempt}}
+
+Dieses Merkmal beschreibt die Entwicklung einer Person von tariflich
+beschäftigt zu außer-tariflich beschäftigt (1) oder nicht (0). Diese
+Entwicklung ist oft im Zusammenhang mit der Beförderung in eine
+Experten- oder Managerfunktion zu beobachten. Die zweifache Entwicklung
+zum außertariflichen Beschäftigungsverhältnis kann auf einen
+Eingabefehler zurück- geführt werden und wird in diesem Schritt in eine
+``1'' umgewandelt.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{development to exempt}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{development to exempt}\StringTok{\textasciigrave{}}\NormalTok{,df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{development to exempt}\StringTok{\textasciigrave{}}\SpecialCharTok{==} \StringTok{"2"}\NormalTok{,}\StringTok{"1"}\NormalTok{)}
+\FunctionTok{unique}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}development to exempt\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "1" "0"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}development to exempt\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Length     Class      Mode 
+##      3869 character character
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}development to exempt\textquotesingle{}}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{qplot}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}development to exempt\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Deskriptive-Analyse-Part2_files/figure-latex/unnamed-chunk-24-1.pdf}
+
+\hypertarget{vertical_horizontal_developments}{%
+\subsubsection{Vertical\_Horizontal\_Developments}\label{vertical_horizontal_developments}}
+
+Dieser Wert sagt aus, wie oft der Mitarbeiter vertikal und horizontal im
+Unternhemen befördert wurde.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{unique}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Vertical\_Horizontal\_Developments)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 3 1 0 2 4 5 6 7 8
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Vertical\_Horizontal\_Developments)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##  0.0000  0.0000  0.0000  0.6614  1.0000  8.0000
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Vertical\_Horizontal\_Developments))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{qplot}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Vertical\_Horizontal\_Developments)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+\end{verbatim}
+
+\includegraphics{Deskriptive-Analyse-Part2_files/figure-latex/unnamed-chunk-25-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df}\SpecialCharTok{$}\NormalTok{Vertical\_Horizontal\_Developments }\OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Vertical\_Horizontal\_Developments,df}\SpecialCharTok{$}\NormalTok{Vertical\_Horizontal\_Developments}\SpecialCharTok{==} \StringTok{"1"}\NormalTok{,}\StringTok{"1{-}2"}\NormalTok{)}
+\NormalTok{df}\SpecialCharTok{$}\NormalTok{Vertical\_Horizontal\_Developments }\OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Vertical\_Horizontal\_Developments,df}\SpecialCharTok{$}\NormalTok{Vertical\_Horizontal\_Developments}\SpecialCharTok{==} \StringTok{"2"}\NormalTok{,}\StringTok{"1{-}2"}\NormalTok{)}
+\NormalTok{df}\SpecialCharTok{$}\NormalTok{Vertical\_Horizontal\_Developments }\OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Vertical\_Horizontal\_Developments,df}\SpecialCharTok{$}\NormalTok{Vertical\_Horizontal\_Developments}\SpecialCharTok{==} \StringTok{"3"}\NormalTok{,}\StringTok{"\textgreater{}= 3"}\NormalTok{)}
+\NormalTok{df}\SpecialCharTok{$}\NormalTok{Vertical\_Horizontal\_Developments }\OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Vertical\_Horizontal\_Developments,df}\SpecialCharTok{$}\NormalTok{Vertical\_Horizontal\_Developments}\SpecialCharTok{==} \StringTok{"4"}\NormalTok{,}\StringTok{"\textgreater{}= 3"}\NormalTok{)}
+\NormalTok{df}\SpecialCharTok{$}\NormalTok{Vertical\_Horizontal\_Developments }\OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Vertical\_Horizontal\_Developments,df}\SpecialCharTok{$}\NormalTok{Vertical\_Horizontal\_Developments}\SpecialCharTok{==} \StringTok{"5"}\NormalTok{,}\StringTok{"\textgreater{}= 3"}\NormalTok{)}
+\NormalTok{df}\SpecialCharTok{$}\NormalTok{Vertical\_Horizontal\_Developments }\OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Vertical\_Horizontal\_Developments,df}\SpecialCharTok{$}\NormalTok{Vertical\_Horizontal\_Developments}\SpecialCharTok{==} \StringTok{"6"}\NormalTok{,}\StringTok{"\textgreater{}= 3"}\NormalTok{)}
+\NormalTok{df}\SpecialCharTok{$}\NormalTok{Vertical\_Horizontal\_Developments }\OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Vertical\_Horizontal\_Developments,df}\SpecialCharTok{$}\NormalTok{Vertical\_Horizontal\_Developments}\SpecialCharTok{==} \StringTok{"7"}\NormalTok{,}\StringTok{"\textgreater{}= 3"}\NormalTok{)}
+\NormalTok{df}\SpecialCharTok{$}\NormalTok{Vertical\_Horizontal\_Developments }\OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Vertical\_Horizontal\_Developments,df}\SpecialCharTok{$}\NormalTok{Vertical\_Horizontal\_Developments}\SpecialCharTok{==} \StringTok{"8"}\NormalTok{,}\StringTok{"\textgreater{}= 3"}\NormalTok{)}
+
+\NormalTok{df}\SpecialCharTok{$}\NormalTok{Vertical\_Horizontal\_Developments }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Vertical\_Horizontal\_Developments)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{start_calendar-yearmonth}{%
+\subsubsection{start\_Calendar
+Year/Month}\label{start_calendar-yearmonth}}
+
+Ist das Datum an dem der Mitarbeiter im Unternhemen angefangen hat.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# unique(df$\textquotesingle{}start\_Calendar Year/Month\textquotesingle{})}
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_Calendar Year/Month\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##         Min.      1st Qu.       Median         Mean      3rd Qu.         Max. 
+## "2006-10-01" "2015-08-01" "2018-04-01" "2017-04-05" "2020-06-01" "2021-10-01"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_Calendar Year/Month\textquotesingle{}}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#hier nach Jahren und eventuell Monaten splitten, dann könnte man ne Abhängigkeit zeigen, dass z.B. Menschen die Monat Januar anfangen schneller aussteigen als \#im März :D}
+
+
+\CommentTok{\#Monat}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{start_contract-type}{%
+\subsubsection{start\_contract type}\label{start_contract-type}}
+
+Hat der Mitarbeiter bei Anstellung einen temporären oder dauerhaften
+Vertrag bekommen? Dieses Merkmal beschreibt die Vertragsart der Person
+zum Start im Unternehmen. Diese unterscheidet sich leicht zur Ausprägung
+``Global contract type''.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{unique}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_contract type\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "permanent staff"     "temporary personnel" "apprentice"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_contract type\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Length     Class      Mode 
+##      3869 character character
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_contract type\textquotesingle{}}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{qplot}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_contract type\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Deskriptive-Analyse-Part2_files/figure-latex/unnamed-chunk-27-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_contract type\textquotesingle{}} \OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_contract type\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{start_part-time-mark}{%
+\subsubsection{start\_Part time mark}\label{start_part-time-mark}}
+
+Zu Beginn der Anstellung in Teilzeit angestellt. Dieses Merkmal
+beschreibt, ob die Person zum Zeitpunkt der ersten Aktivität in Teilzeit
+tätig ist/war (1) oder nicht (0).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{unique}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_Part time mark\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "no"  "yes"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_Part time mark\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Length     Class      Mode 
+##      3869 character character
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_Part time mark\textquotesingle{}}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{qplot}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_Part time mark\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Deskriptive-Analyse-Part2_files/figure-latex/unnamed-chunk-28-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_Part time mark\textquotesingle{}} \OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_Part time mark\textquotesingle{}}\NormalTok{,df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_Part time mark\textquotesingle{}}\SpecialCharTok{==} \StringTok{"no"}\NormalTok{,}\StringTok{"0"}\NormalTok{)}
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_Part time mark\textquotesingle{}} \OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_Part time mark\textquotesingle{}}\NormalTok{,df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_Part time mark\textquotesingle{}}\SpecialCharTok{==} \StringTok{"yes"}\NormalTok{,}\StringTok{"1"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{start_employee-subgroup-detail}{%
+\subsubsection{start\_employee subgroup
+detail}\label{start_employee-subgroup-detail}}
+
+Beschreibt Vertragsart bei Anstellung Aufgrund der Verteilung ist eine
+Einstufung nur in die Gruppen ``exempt'' (außertarfilich beschäftigt)
+und ``non exempt'' (tariflich beschäftigt). 0 - ``exempt'' umfasst:
+``exempt'', ``exempt higher level'', ``senior executive'' 1 - ``non
+exempt'': ``non-exempt (white)'', ``working student whit'',
+``apprentice''
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{unique}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_employee subgroup detail\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "non-exempt (white)"   "exempt"               "working student whit"
+## [4] "exempt higher level"  "apprentice"           "senior executive"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_employee subgroup detail\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Length     Class      Mode 
+##      3869 character character
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_employee subgroup detail\textquotesingle{}}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#cluster in exampt and non exempt}
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_employee subgroup detail clustered\textquotesingle{}} \OtherTok{\textless{}{-}}\NormalTok{ df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_employee subgroup detail\textquotesingle{}}
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_employee subgroup detail clustered\textquotesingle{}} \OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_employee subgroup detail clustered\textquotesingle{}}\NormalTok{,df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_employee subgroup detail clustered\textquotesingle{}}\SpecialCharTok{==} \StringTok{"exempt"}\NormalTok{,}\StringTok{"0"}\NormalTok{)}
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_employee subgroup detail clustered\textquotesingle{}} \OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_employee subgroup detail clustered\textquotesingle{}}\NormalTok{,df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_employee subgroup detail clustered\textquotesingle{}}\SpecialCharTok{==} \StringTok{"exempt higher level"}\NormalTok{,}\StringTok{"0"}\NormalTok{)}
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_employee subgroup detail clustered\textquotesingle{}} \OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_employee subgroup detail clustered\textquotesingle{}}\NormalTok{,df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_employee subgroup detail clustered\textquotesingle{}}\SpecialCharTok{==} \StringTok{"senior executive"}\NormalTok{,}\StringTok{"0"}\NormalTok{)}
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_employee subgroup detail clustered\textquotesingle{}} \OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_employee subgroup detail clustered\textquotesingle{}}\NormalTok{,df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_employee subgroup detail clustered\textquotesingle{}}\SpecialCharTok{==} \StringTok{"non{-}exempt (white)"}\NormalTok{,}\StringTok{"1"}\NormalTok{)}
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_employee subgroup detail clustered\textquotesingle{}} \OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_employee subgroup detail clustered\textquotesingle{}}\NormalTok{,df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_employee subgroup detail clustered\textquotesingle{}}\SpecialCharTok{==} \StringTok{"working student whit"}\NormalTok{,}\StringTok{"1"}\NormalTok{)}
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_employee subgroup detail clustered\textquotesingle{}} \OtherTok{\textless{}{-}} \FunctionTok{replace}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_employee subgroup detail clustered\textquotesingle{}}\NormalTok{,df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_employee subgroup detail clustered\textquotesingle{}}\SpecialCharTok{==} \StringTok{"apprentice"}\NormalTok{,}\StringTok{"1"}\NormalTok{)}
+
+\FunctionTok{colnames}\NormalTok{(df)[}\FunctionTok{colnames}\NormalTok{(df) }\SpecialCharTok{==} \StringTok{"start\_employee subgroup detail clustered"}\NormalTok{] }\OtherTok{\textless{}{-}} \StringTok{"start\_NonExempt"}
+
+\FunctionTok{qplot}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{start\_NonExempt)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Deskriptive-Analyse-Part2_files/figure-latex/unnamed-chunk-29-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{start\_employee subgroup detail}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \ConstantTok{NULL}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{start_cost-center2}{%
+\subsubsection{start\_Cost Center2}\label{start_cost-center2}}
+
+Dieses Merkmal beschreibt die Kostenstelle zum Start am Standort Berlin.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# unique(df$\textquotesingle{}start\_Cost Center2\textquotesingle{})}
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_Cost Center2\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Length     Class      Mode 
+##      3869 character character
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_Cost Center2\textquotesingle{}}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\hypertarget{da-es-sehr-viele-unterschiedliche-auspruxe4gungen-bei-diesem-merkmal-gibt-und-die-interne-rechnungstelle-fuxfcr-uns-in-keinem-sichtbaren-zusammenhang-mit-dem-mitarbeiter-sthet-da-dies-keinen-einfluss-auf-den-mitarbeiter-an-sich-hat-haben-wir-uns-entschieden-dieses-merkmal-nicht-weiter-zu-beruxfccksichtiegen.}{%
+\subparagraph{Da es sehr viele unterschiedliche Ausprägungen bei diesem
+Merkmal gibt und die interne Rechnungstelle für uns in keinem sichtbaren
+Zusammenhang mit dem Mitarbeiter sthet, da dies keinen Einfluss auf den
+Mitarbeiter an sich hat, haben wir uns entschieden dieses Merkmal nicht
+weiter zu
+berücksichtiegen.}\label{da-es-sehr-viele-unterschiedliche-auspruxe4gungen-bei-diesem-merkmal-gibt-und-die-interne-rechnungstelle-fuxfcr-uns-in-keinem-sichtbaren-zusammenhang-mit-dem-mitarbeiter-sthet-da-dies-keinen-einfluss-auf-den-mitarbeiter-an-sich-hat-haben-wir-uns-entschieden-dieses-merkmal-nicht-weiter-zu-beruxfccksichtiegen.}}
+
+Dieses Merkmal beschreibt die Kostenstelle inclusive der Zuordnung der
+Region und dem Unternehmen.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{start\_Cost Center2}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \ConstantTok{NULL}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{start_employee-group}{%
+\subsubsection{start\_Employee group}\label{start_employee-group}}
+
+Gibt an, ob der Mitarbeiter befristet oder unbefristet angestellt wurde.
+Inhaltlich kommt es zu einer Überschneidung mit dem ``start\_contract
+type''-Merkmal.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{unique}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_Employee group\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "permanent"          "temporary"          "project assignment"
+## [4] "inpatriate"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_Employee group\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Length     Class      Mode 
+##      3869 character character
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_Employee groupl\textquotesingle{}}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Unknown or uninitialised column: `start_Employee groupl`.
+\end{verbatim}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{qplot}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_Employee group\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Deskriptive-Analyse-Part2_files/figure-latex/unnamed-chunk-32-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_Employee group\textquotesingle{}} \OtherTok{\textless{}{-}} \ConstantTok{NULL}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{cost-center}{%
+\subsubsection{Cost Center}\label{cost-center}}
+
+Dieses Merkmal beschreibt die Kostenstelle der Person zum letzten
+aktiven Zeitpunkt.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# unique(df$\textquotesingle{}Cost Center\textquotesingle{})}
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}Cost Center\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Length     Class      Mode 
+##      3869 character character
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}Cost Center\textquotesingle{}}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# qplot(df$\textquotesingle{}Cost Center\textquotesingle{})}
+\end{Highlighting}
+\end{Shaded}
+
+\hfill\break
+Wie oben bereits erläutert hat die Kostenstelle keinen Einfluss auf die
+Mitarbeiter, da dies intern geschieht und mögliche Zusammenhänge kausal
+ausgeschlossen sind, werden wir dieses Merkmal nicht weiter
+berücksichtigen
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Cost Center}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \ConstantTok{NULL}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{decrease_category}{%
+\subsubsection{decrease\_Category}\label{decrease_category}}
+
+Funktionsbereich beim Verlassen des Unternehmens
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{unique}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}decrease\_Category\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  [1] "Supplier & Reporting"      "Human Resources GBS"      
+##  [3] "People"                    "Customer"                 
+##  [5] "GTU GD"                    "GB Management"            
+##  [7] NA                          "Planning & Development"   
+##  [9] "IT Service CC"             "Safety"                   
+## [11] "Procurement Services - GP" "GBR/N"                    
+## [13] "Intellectual Property"     "RAA/A Competence"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}decrease\_Category\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Length     Class      Mode 
+##      3869 character character
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}decrease\_Category\textquotesingle{}}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 47
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#qplot(df$\textquotesingle{}decrease\_Category\textquotesingle{})}
+
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textquotesingle{}decrease\_Category\textquotesingle{}} \OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}decrease\_Category\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{decrease_sub-category}{%
+\subsubsection{decrease\_Sub-category}\label{decrease_sub-category}}
+
+Abteilung beim Verlassen des Unternehmens
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{unique}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}decrease\_Sub{-}category\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  [1] "VP Book to Report"          "VP Purchase to Pay"        
+##  [3] "Local HR"                   "HR Services LU"            
+##  [5] "VP Order to Cash"           "VP Personnel Services"     
+##  [7] "HR Services Europe"         "GTU - GD"                  
+##  [9] "Talent Aquisition"          "HR Services German Group"  
+## [11] "People Services"            "GBE Management"            
+## [13] NA                           "GB Build"                  
+## [15] "GTU - GB"                   "Local Controlling"         
+## [17] "Projects"                   "IT Ongoing"                
+## [19] "Product Safety Services"    "Communication"             
+## [21] "AP Services"                "Procurement Services - GP" 
+## [23] "GBR/N"                      "Supplier & Reporting Other"
+## [25] "HR Service Delivery"        "Intellectual Property"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}decrease\_Sub{-}category\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Length     Class      Mode 
+##      3869 character character
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}decrease\_Sub{-}category\textquotesingle{}}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 49
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# qplot(df$\textquotesingle{}decrease\_Sub{-}category\textquotesingle{})}
+
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textquotesingle{}decrease\_Sub{-}category\textquotesingle{}} \OtherTok{\textless{}{-}} \ConstantTok{NULL}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{decrease_sdu-name-for-exr}{%
+\subsubsection{decrease\_SDU Name for
+ExR}\label{decrease_sdu-name-for-exr}}
+
+Offizieller Name der Abteilung beim Verlassen des Unternehmens
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{unique}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}decrease\_SDU Name for ExR\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  [1] "B2R-Financial Reporting"        "Accounts Payable"              
+##  [3] "Local HR"                       "HR Services Campus LU"         
+##  [5] "Accounts Receivable"            "Management"                    
+##  [7] "HR Services Europe"             "IT Ongoing and Project"        
+##  [9] NA                               "Talent Management"             
+## [11] "HR Services German Group Co."   "People Services"               
+## [13] "Sales Tax Settlement"           "B2R-Business Reporting I"      
+## [15] "Cash Management & Master Data"  "GB Build"                      
+## [17] "GSSO Technology Unit"           "Local Controlling"             
+## [19] "Project Finance"                "Procurement Services - GB part"
+## [21] "Learning"                       "B2R-Business Reporting II"     
+## [23] "Business Experts"               "Ludwigshafen"                  
+## [25] "Product Safety Services"        "Communications"                
+## [27] "HR Business Support"            "Agricultural Solutions"        
+## [29] "Global Indirect Procurement"    "Management Assistants"         
+## [31] "Projects HR"                    "Local Procurement"             
+## [33] "Digital Excellence"             "Real Estate Management"        
+## [35] "Intellectual Property"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}decrease\_SDU Name for ExR\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Length     Class      Mode 
+##      3869 character character
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}decrease\_SDU Name for ExR\textquotesingle{}}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 402
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# qplot(df$\textquotesingle{}decrease\_SDU Name for ExR\textquotesingle{})}
+
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textquotesingle{}decrease\_SDU Name for ExR\textquotesingle{}} \OtherTok{\textless{}{-}} \ConstantTok{NULL}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{decrease_sdu}{%
+\subsubsection{decrease\_SDU}\label{decrease_sdu}}
+
+Interner Name/Abkürzung der Abteilung beim Verlassen des Unternehmens
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{unique}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}decrease\_SDU\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  [1] "GBE/SB-RR"                           
+##  [2] "GBE/SL-P"                            
+##  [3] "GB/H LHR"                            
+##  [4] "GBE/SHV-L"                           
+##  [5] "GBE/SO-A"                            
+##  [6] "GBE/SHV"                             
+##  [7] "GBE/SHV-E"                           
+##  [8] "GD/X_GTU"                            
+##  [9] "GBE/SB-RM"                           
+## [10] "GBE/SHV-T"                           
+## [11] "GBE/SHV-G"                           
+## [12] "GBE/SHV-P"                           
+## [13] "GBE"                                 
+## [14] NA                                    
+## [15] "GBE/SO-V"                            
+## [16] "GBE/SO-B"                            
+## [17] "GB WS Customs and Oversea Deliveries"
+## [18] "GB/C_GTU"                            
+## [19] "GB/C-OC"                             
+## [20] "GB/C-OT"                             
+## [21] "GB WS Talent Acquisition"            
+## [22] "GBE/SL-B"                            
+## [23] "IT Ongoing"                          
+## [24] "GBR/P"                               
+## [25] "GBP/OE"                              
+## [26] "GB WS Financial Reporting"           
+## [27] "GBC/O"                               
+## [28] "GB/H-OM"                             
+## [29] "GB WS HR Services Europe"            
+## [30] "EU/B-BS"                             
+## [31] "AP"                                  
+## [32] "GB WS Global People Services"        
+## [33] "GB Build WS AP"                      
+## [34] "GB WS Domestic Deliveries"           
+## [35] "GPI/R"                               
+## [36] "GBR"                                 
+## [37] "GBE/SF-OA"                           
+## [38] "GBR/B"                               
+## [39] "GB WS Safety Services"               
+## [40] "GB WS Accounts Receivables"          
+## [41] "GB WS Business Reporting"            
+## [42] "GBE/SY-OX"                           
+## [43] "GBE/SY Facility"                     
+## [44] "GBE/SI"                              
+## [45] "GB Build GBI"                        
+## [46] "GB WS Indirect Tax"                  
+## [47] "RAA/A"                               
+## [48] "GB WS Cash&Master Data"              
+## [49] "GB Build Project"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}decrease\_SDU\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Length     Class      Mode 
+##      3869 character character
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}decrease\_SDU\textquotesingle{}}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 47
+\end{verbatim}
+
+\hfill\break
+Da wir bereits den offiziellen namen der SDU betrachtet werden wir die
+gleichen Daten auf Grund von redundanz aus dem Datensatz entfernen
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df}\SpecialCharTok{$}\NormalTok{decrease\_SDU }\OtherTok{\textless{}{-}} \ConstantTok{NULL}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{decrease_service-stream}{%
+\subsubsection{decrease\_Service Stream}\label{decrease_service-stream}}
+
+Fachbereich beim verlassen des Unternehmens.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{unique}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}decrease\_Service Stream\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  [1] "B2R"                   "P2P"                   "HR Services"          
+##  [4] "O2C"                   "IT"                    "-"                    
+##  [7] NA                      "OD"                    "Controlling Services" 
+## [10] "FEP/S"                 "Finance Services"      "S2C"                  
+## [13] "Intellectual Property"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}decrease\_Service Stream\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Length     Class      Mode 
+##      3869 character character
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}decrease\_Service Stream\textquotesingle{}}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 53
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# qplot(df$\textquotesingle{}decrease\_Service Stream\textquotesingle{})}
+
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textquotesingle{}decrease\_Service Stream\textquotesingle{}} \OtherTok{\textless{}{-}} \ConstantTok{NULL}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{start_category}{%
+\subsubsection{start\_Category}\label{start_category}}
+
+Fachbereich in dem der Mitarbeiter anfangs eingestellt wurde. Das
+Quellsystem ist erst Zeit Oktober 2006 im Einsatz. Alle Mitarbeiter, die
+vorher begonnen haben, werden nicht berücksichtigt. Aus diesem Grund
+müssen diese (NaN) aus dem Datenset entfernt werden. Da es 895 dieser
+Fälle gibt, wird dieses Merkmal als Ganzes nicht weiter betrachet.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{unique}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_Category\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  [1] NA                          "Supplier & Reporting"     
+##  [3] "GTU GD"                    "People"                   
+##  [5] "Customer"                  "Planning & Development"   
+##  [7] "GBR/N"                     "Human Resources GBS"      
+##  [9] "IT Service CC"             "Procurement Services - GP"
+## [11] "Safety"                    "GB Management"            
+## [13] "Intellectual Property"     "RAA/A Competence"         
+## [15] "GBI_"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_Category\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Length     Class      Mode 
+##      3869 character character
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_Category\textquotesingle{}}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 895
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# qplot(df$\textquotesingle{}start\_Category\textquotesingle{})}
+
+\NormalTok{df}\SpecialCharTok{$}\NormalTok{start\_Category }\OtherTok{\textless{}{-}} \ConstantTok{NULL}
+\CommentTok{\#df$\textquotesingle{}start\_Category\textquotesingle{} \textless{}{-} as.factor(df$\textquotesingle{}start\_Category\textquotesingle{})}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{start_sub-category}{%
+\subsubsection{start\_Sub-category}\label{start_sub-category}}
+
+Abteilung in dem der Mitarbeiter anfangs eingestellt wurde.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{unique}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_Sub{-}category\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  [1] NA                           "VP Purchase to Pay"        
+##  [3] "GTU - GD"                   "Talent Aquisition"         
+##  [5] "HR Services German Group"   "People Services"           
+##  [7] "VP Book to Report"          "VP Order to Cash"          
+##  [9] "GTU - GB"                   "HR Services Europe"        
+## [11] "GBR/N"                      "Projects"                  
+## [13] "Communication"              "Local HR"                  
+## [15] "IT Ongoing"                 "Procurement Services - GP" 
+## [17] "Local Controlling"          "Supplier & Reporting Other"
+## [19] "HR Services LU"             "Product Safety Services"   
+## [21] "GBE Management"             "VP Personnel Services"     
+## [23] "HR Service Delivery"        "AP Services"               
+## [25] "Intellectual Property"      "Supply Chain"              
+## [27] "GB Build"                   "GBI_"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_Sub{-}category\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Length     Class      Mode 
+##      3869 character character
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_Sub{-}category\textquotesingle{}}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 897
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# qplot(df$\textquotesingle{}start\_Sub{-}category\textquotesingle{})}
+
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_Sub{-}category\textquotesingle{}} \OtherTok{\textless{}{-}} \ConstantTok{NULL}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{start_sdu-name-for-exr}{%
+\subsubsection{start\_SDU Name for ExR}\label{start_sdu-name-for-exr}}
+
+Offizieller Name der Abteilung beim Eintritt in das Unternehmen.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{unique}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_SDU Name for ExR\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  [1] NA                               "Accounts Payable"              
+##  [3] "IT Ongoing and Project"         "Talent Management"             
+##  [5] "Learning"                       "People Services"               
+##  [7] "B2R-Business Reporting I"       "HR Services German Group Co."  
+##  [9] "B2R-Business Reporting II"      "Ludwigshafen"                  
+## [11] "Procurement Services - GB part" "Cash Management & Master Data" 
+## [13] "Accounts Receivable"            "Business Experts"              
+## [15] "B2R-Financial Reporting"        "HR Services Europe"            
+## [17] "Project Finance"                "Communications"                
+## [19] "Sales Tax Settlement"           "GSSO Technology Unit"          
+## [21] "Local HR"                       "Global Indirect Procurement"   
+## [23] "Local Controlling"              "Management Assistants"         
+## [25] "HR Services Campus LU"          "Management"                    
+## [27] "Product Safety Services"        "HR Business Support"           
+## [29] "Real Estate Management"         "Agricultural Solutions"        
+## [31] "Intellectual Property"          "Supply Chain"                  
+## [33] "GB Build"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_SDU Name for ExR\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Length     Class      Mode 
+##      3869 character character
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_SDU Name for ExR\textquotesingle{}}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 1001
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# qplot(df$\textquotesingle{}start\_SDU Name for ExR\textquotesingle{})}
+
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_SDU Name for ExR\textquotesingle{}} \OtherTok{\textless{}{-}} \ConstantTok{NULL}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{start_sdu}{%
+\subsubsection{start\_SDU}\label{start_sdu}}
+
+Interner Name der Abteilung beim Eintritt in das Unternehmen.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{unique}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_SDU\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  [1] NA                                    
+##  [2] "GBE/SL-P"                            
+##  [3] "GD/X_GTU"                            
+##  [4] "GBE/SHV-T"                           
+##  [5] "GBE/SHV-G"                           
+##  [6] "GBE/SHV-P"                           
+##  [7] "GBE/SB-RM"                           
+##  [8] "GBR/P"                               
+##  [9] "GBE/SL-B"                            
+## [10] "GBE/SO-B"                            
+## [11] "GBE/SO-A"                            
+## [12] "GB/C_GTU"                            
+## [13] "GBE/SB-RR"                           
+## [14] "GBE/SHV-E"                           
+## [15] "GBR"                                 
+## [16] "GBC/O"                               
+## [17] "GB/C-OT"                             
+## [18] "GB/H-OM"                             
+## [19] "GBE/SO-V"                            
+## [20] "GB/H LHR"                            
+## [21] "IT Ongoing"                          
+## [22] "GPI/R"                               
+## [23] "GB/C-OC"                             
+## [24] "GBE/SF-OA"                           
+## [25] "GBE/SHV-L"                           
+## [26] "GBR/B"                               
+## [27] "GBP/OE"                              
+## [28] "GBE"                                 
+## [29] "EU/B-BS"                             
+## [30] "GBE/SY Facility"                     
+## [31] "AP"                                  
+## [32] "GBE/SHV"                             
+## [33] "GBE/SI"                              
+## [34] "GBE/SU-G"                            
+## [35] "GB WS Customs and Oversea Deliveries"
+## [36] "GB WS Business Reporting"            
+## [37] "GB WS Financial Reporting"           
+## [38] "GB WS Talent Acquisition"            
+## [39] "GB WS Domestic Deliveries"           
+## [40] "GB WS HR Services Europe"            
+## [41] "GB WS Indirect Tax"                  
+## [42] "GB WS Global People Services"        
+## [43] "GB WS Safety Services"               
+## [44] "GB Build WS AP"                      
+## [45] "GB Build GBI"                        
+## [46] "RAA/A"                               
+## [47] "GB WS Cash&Master Data"              
+## [48] "GBI"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_SDU\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Length     Class      Mode 
+##      3869 character character
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_SDU\textquotesingle{}}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 895
+\end{verbatim}
+
+\hfill\break
+Da wir bereits den offiziellen namen der SDU werden wir die gleichen
+Daten auf Grund von redundanz aus dem Datensatz entfernen
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df}\SpecialCharTok{$}\NormalTok{start\_SDU }\OtherTok{\textless{}{-}} \ConstantTok{NULL}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{start_service-stream}{%
+\subsubsection{start\_Service Stream}\label{start_service-stream}}
+
+Fachbereich beim Eintritt in das Unternehmen.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{unique}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_Service Stream\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  [1] NA                      "P2P"                   "IT"                   
+##  [4] "HR Services"           "B2R"                   "O2C"                  
+##  [7] "-"                     "Controlling Services"  "OD"                   
+## [10] "S2C"                   "FEP/S"                 "Finance Services"     
+## [13] "Intellectual Property"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_Service Stream\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Length     Class      Mode 
+##      3869 character character
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_Service Stream\textquotesingle{}}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 919
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# qplot(df$\textquotesingle{}start\_Service Stream\textquotesingle{})}
+
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textquotesingle{}start\_Service Stream\textquotesingle{}} \OtherTok{\textless{}{-}} \ConstantTok{NULL}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{age}{%
+\subsubsection{Age}\label{age}}
+
+Dies ist das selbst berechnete Merkmal, welches das aktuelle Alter aller
+aktiven Mitarbeiter oder das Alter der Mitarbeiter bei Ihrem Ausstieg in
+Jahren anzeigt.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{unique}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Age)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  [1] 39 37 61 48 40 46 50 45 42 43 44 54 38 34 36 63 49 67 52 51 60 41 56 33 57
+## [26] 68 65 59 62 53 58 47 66 55 32 64 31 30 29 35 27 28 26 25 23 22 24 20 21 19
+## [51] 18
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Age)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   18.00   29.00   33.00   34.34   38.00   68.00
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Age))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{qplot}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Age)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+\end{verbatim}
+
+\includegraphics{Deskriptive-Analyse-Part2_files/figure-latex/unnamed-chunk-47-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ggplot}\NormalTok{(df, }\FunctionTok{aes}\NormalTok{(EmployeeChurned, Age)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_boxplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{colour =}\NormalTok{ EmployeeChurned), }\AttributeTok{alpha=}\FloatTok{0.2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Deskriptive-Analyse-Part2_files/figure-latex/unnamed-chunk-47-2.pdf}\\
+Es lässt sich erkennen, dass jüngere Mitarbeiter eher dazu tendieren das
+Unternehmen zu verlassen. \#\#\# Month Of Service Dieses Merkmal haben
+wir erstellt, um die Anstellungszeit genauer darstellen zu können. Die
+Aufteilung in Jahre ist zu unspezidfisch für unsere Analyse, da dieses
+merkmal auf Grund der Problemstellung eine wichtige Rolle in unserem
+Projetk spielen wird.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Month Of Service}\StringTok{\textasciigrave{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   -5.00    9.00   26.00   43.07   57.00  183.00
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Month Of Service}\StringTok{\textasciigrave{}}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Bei der Berechnung wurden bereits alle "NA"{-}Werte gelöscht, daher sind diese hier nicht mehr vorhanden. }
+
+\FunctionTok{qplot}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Month Of Service}\StringTok{\textasciigrave{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+\end{verbatim}
+
+\includegraphics{Deskriptive-Analyse-Part2_files/figure-latex/unnamed-chunk-48-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ggplot}\NormalTok{(df, }\FunctionTok{aes}\NormalTok{(EmployeeChurned, }\StringTok{\textasciigrave{}}\AttributeTok{Month Of Service}\StringTok{\textasciigrave{}}\NormalTok{)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_boxplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{colour =}\NormalTok{ EmployeeChurned), }\AttributeTok{alpha=}\FloatTok{0.2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Deskriptive-Analyse-Part2_files/figure-latex/unnamed-chunk-48-2.pdf}\\
+Es lässt sich erkennen, dass Mitarbeitende mit längerer Anstellungszeit
+eher im Unternehmen bleiben, als weniger lang angestellte Mitarbeitende.
+
+\hypertarget{month-since-last-development}{%
+\subsubsection{Month Since Last
+Development}\label{month-since-last-development}}
+
+Das hier von uns erzeugte und gezeigte Merkmal beschreibt die Dauer
+zwischen der letzten Beförderung und dem Austritt aus dem Unternehmen.
+Sollte der Mitarbeiter noch aktiv sein, bezieht sich die Dauer auf die
+letzte Beförderung und das aktuelle Datum. Hier gibt es falsche Werte.
+Diese sind negative Zeiten. Diese falschen Werte sind entstanden, wenn
+ein Mitarbeiter eine Beförderung erhalten, danach das Unternhemen
+verlassen und später wieder in das Unternehmen als Mitarbeiter
+aufgenommen wurde. Diese falschen Werte ersetzten wir durch 0.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#ändert alle negativen Werte in 0}
+\NormalTok{df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Months Since Last Development}\StringTok{\textasciigrave{}} \OtherTok{\textless{}{-}} \FunctionTok{pmax}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Months Since Last Development}\StringTok{\textasciigrave{}}\NormalTok{, }\DecValTok{0}\NormalTok{)}
+
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Months Since Last Development}\StringTok{\textasciigrave{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##    0.00    5.00   15.00   26.33   36.00  183.00
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Months Since Last Development}\StringTok{\textasciigrave{}}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{qplot}\NormalTok{(df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Months Since Last Development}\StringTok{\textasciigrave{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+\end{verbatim}
+
+\includegraphics{Deskriptive-Analyse-Part2_files/figure-latex/unnamed-chunk-49-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ggplot}\NormalTok{(df, }\FunctionTok{aes}\NormalTok{(EmployeeChurned, }\StringTok{\textasciigrave{}}\AttributeTok{Months Since Last Development}\StringTok{\textasciigrave{}}\NormalTok{)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_boxplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{colour =}\NormalTok{ EmployeeChurned), }\AttributeTok{alpha=}\FloatTok{0.2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Deskriptive-Analyse-Part2_files/figure-latex/unnamed-chunk-49-2.pdf}\\
+Auf den ersten Blick gibt es keinen erkennbaren Zusammenhang zwischen
+der Zielvariable EmployeeChurned und Month Since Last Development.
+
+\hypertarget{korrelation-der-numerischen-merkmale}{%
+\subsubsection{Korrelation der Numerischen
+Merkmale}\label{korrelation-der-numerischen-merkmale}}
+
+Die roten Punkte bedeuten, dass der Mitarbeiter nicht mehr im
+Unternehmen ist.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{str}\NormalTok{(df)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## tibble[,19] [3,869 x 19] (S3: tbl_df/tbl/data.frame)
+##  $ Gender                          : chr [1:3869] "1" "0" "1" "1" ...
+##  $ Part Time Mark                  : chr [1:3869] "1" "0" "0" "0" ...
+##  $ TemporaryPersonel               : chr [1:3869] "0" "0" "0" "0" ...
+##  $ development to exempt           : chr [1:3869] "1" "0" "1" "1" ...
+##  $ Vertical_Horizontal_Developments: Factor w/ 3 levels ">= 3","0","1-2": 1 3 2 3 3 2 3 3 3 3 ...
+##  $ start_Calendar Year/Month       : Date[1:3869], format: "2009-10-01" "2008-05-01" ...
+##  $ start_contract type             : Factor w/ 3 levels "apprentice","permanent staff",..: 2 3 2 2 3 2 2 2 2 2 ...
+##  $ start_Part time mark            : chr [1:3869] "0" "1" "0" "0" ...
+##  $ LastActive_Calendar Year/Month  : Date[1:3869], format: "2021-10-01" "2016-06-01" ...
+##  $ EmployeeChurned                 : chr [1:3869] "0" "1" "1" "0" ...
+##  $ start_Cost center               : chr [1:3869] "DB152100" "DB67100" "DB67500" "DB610306" ...
+##  $ decrease_Category               : Factor w/ 13 levels "Customer","GB Management",..: 13 13 5 8 13 1 8 8 13 13 ...
+##  $ Nationality_Classification      : Factor w/ 3 levels "EU","German",..: 2 3 2 2 2 2 2 2 2 1 ...
+##  $ Month Of Service                : num [1:3869] 146 98 151 60 39 163 130 53 32 114 ...
+##  $ Age                             : num [1:3869] 39 37 61 39 48 40 46 37 61 46 ...
+##  $ Months Since Last Development   : num [1:3869] 3 18 41 71 14 163 81 0 32 26 ...
+##  $ NonExempt                       : chr [1:3869] "0" "1" "0" "0" ...
+##  $ Paybands                        : Factor w/ 8 levels "A","B","C","D",..: 7 6 5 7 3 3 8 8 7 8 ...
+##  $ start_NonExempt                 : chr [1:3869] "1" "1" "1" "1" ...
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df}\SpecialCharTok{$}\NormalTok{EmployeeChurned }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{EmployeeChurned)}
+\NormalTok{df\_cor }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Age, df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Month Of Service}\StringTok{\textasciigrave{}}\NormalTok{, df}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{Months Since Last Development}\StringTok{\textasciigrave{}}\NormalTok{, df}\SpecialCharTok{$}\NormalTok{NonExempt, df}\SpecialCharTok{$}\NormalTok{Paybands, df}\SpecialCharTok{$}\NormalTok{start\_NonExempt,  df}\SpecialCharTok{$}\NormalTok{EmployeeChurned)}
+\NormalTok{df\_cor}\SpecialCharTok{$}\NormalTok{df.NonExempt }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(df\_cor}\SpecialCharTok{$}\NormalTok{df.NonExempt)}
+\NormalTok{df\_cor}\SpecialCharTok{$}\NormalTok{df.start\_NonExempt }\OtherTok{\textless{}{-}} \FunctionTok{as.factor}\NormalTok{(df\_cor}\SpecialCharTok{$}\NormalTok{df.start\_NonExempt)}
+\FunctionTok{pairs}\NormalTok{(df\_cor, }\AttributeTok{col =}\NormalTok{ df\_cor}\SpecialCharTok{$}\NormalTok{df.EmployeeChurned)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Deskriptive-Analyse-Part2_files/figure-latex/unnamed-chunk-50-1.pdf}\\
+Im nächsten Schritt wird beispielhaft versucht, Zusammenhänge zwischen
+verschiedenen Merkmalen und der Abwanderung zu Visualisieren.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# df$Gender \textless{}{-} as.factor(df$Gender)}
+\FunctionTok{ggplot}\NormalTok{(df, }\FunctionTok{aes}\NormalTok{(}\StringTok{\textasciigrave{}}\AttributeTok{Month Of Service}\StringTok{\textasciigrave{}}\NormalTok{, Gender)) }\SpecialCharTok{+}
+\FunctionTok{geom\_jitter}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{colour =}\NormalTok{ EmployeeChurned), }\AttributeTok{alpha=}\FloatTok{0.2}\NormalTok{, }\AttributeTok{height =} \FloatTok{0.3}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Deskriptive-Analyse-Part2_files/figure-latex/unnamed-chunk-51-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ggplot}\NormalTok{(df, }\FunctionTok{aes}\NormalTok{(}\StringTok{\textasciigrave{}}\AttributeTok{Month Of Service}\StringTok{\textasciigrave{}}\NormalTok{, }\StringTok{\textasciigrave{}}\AttributeTok{start\_Part time mark}\StringTok{\textasciigrave{}}\NormalTok{)) }\SpecialCharTok{+}
+\FunctionTok{geom\_jitter}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{colour =}\NormalTok{ EmployeeChurned), }\AttributeTok{alpha=}\FloatTok{0.2}\NormalTok{, }\AttributeTok{height =} \FloatTok{0.3}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Deskriptive-Analyse-Part2_files/figure-latex/unnamed-chunk-52-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ggplot}\NormalTok{(df, }\FunctionTok{aes}\NormalTok{(}\StringTok{\textasciigrave{}}\AttributeTok{Month Of Service}\StringTok{\textasciigrave{}}\NormalTok{, }\StringTok{\textasciigrave{}}\AttributeTok{Part Time Mark}\StringTok{\textasciigrave{}}\NormalTok{)) }\SpecialCharTok{+}
+\FunctionTok{geom\_jitter}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{colour =}\NormalTok{ EmployeeChurned), }\AttributeTok{alpha=}\FloatTok{0.2}\NormalTok{, }\AttributeTok{height =} \FloatTok{0.3}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Deskriptive-Analyse-Part2_files/figure-latex/unnamed-chunk-53-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{names}\NormalTok{(df)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  [1] "Gender"                           "Part Time Mark"                  
+##  [3] "TemporaryPersonel"                "development to exempt"           
+##  [5] "Vertical_Horizontal_Developments" "start_Calendar Year/Month"       
+##  [7] "start_contract type"              "start_Part time mark"            
+##  [9] "LastActive_Calendar Year/Month"   "EmployeeChurned"                 
+## [11] "start_Cost center"                "decrease_Category"               
+## [13] "Nationality_Classification"       "Month Of Service"                
+## [15] "Age"                              "Months Since Last Development"   
+## [17] "NonExempt"                        "Paybands"                        
+## [19] "start_NonExempt"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{str}\NormalTok{(df)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## tibble[,19] [3,869 x 19] (S3: tbl_df/tbl/data.frame)
+##  $ Gender                          : chr [1:3869] "1" "0" "1" "1" ...
+##  $ Part Time Mark                  : chr [1:3869] "1" "0" "0" "0" ...
+##  $ TemporaryPersonel               : chr [1:3869] "0" "0" "0" "0" ...
+##  $ development to exempt           : chr [1:3869] "1" "0" "1" "1" ...
+##  $ Vertical_Horizontal_Developments: Factor w/ 3 levels ">= 3","0","1-2": 1 3 2 3 3 2 3 3 3 3 ...
+##  $ start_Calendar Year/Month       : Date[1:3869], format: "2009-10-01" "2008-05-01" ...
+##  $ start_contract type             : Factor w/ 3 levels "apprentice","permanent staff",..: 2 3 2 2 3 2 2 2 2 2 ...
+##  $ start_Part time mark            : chr [1:3869] "0" "1" "0" "0" ...
+##  $ LastActive_Calendar Year/Month  : Date[1:3869], format: "2021-10-01" "2016-06-01" ...
+##  $ EmployeeChurned                 : Factor w/ 2 levels "0","1": 1 2 2 1 1 1 2 2 1 2 ...
+##  $ start_Cost center               : chr [1:3869] "DB152100" "DB67100" "DB67500" "DB610306" ...
+##  $ decrease_Category               : Factor w/ 13 levels "Customer","GB Management",..: 13 13 5 8 13 1 8 8 13 13 ...
+##  $ Nationality_Classification      : Factor w/ 3 levels "EU","German",..: 2 3 2 2 2 2 2 2 2 1 ...
+##  $ Month Of Service                : num [1:3869] 146 98 151 60 39 163 130 53 32 114 ...
+##  $ Age                             : num [1:3869] 39 37 61 39 48 40 46 37 61 46 ...
+##  $ Months Since Last Development   : num [1:3869] 3 18 41 71 14 163 81 0 32 26 ...
+##  $ NonExempt                       : chr [1:3869] "0" "1" "0" "0" ...
+##  $ Paybands                        : Factor w/ 8 levels "A","B","C","D",..: 7 6 5 7 3 3 8 8 7 8 ...
+##  $ start_NonExempt                 : chr [1:3869] "1" "1" "1" "1" ...
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ggplot}\NormalTok{(df, }\FunctionTok{aes}\NormalTok{(Paybands)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_bar}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{colour =}\NormalTok{ EmployeeChurned), }\AttributeTok{alpha=}\FloatTok{0.2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Deskriptive-Analyse-Part2_files/figure-latex/unnamed-chunk-54-1.pdf}
+Fokus auf Paybands ``C'' und ``D'', da hohe Zahl an Mitarbeitenden sowie
+Mitarbeiterabwanderung. Speziell das Payband ``C'' weißt eine hohe
+Mitarbeiterabwanderung auf.
+
+Das Payband ``A'' umfasst die Auszubildenden, von denen laut der Daten
+keiner das Unternehmen während der Ausbildung verlassen hat.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ggplot}\NormalTok{(df, }\FunctionTok{aes}\NormalTok{(Paybands, }\StringTok{\textasciigrave{}}\AttributeTok{Month Of Service}\StringTok{\textasciigrave{}}\NormalTok{)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_boxplot}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Deskriptive-Analyse-Part2_files/figure-latex/unnamed-chunk-55-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{ggplot}\NormalTok{(df, }\FunctionTok{aes}\NormalTok{(Paybands, }\StringTok{\textasciigrave{}}\AttributeTok{Month Of Service}\StringTok{\textasciigrave{}}\NormalTok{)) }\SpecialCharTok{+} 
+  \FunctionTok{geom\_boxplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{colour =}\NormalTok{ EmployeeChurned), }\AttributeTok{alpha=}\FloatTok{0.2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Deskriptive-Analyse-Part2_files/figure-latex/unnamed-chunk-55-2.pdf}
+Mitarbeitende in höheren Paybands zum Zeitpunkt der letzten Aktivität
+sind länger im Unternehmen, als in unteren. Mitarbeitende, die das
+Unternehmen verlassen haben, waren in fast allen Paybands länger im
+Unternehmen als die aktiven. Dies kann auch daran liegen, dass solche
+Positionen auch nachbesetzt werden müssen, zum Teil von extern oder es
+rücken Mitarbeitende nach.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{write\_xlsx}\NormalTok{(df,}\StringTok{"20220110\_dataPrepped\_beforeOneHot.xlsx"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{umwandeln-qualitativer-merkmal-in-fuxfcr-die-algorithmen-lesbare-dichotome-merkmale-0-und-1.}{%
+\subsection{Umwandeln qualitativer Merkmal in für die algorithmen
+lesbare dichotome Merkmale (0 und
+1).}\label{umwandeln-qualitativer-merkmal-in-fuxfcr-die-algorithmen-lesbare-dichotome-merkmale-0-und-1.}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{hot\_df }\OtherTok{\textless{}{-}} \FunctionTok{one\_hot}\NormalTok{(}\FunctionTok{as.data.table}\NormalTok{(df))}
+\FunctionTok{write\_xlsx}\NormalTok{(hot\_df,}\StringTok{"20220110\_dataPrepped\_afterOneHot.xlsx"}\NormalTok{)}
+
+\FunctionTok{str}\NormalTok{(hot\_df)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Classes 'data.table' and 'data.frame':   3869 obs. of  45 variables:
+##  $ Gender                                     : chr  "1" "0" "1" "1" ...
+##  $ Part Time Mark                             : chr  "1" "0" "0" "0" ...
+##  $ TemporaryPersonel                          : chr  "0" "0" "0" "0" ...
+##  $ development to exempt                      : chr  "1" "0" "1" "1" ...
+##  $ Vertical_Horizontal_Developments_>= 3      : int  1 0 0 0 0 0 0 0 0 0 ...
+##  $ Vertical_Horizontal_Developments_0         : int  0 0 1 0 0 1 0 0 0 0 ...
+##  $ Vertical_Horizontal_Developments_1-2       : int  0 1 0 1 1 0 1 1 1 1 ...
+##  $ start_Calendar Year/Month                  : Date, format: "2009-10-01" "2008-05-01" ...
+##  $ start_contract type_apprentice             : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ start_contract type_permanent staff        : int  1 0 1 1 0 1 1 1 1 1 ...
+##  $ start_contract type_temporary personnel    : int  0 1 0 0 1 0 0 0 0 0 ...
+##  $ start_Part time mark                       : chr  "0" "1" "0" "0" ...
+##  $ LastActive_Calendar Year/Month             : Date, format: "2021-10-01" "2016-06-01" ...
+##  $ EmployeeChurned_0                          : int  1 0 0 1 1 1 0 0 1 0 ...
+##  $ EmployeeChurned_1                          : int  0 1 1 0 0 0 1 1 0 1 ...
+##  $ start_Cost center                          : chr  "DB152100" "DB67100" "DB67500" "DB610306" ...
+##  $ decrease_Category_Customer                 : int  0 0 0 0 0 1 0 0 0 0 ...
+##  $ decrease_Category_GB Management            : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ decrease_Category_GBR/N                    : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ decrease_Category_GTU GD                   : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ decrease_Category_Human Resources GBS      : int  0 0 1 0 0 0 0 0 0 0 ...
+##  $ decrease_Category_Intellectual Property    : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ decrease_Category_IT Service CC            : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ decrease_Category_People                   : int  0 0 0 1 0 0 1 1 0 0 ...
+##  $ decrease_Category_Planning & Development   : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ decrease_Category_Procurement Services - GP: int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ decrease_Category_RAA/A Competence         : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ decrease_Category_Safety                   : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ decrease_Category_Supplier & Reporting     : int  1 1 0 0 1 0 0 0 1 1 ...
+##  $ Nationality_Classification_EU              : int  0 0 0 0 0 0 0 0 0 1 ...
+##  $ Nationality_Classification_German          : int  1 0 1 1 1 1 1 1 1 0 ...
+##  $ Nationality_Classification_Other           : int  0 1 0 0 0 0 0 0 0 0 ...
+##  $ Month Of Service                           : num  146 98 151 60 39 163 130 53 32 114 ...
+##  $ Age                                        : num  39 37 61 39 48 40 46 37 61 46 ...
+##  $ Months Since Last Development              : num  3 18 41 71 14 163 81 0 32 26 ...
+##  $ NonExempt                                  : chr  "0" "1" "0" "0" ...
+##  $ Paybands_A                                 : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ Paybands_B                                 : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ Paybands_C                                 : int  0 0 0 0 1 1 0 0 0 0 ...
+##  $ Paybands_D                                 : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ Paybands_E                                 : int  0 0 1 0 0 0 0 0 0 0 ...
+##  $ Paybands_F                                 : int  0 1 0 0 0 0 0 0 0 0 ...
+##  $ Paybands_G                                 : int  1 0 0 1 0 0 0 0 1 0 ...
+##  $ Paybands_H                                 : int  0 0 0 0 0 0 1 1 0 1 ...
+##  $ start_NonExempt                            : chr  "1" "1" "1" "1" ...
+##  - attr(*, ".internal.selfref")=<externalptr>
+\end{verbatim}
+
+\end{document}
