@@ -17,11 +17,9 @@ library(data.table)
 library(mlbench)
 library(tidyverse)
 library(magrittr)
+library(caret)
 
 #tree
-
-library(caret)
-library(caretEnsemble)
 library(h2o)
 h2o.init()
 
@@ -32,11 +30,11 @@ h2o.init()
 ```{r}
 hot_df <- read_xlsx("20220110_dataPrepped_afterOneHot.xlsx")
 hot_df <- subset(hot_df, 
-                  select = -c(EmployeeChurned_1, `start_Cost center`,
+                  select = -c(EmployeeChurned_0, `start_Cost center`,
                               `start_Calendar Year/Month`,
                               `LastActive_Calendar Year/Month`))
 
-colnames(hot_df)[colnames(hot_df) == "EmployeeChurned_0"] <- "EmployeeChurned"
+colnames(hot_df)[colnames(hot_df) == "EmployeeChurned_1"] <- "EmployeeChurned"
 
 # Kategorische Variablen
 factorCols <- c("Gender",
@@ -205,40 +203,36 @@ xxx Ausnahme wenn kein one hot encoding, dann 2
 F1 Score für Split
 
 ```{r}
-# Umwandlung in h2o-Dataframe
-trainingH2O <- as.h2o(training)
-testingH2O <- as.h2o(testing)
-
 predictors <- c(factorCols, "Month Of Service", "Age", "Months Since Last Development")
-response <- "EmployeeChurned"
+target <- "EmployeeChurned"
 
 h2oFit <- h2o.randomForest(x = predictors,
-                             y = response,
+                             y = target,
                              ntrees = 10,
                              max_depth = 5,
                              min_rows = 10,
                              min_split_improvement = 0.0001,
                              calibrate_model = FALSE,
                              binomial_double_trees = TRUE,
-                             training_frame = trainingH2O,
+                             training_frame = trainH2O,
                              nfolds = 6)
 #Check: verbose: Print scoring history to the console. For DRF, metrics are per tree. 
 #This option is defaults to false (not enabled).
 
 # Güte im Trainingsset
-perf <- h2o.performance(h2oFit)
-perf
+perfH2O <- h2o.performance(h2oFit)
+perfH2O
 h2o.confusionMatrix(h2oFit)
 
 # Anwendung auf Testset
-predict <- h2o.predict(h2oFit, newdata = testingH2O)
+predict <- h2o.predict(h2oFit, newdata = testH2O)
 head(predict, 100)
 
 # Güte anhand Testset
-perfTest <- h2o.performance(h2oFit, testingH2O)
-h2o.confusionMatrix(perfTest)
+perfTestH2O <- h2o.performance(h2oFit, testH2O)
+h2o.confusionMatrix(perfTestH2O)
 
-curve_data <- data.frame(perfTest@metrics$thresholds_and_metric_scores) %>% select(c(tpr,fpr))
+curve_data <- data.frame(perfTestH2O@metrics$thresholds_and_metric_scores) %>% select(c(tpr,fpr))
 
 ggplot(curve_data, aes(x = fpr, y = tpr)) +
     geom_point() +
@@ -246,13 +240,17 @@ ggplot(curve_data, aes(x = fpr, y = tpr)) +
     geom_segment(
         aes(x = 0, y = 0, xend = 1, yend = 1),
         linetype = "dotted",
-        color = "grey50"
+        color = "grey40"
         ) +
     xlab("False Positive Rate") +
     ylab("True Positive Rate") +
     ggtitle("ROC Curve") +
     theme_bw()
 
+h2o.gainsLift(h2oFit, testH2O)
+h2o.auc(perfH2O)
+h2o.aucpr(perfH2O)
+h2o.accuracy(perfH2O)
 
 #https://docs.h2o.ai/h2o/latest-stable/h2o-docs/performance-and-prediction.html?highlight=confusion%20matrix
 ```
@@ -265,10 +263,10 @@ predictorsSmall <- c("Gender", "Month Of Service" ,
                 "Part Time Mark", "Age",
                 "Paybands_A", "Paybands_B", "Paybands_C", "Paybands_D", "Paybands_E")
 
-response <- "EmployeeChurned"
+targetSmall <- "EmployeeChurned"
 
 h2oFitS <- h2o.randomForest(x = predictorsSmall,
-                             y = response,
+                             y = targetSmall,
                              ntrees = 10,
                              max_depth = 5,
                              min_rows = 10,
@@ -311,16 +309,15 @@ ggplot(curve_dataS, aes(x = fpr, y = tpr)) +
 ##h2o Random Forest und Grid Search (Tuning Hyperparameter)
 ```{r}
 predictors <- c(factorCols, "Month Of Service", "Age", "Months Since Last Development")
-response <- "EmployeeChurned"
+target <- "EmployeeChurned"
 
 #https://docs.h2o.ai/h2o/latest-stable/h2o-docs/grid-search.html#grid-search-in-r
+#balance_classes = c(TRUE, FALSE)
 
-
-grid_params <- list(balance_classes = c(TRUE, FALSE),
+drf_params <- list( balance_classes = c(TRUE, FALSE),
                     ntrees = c(30, 50, 70),
                     max_depth = c(10, 15, 20, 25),
-                    min_split_improvement = c(0.0001, 0.00001, 0.000001),
-                    nfolds = c(4,5,6))
+                    min_split_improvement = c(0.0001, 0.00001, 0.000001))
 
 #Hyperparameter
 #balance classes=True or False (Oversample the minority classes to balance the class distribution. 
@@ -330,40 +327,41 @@ grid_params <- list(balance_classes = c(TRUE, FALSE),
 #ntrees - default 50
 #max_depth 20 default
 
-#col_sample_rate_per_tree: Specify the column sample rate per tree. This can be a value from 0.0 to 1.0 and defaults to 1. Note that this method is sample without replacement.
-
 #binomial_double_trees: (Binary classification only) Build twice as many trees (one per class). Enabling this option can lead to higher accuracy, while disabling can result in faster model building. This option is defaults to false (not enable
+#Min_split_improvement
 
-#bins?
 
-                                                                                                                                                                                            #Min_split_improvement
+#search_criteria strategy = “Cartesian”
 
-h2oFitGrid <- h2o.randomForest(x = predictors,
-                             y = response,
-                             ntrees = 10,
-                             max_depth = 5,
-                             min_rows = 10,
-                             min_split_improvement = 0.0001,
-                             calibrate_model = FALSE,
-                             binomial_double_trees = TRUE,
-                             training_frame = trainingH2O,
-                             nfolds = 6)
+h2oGrid <- h2o.grid("drf", x = predictors, y = target,
+            grid_id = "h2oGrid",
+            training_frame = trainH2O,
+            hyper_params = drf_params)
 
+h2oGridPerf <- h2o.getGrid(grid_id = "h2oGrid",
+                           sort_by = "auc",
+                           decreasing = TRUE)
 
 # Güte im Trainingsset
-perfGrid <- h2o.performance(h2oFitGrid)
-perfGrid
-h2o.confusionMatrix(h2oFitGrid)
+print(h2oGridPerf)
+summary(h2oGridPerf)
+best_drf <- h2o.getModel(h2oGridPerf@model_ids[[1]])
+
 
 # Anwendung auf Testset
-predictGrid <- h2o.predict(h2oFitGrid, newdata = testingH2O)
-head(predictGrid, 100)
+predictBestGrid <- h2o.predict(best_drf, newdata = testH2O)
+head(predictBestGrid, 100)
 
 # Güte anhand Testset
-perfTestGrid <- h2o.performance(h2oFitGrid, testingH2O)
-h2o.confusionMatrix(perfTestGrid)
+best_drf_perf <- h2o.performance(model = best_drf,
+                                  newdata = testH2O)
 
-curve_dataGrid <- data.frame(perfTestGrid@metrics$thresholds_and_metric_scores) %>% select(c(tpr,fpr))
+best_drf_perf
+
+
+curve_dataGrid <- data.frame(best_drf_perf@metrics$thresholds_and_metric_scores) %>% select(c(tpr,fpr))
+
+best_drf_perf@metrics
 
 ggplot(curve_data, aes(x = fpr, y = tpr)) +
     geom_point() +
@@ -389,7 +387,8 @@ ggplot(curve_data, aes(x = fpr, y = tpr)) +
 
 
 
-
+##Güte
+Ziel unten links klein (false positve)
 
 
 #h2o XGBoost or normal boost
