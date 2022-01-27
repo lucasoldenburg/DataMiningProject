@@ -298,7 +298,7 @@ sum(is.na(df$`Cost Center text`))
 df$`Cost Center text` <- NULL
 ```
 
-### LastActive_Calendar Year/Montht
+### LastActive_Calendar Year/Month
 Dieses Merkmal beschreibt, wann die Person das letzte Mal aktiv war.
 ```{r}
 # unique(df$`LastActive_Calendar Year/Month`)
@@ -362,9 +362,18 @@ df$`In Dashboard` <- NULL
 ### Paybands
 Dieses Merkmal beschreibt die Position der Person in Klustern. Dabei wird sich an den Gehaltsbändern orientiert.
 ```{r}
+sum(is.na(df$`Paybands`))
+
+#Verlust der Datenpunkte vermeiden und Gehaltsband mit höchster
+#Ausprägung angeben (Payband D)
+df$Paybands2 <- df$Paybands %>% str_replace_na("D")
+
+df$Paybands <- as.factor(df$Paybands2)
+df$Paybands2 <- NULL
+
 unique(df$`Paybands`)
 summary(df$`Paybands`)
-sum(is.na(df$`Paybands`))
+
 # qplot(df$`Paybands`)
 
 ```
@@ -559,15 +568,30 @@ df$`Cost Center` <- NULL
 
 
 ### decrease_Category 
-Funktionsbereich beim Verlassen des Unternehmens
+Funktionsbereich beim Verlassen des Unternehmens.
+Der Funktionsbereich wurde anhand der Kostenstelle aus einer weiteren Tabelle hinzugefügt. 
 ```{r}
+sum(is.na(df$'decrease_Category'))
+df$decrease_Category2 <- df$'decrease_Category' %>% str_replace_na("Other")
+
+df$'decrease_Category' <- as.factor(df$'decrease_Category2')
+df$'decrease_Category2'<- NULL
+
+df$'decrease_Category' <- replace(df$'decrease_Category',df$'decrease_Category'== "IT Service CC","Other")
+df$'decrease_Category' <- replace(df$'decrease_Category',df$'decrease_Category'== "GBR/N","Other")
+df$'decrease_Category' <- replace(df$'decrease_Category',df$'decrease_Category'== "Intellectual Property","Other")
+df$'decrease_Category' <- replace(df$'decrease_Category',df$'decrease_Category'== "RAA/A Competence","Other")
+df$'decrease_Category' <- replace(df$'decrease_Category',df$'decrease_Category'== "Procurement Services - GP","Other")
+
 unique(df$'decrease_Category')
 summary(df$'decrease_Category')
-sum(is.na(df$'decrease_Category'))
-#qplot(df$'decrease_Category')
-
-df$'decrease_Category' <- as.factor(df$'decrease_Category')
+qplot(df$'decrease_Category')
 ```
+Aufgrund nicht mehr existierender Kostenstellen, Funktionsbereichen oder
+nicht zugeordneten Kostenstellen zu Funktionsbereichen kommt es <NA>-Werten.
+Diese werden zusammen mit wenig besetzten Funktionsbereichen geclustered.
+Auch der Bereich "Procurement Services - GP" zählt dazu, da diese
+Dienstleistung nicht mehr vom Hub erbracht wird.
 
 
 ### decrease_Sub-category 
@@ -633,7 +657,6 @@ df$start_Category <- NULL
 #df$'start_Category' <- as.factor(df$'start_Category')
 ```
 
-
 ### start_Sub-category 
 Abteilung in dem der Mitarbeiter anfangs eingestellt wurde.
 ```{r}
@@ -687,18 +710,30 @@ bei Ihrem Ausstieg in Jahren anzeigt.
 unique(df$Age)
 summary(df$Age)
 sum(is.na(df$Age))
+churned_employees <- subset(df, EmployeeChurned == 1)
+current_employees <- subset(df, EmployeeChurned == 0)
+
+mean(churned_employees$Age)
+median(churned_employees$Age)
+
+mean(current_employees$Age)
+median(current_employees$Age)
+
 qplot(df$Age)
 ggplot(df, aes(EmployeeChurned, Age)) + 
-  geom_boxplot(aes(colour = EmployeeChurned), alpha=0.2)
+  geom_boxplot(alpha=0.2)
 ```
-\
+Das Durchschnittsalter der aktiven Belegschaft ist geringer als das derer, die
+das Unternehmen verlassen haben.
 Es lässt sich erkennen, dass jüngere Mitarbeiter eher dazu tendieren das Unternehmen zu verlassen.
+
 ### Month Of Service
 Dieses Merkmal haben wir erstellt, um die Anstellungszeit genauer darstellen zu können. Die Aufteilung in Jahre ist zu unspezidfisch 
 für unsere Analyse, da dieses merkmal auf Grund der Problemstellung eine wichtige Rolle in unserem Projetk spielen wird. 
 
 ```{r}
 summary(df$`Month Of Service`)
+df$`Month Of Service` <- pmax(df$`Month Of Service`, 0)
 
 sum(is.na(df$`Month Of Service`))
 #Bei der Berechnung wurden bereits alle "NA"-Werte gelöscht, daher sind diese hier nicht mehr vorhanden. 
@@ -723,7 +758,6 @@ qplot(df$`Months Since Last Development`)
 ggplot(df, aes(EmployeeChurned, `Months Since Last Development`)) + 
   geom_boxplot(aes(colour = EmployeeChurned), alpha=0.2)
 ```
-\
 Auf den ersten Blick gibt es keinen erkennbaren Zusammenhang zwischen der Zielvariable EmployeeChurned und Month Since Last Development.
 
 ### Korrelation der Numerischen Merkmale
@@ -731,23 +765,62 @@ Die roten Punkte bedeuten, dass der Mitarbeiter nicht mehr im Unternehmen ist.
 ```{r}
 str(df)
 df$EmployeeChurned <- as.factor(df$EmployeeChurned)
-df_cor <- data.frame(df$Age, df$`Month Of Service`, df$`Months Since Last Development`, df$NonExempt, df$Paybands, df$start_NonExempt,  df$EmployeeChurned)
+df_cor <- data.frame(df$Age, df$`Month Of Service`, df$`Months Since Last Development`, df$NonExempt, df$Paybands, df$start_NonExempt,df$EmployeeChurned)
 df_cor$df.NonExempt <- as.factor(df_cor$df.NonExempt)
 df_cor$df.start_NonExempt <- as.factor(df_cor$df.start_NonExempt)
-pairs(df_cor, col = df_cor$df.EmployeeChurned)
+pairs(df_cor[0:6], col = df_cor$df.EmployeeChurned)
 ```
-\
 Im nächsten Schritt wird beispielhaft versucht, Zusammenhänge zwischen verschiedenen Merkmalen und der Abwanderung zu Visualisieren.
+Besonderer Fokus soll dabei auf der Unterteilung in Mitarbeiter:innen bleiben
+oder verlassen das Unternehmen liegen sowie der Zugehörigkeitsdauer.
+
 ```{r}
-# df$Gender <- as.factor(df$Gender)
-ggplot(df, aes(`Month Of Service`, Gender)) +
+ggplot(df, aes(`Month Of Service`, Age)) +
 geom_jitter(aes(colour = EmployeeChurned), alpha=0.2, height = 0.3)
 ```
+Der Standord Berlin hat allgemein ein geringes Durchschnittsalter.
+Auch wenn die Anzahl der die im Unternehmen noch aktiven Mitarbeiter:innen die der gegangenen übersteigt, kann gesagt werden, dass ein Großteil nicht länger als
+50 Monate aktiv war. 
+Eine deutliche blaue Linie ist bei circa 24 Monaten zu erkennen. Viele Arbeit-
+nehmer:innen orientieren sich in der Regel nach dieser Zeit um. Es kann sich
+allerdings auch um befristete Verträge handeln.
+Die erhöhte Dichte von blauen Punkten im Bereich ab 60 Jahren ist auf den
+Renteneintritt zurückzuführen.
+
+```{r}
+ggplot(df, aes(TemporaryPersonel)) +
+  geom_bar(aes(colour = EmployeeChurned), alpha=0.2)
+
+ggplot(df, aes(TemporaryPersonel, `Month Of Service`)) + 
+  geom_boxplot(aes(colour = EmployeeChurned), alpha=0.2)
+```
+Befristungen bis 12 Monate oder 24 Monate sind eindeutig zu erkennen.
+Da seit 2021 stark auf die Hub-Entwicklung gesetzt wird, sind viele
+Positionen geschaffen und ersteinmal mit befristeten Verträgen besetzt worden.
+
+
+```{r}
+#Gender 1 entspricht weiblich
+ggplot(df, aes(Gender)) + 
+  geom_bar(aes(colour = EmployeeChurned), alpha=0.2)
+
+ggplot(df, aes(Gender,`Month Of Service`)) + 
+  geom_boxplot(aes(colour = EmployeeChurned), alpha=0.2)
+```
+Im Unternehmen sind mehr als 60% der Belegschaft weiblich. Der Anteil derer, die
+das Unternehmen verlassen ist bei dem männlichen Teil der Belegschaft höher, als
+für den weiblichen. 
+Während die Männer und Frauen, die das Unternehmen verlasssen dies nach ähnlicher 
+Dauer machen, kann für die gebliebenen festgestellt werden, dass die weiblichen 
+länger im Unternehmen bleiben.
+Frauen bleiben demnach länger im Unternehmen und die Abwanderungsrate ist geringer.
+
 
 ```{r}
 ggplot(df, aes(`Month Of Service`, `start_Part time mark`)) +
 geom_jitter(aes(colour = EmployeeChurned), alpha=0.2, height = 0.3)
 ```
+
 
 ```{r}
 ggplot(df, aes(`Month Of Service`, `Part Time Mark`)) +
@@ -755,13 +828,14 @@ geom_jitter(aes(colour = EmployeeChurned), alpha=0.2, height = 0.3)
 names(df)
 str(df)
 ```
-
+Der Anteil an Teilzeitmitarbeiter:innen entweder zum Start, als auch beim
+letzten aktiven Zeitpunkt ist klar unterrepräsentiert. Es kann darüber hinaus
+kein Muster aus den beiden vorhergehenden Visualisierungen erkannt  werden. 
 
 
 ```{r}
 ggplot(df, aes(Paybands)) +
   geom_bar(aes(colour = EmployeeChurned), alpha=0.2)
-
 ```
 Fokus auf Paybands "C" und "D", da hohe Zahl an Mitarbeitenden sowie Mitarbeiterabwanderung. 
 Speziell das Payband "C" weißt eine hohe Mitarbeiterabwanderung auf.
@@ -777,11 +851,53 @@ ggplot(df, aes(Paybands, `Month Of Service`)) +
 ggplot(df, aes(Paybands, `Month Of Service`)) + 
   geom_boxplot(aes(colour = EmployeeChurned), alpha=0.2)
 ```
-Mitarbeitende in höheren Paybands zum Zeitpunkt der letzten Aktivität sind länger im 
-Unternehmen, als in unteren. 
-Mitarbeitende, die das Unternehmen verlassen haben, waren in fast allen Paybands länger im
-Unternehmen als die aktiven. Dies kann auch daran liegen, dass solche Positionen auch
-nachbesetzt werden müssen, zum Teil von extern oder es rücken Mitarbeitende nach.
+Mitarbeitende in höheren Paybands zum Zeitpunkt der letzten Aktivität sind länger 
+im Unternehmen, als in unteren. Mitarbeitende, die das Unternehmen verlassen haben, waren in fast allen Paybands länger im Unternehmen als die aktiven. Dies kann auch daran liegen, dass solche Positionen auch nachbesetzt werden müssen, zum Teil von extern oder es rücken Mitarbeitende nach.
+
+```{r}
+ggplot(df, aes(decrease_Category)) +
+  geom_bar(aes(colour = EmployeeChurned), alpha=0.2) +
+  theme(axis.text.x=element_blank())
+```
+X-Achse:
+Customer
+GB Management 
+GTU GD 
+Human Resources GBS     
+Other 
+People    
+Planning & Development 
+Safety
+Supplier & Reporting 
+
+Aus dem Bereich GB Management verlassen wenige Mitarbeiter:innen das
+Unternehmen, was daran liegt, dass es sich eher um Senior-Positionen handelt und 
+es eine neuere Einheit ist.
+Die geringe Abwanderung im Bereich Safety kann darauf zurückgeführt werden,
+dass es sich um eine relativ neue Einheit handelt.
+
+"People" sowie "Supplier & Reporting" bilden die größten Bereiche.
+
+```{r}
+ggplot(df, aes(decrease_Category, `Month Of Service`)) + 
+  geom_boxplot(aes(colour = EmployeeChurned), alpha=0.2)+
+  theme(axis.text.x=element_blank())
+```
+X-Achse:
+Customer
+GB Management 
+GTU GD 
+Human Resources GBS     
+Other 
+People    
+Planning & Development 
+Safety
+Supplier & Reporting 
+
+In den größeren Bereichen (Customer, People, Supplier & Reporting) ist zu erkennen, 
+dass das Unternehmen enweder früh verlassen wird oder Mitarbeiter:innen deutlich
+länger bleiben. (Median größer als 12 Monate auseinander für betreffende Bereiche)
+
 
 ```{r}
 write_xlsx(df,"20220110_dataPrepped_beforeOneHot.xlsx")
