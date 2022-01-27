@@ -182,11 +182,16 @@ raw_rpart <- rpart(EmployeeChurned ~., y = TRUE, x = TRUE,
 raw_rpart_prediction <- rpart.predict(raw_rpart, raw_test)
 raw_rpart_prediction <- data.frame(raw_rpart_prediction)
 raw_test$prob <- raw_rpart_prediction$`X1`
+raw_test$EmployeeChurned <- as.numeric(as.character(raw_test$EmployeeChurned))
+raw_test
 ```
 
 
 # Allgemeine Modellgüte anhand der ROC-Kurve bestimmen
 ```{r}
+pred_rocr <- prediction(raw_test$prob, raw_test$EmployeeChurned)
+perf_rocr <- performance(pred_rocr, "tpr", "fpr" )
+
 fpr_rocr <- perf_rocr@x.values[[1]]
 tpr_rocr <- perf_rocr@y.values[[1]]
 threshold_rocr <- perf_rocr@alpha.values[[1]] 
@@ -198,13 +203,13 @@ performance(pred_rocr, "auc")@y.values
 plot(perf_rocr, col="blue")
 abline(0,1)
 ```
-Die Fläche unterhalb der ROC-Kurve ist mit 0,69 größer als 0,5 und damit liefert 
+Die Fläche unterhalb der ROC-Kurve ist mit 0,71 größer als 0,5 und damit liefert 
 das erstellte Modell eine genauere Vorhersage als bloßes Raten.
 
 # Auswahl Threshold
 ```{r}
 #Funktion zur Klassifizierung der Vorhersage
-classifyPredict <- function(x, threshold){
+classify <- function(x, threshold){
   ifelse(x < threshold,0,1)
 }
 
@@ -275,11 +280,11 @@ cost_matrix <- matrix(c(threshold_input,costs),nrow=length(threshold_input))
 colnames(cost_matrix) <- c("Threshold", "Kosten in Euro")
 cost_matrix
 ```
-Mit Betrachtung der Kosten liegt optimale Threshold für das Model liegt bei 0,16
+Mit Betrachtung der Kosten liegt der optimale Threshold für das Model bei 0,16
 und sollte für Vorhersagen eingesetzt werden.
 
+# Auswahl Threshold aus ROC-Kurve ("Ellenbogenpunkt")
 ```{r}
-#Auswahl Threshold aus ROC-Kurve ("Ellenbogenpunkt")
 threshold_optimum <- 0.16
 
 raw_test$predict_optimum <-classify(raw_test$prob, threshold_optimum)
@@ -290,17 +295,30 @@ confusionMatrix(factor(raw_test$predict_optimum), raw_test$EmployeeChurned,
 Es werden fast alle Mitarbeiter:innen erkannt, die das Unternehmen verlassen.
 Allerdings ist die FN-Klassifikation sehr hoch. Eine Spezifizität von circa
 1/3 würde für einen hohen Aufwand bei Managern führen und nicht unbedingt für
-deren Zuspruch stehen.
+deren Zuspruch sorgen.
 Doch aufgrund der hohen Sensitivität kann eine noch gute balanzierte Genauigkeit
-von dem Modell erreicht werden.
+von dem Modell bei Anwendung auf die Testdaten erreicht werden.
 
 # Visualisierung des Entscheidungsbaumes
 ```{r}
 printcp(raw_rpart)
 prp(raw_rpart)
 ```
-Der Bereich, in dem
+Den stärksten Einflussfaktor bildet der Funktionsbereich in dem die Mitarbeiter:in
+zum letzten aktiven Zeitpunkt tätig war. GB Management, Human Resources GBS und
+Safety sind dabei die genannten Faktoren. Dabei handelt es sich um erst kürzlich
+aufgebaute Einheiten, was die kurze Zugehörigkeit der Mitarbeiter:innen und
+geringe Abwanderung beschreibt. In zukünftigen Anpassungen des Modells auf neue
+Daten sollte dies schrittweise an die übrigen Funktionsbereiche angeglichen
+werden.
+Die nächste Spaltung erfolgt durch das Merkmal Befristung. 
+Auch die Dauer der Unternehmenszugehörigkeit sowie der Zeitpunkt seit der
+letzten Entwicklung kommen zum Einsatz, während das Alter und die Gehaltsstufe
+in den darauffolgenden Splits relevant werden.
 
+Nicht zum Einsatz kommen: "Part Time Mark", "NonExempt", "start_NonExempt",
+                "development to exempt", "decrease_Category",
+                "Nationality_Classification", "Paybands"
 
 
 # h2o Distributed Random Forest (DRF)
@@ -311,10 +329,120 @@ Um robuste Bäume zu erhalten werden darüber hinaus auf jedem Level je Baum
 zufällig die betrachteten Spalten (Features) gewählt. Die Anzahl der verwendeten
 Spalten wird dabei durch die Wurzel aus der Gesamtanzahl der Spalten definiert.
 
-xxx Ausnahme wenn kein one hot encoding, dann 2
+##H2O Distributed Random Forest und Grid-Search (Tuning Hyperparameter)
+```{r}
+predictors <- c(factorCols, "Month Of Service", "Age", "Months Since Last Development")
+target <- "EmployeeChurned"
 
-F1 Score für Split
+#Hyperparameter
+drf_params <- list( balance_classes = c(TRUE, FALSE),
+                    ntrees = c(30, 50, 70),
+                    max_depth = c(10, 15, 20, 25),
+                    min_split_improvement = c(0.001, 0.0001, 0.00001, 0.000001))
+#0.0000001
+```
+##Hyperparameter
+balance classes - default False
+ntrees - default 50
+max_depth - default 20
+Min_split_improvement - default 0,00001
 
+##Hyperparameterwahl
+```{r}
+#search_criteria strategy “Cartesian”
+h2oGrid <- h2o.grid("drf", x = predictors, y = target,
+            grid_id = "h2oGrid",
+            training_frame = raw_trainH2O,
+            hyper_params = drf_params)
+
+#Auswahl der optimalen Parameter anhand der AUC der einzelnen Modelle
+h2oGridPerf <- h2o.getGrid(grid_id = "h2oGrid",
+                           sort_by = "auc",
+                           decreasing = TRUE)
+
+# Güte im Trainingsset
+summary(h2oGridPerf)
+best_drf <- h2o.getModel(h2oGridPerf@model_ids[[1]])
+h2o.performance(best_drf, raw_testH2O)
+```
+## Auswahl Threshold
+```{r}
+best_drf
+```
+Der Threshold wird automatisch auf die Metrik F1 optimiert.
+Empfohlener Threshold bei Maximierung von F1 bei 0,39.
+
+## Auswahl Threshold
+```{r}
+# Anwendung auf Testset
+predictBestGrid <- h2o.predict(best_drf, newdata = raw_testH2O)
+#head(predictBestGrid, 20)
+
+raw_drfPrediciton_df <- as.data.frame(predictBestGrid)
+raw_testH2O_asdf <- as.data.frame(raw_testH2O)
+raw_testH2O_asdf$prob <- raw_drfPrediciton_df$p1
+raw_testH2O_asdf
+
+raw_testH2O_asdf$EmployeeChurned <- as.numeric(as.character(raw_testH2O_asdf$EmployeeChurned))
+raw_test
+
+pred_rocr_drf <- prediction(raw_testH2O_asdf$prob, raw_testH2O_asdf$EmployeeChurned)
+perf_rocr_drf <- performance(pred_rocr_drf, "tpr", "fpr" )
+
+fpr_rocr <- perf_rocr_drf@x.values[[1]]
+tpr_rocr <- perf_rocr_drf@y.values[[1]]
+threshold_rocr_drf <- perf_rocr_drf@alpha.values[[1]] 
+
+performance(pred_rocr, "auc")@y.values
+# Darstellung der ROC-Kurve
+plot(perf_rocr_drf, col="blue")
+abline(0,1)
+```
+Beschreibung
+
+## Auswahl Threshold aus ROC-Kurve ("Ellenbogenpunkt")
+```{r}
+threshold_drf <- 0.25
+
+```
+
+## Modellgüte anhand der Konfusionsmatrix bestimmen
+```{r}
+raw_testH2O_asdf$predict <-classify(raw_testH2O_asdf$prob, threshold_drf)
+
+# Güte anhand Testset
+best_drf_perf <- h2o.performance(model = best_drf,
+                                  newdata = raw_testH2O)
+
+best_drf_perf
+
+curve_dataGrid <- data.frame(best_drf_perf@metrics$thresholds_and_metric_scores) %>% select(c(tpr,fpr))
+
+best_drf_perf@metrics
+
+ggplot(curve_dataGrid, aes(x = fpr, y = tpr)) +
+    geom_point() +
+    geom_line() +
+    geom_segment(
+        aes(x = 0, y = 0, xend = 1, yend = 1),
+        linetype = "dotted",
+        color = "grey50"
+        ) +
+    xlab("False Positive Rate") +
+    ylab("True Positive Rate") +
+    ggtitle("ROC Curve") +
+    theme_bw()
+
+```
+
+
+##Güte
+Ziel unten links klein (false positve)
+h2o.varimp_plot(pros_gbm)
+
+
+
+# drf first try without hyper
 ```{r}
 predictors <- c(factorCols, "Month Of Service", "Age", "Months Since Last Development")
 target <- "EmployeeChurned"
@@ -338,11 +466,11 @@ perfH2O
 h2o.confusionMatrix(h2oFit)
 
 # Anwendung auf Testset
-predict <- h2o.predict(h2oFit, newdata = testH2O)
+predict <- h2o.predict(h2oFit, newdata = raw_testH2O)
 head(predict, 100)
 
 # Güte anhand Testset
-perfTestH2O <- h2o.performance(h2oFit, testH2O)
+perfTestH2O <- h2o.performance(h2oFit, raw_testH2O)
 h2o.confusionMatrix(perfTestH2O)
 
 curve_data <- data.frame(perfTestH2O@metrics$thresholds_and_metric_scores) %>% select(c(tpr,fpr))
@@ -400,7 +528,7 @@ predictS <- h2o.predict(h2oFitS, newdata = testingH2O)
 head(predictS, 100)
 
 # Güte anhand Testset
-perfTestS <- h2o.performance(h2oFitS, testingH2O)
+perfTestS <- h2o.performance(h2oFitS, raw_testH2O)
 h2o.confusionMatrix(perfTestS)
 
 curve_dataS <- data.frame(perfTestS@metrics$thresholds_and_metric_scores) %>% select(c(tpr,fpr))
@@ -419,106 +547,6 @@ ggplot(curve_dataS, aes(x = fpr, y = tpr)) +
     theme_bw()
 ```
 
-##h2o Random Forest und Grid Search (Tuning Hyperparameter)
-```{r}
-predictors <- c(factorCols, "Month Of Service", "Age", "Months Since Last Development")
-target <- "EmployeeChurned"
-
-#https://docs.h2o.ai/h2o/latest-stable/h2o-docs/grid-search.html#grid-search-in-r
-#balance_classes = c(TRUE, FALSE)
-
-drf_params <- list( balance_classes = c(TRUE, FALSE),
-                    ntrees = c(30, 50, 70),
-                    max_depth = c(10, 15, 20, 25),
-                    min_split_improvement = c(0.0001, 0.00001, 0.000001))
-
-#Hyperparameter
-#balance classes=True or False (Oversample the minority classes to balance the class distribution. 
-#This option is defaults to false (not enabled), and can increase the data frame size. 
-#This option is only applicable for classification.)
-
-#ntrees - default 50
-#max_depth 20 default
-
-#binomial_double_trees: (Binary classification only) Build twice as many trees (one per class). Enabling this option can lead to higher accuracy, while disabling can result in faster model building. This option is defaults to false (not enable
-#Min_split_improvement
-
-
-#search_criteria strategy = “Cartesian”
-
-h2oGrid <- h2o.grid("drf", x = predictors, y = target,
-            grid_id = "h2oGrid",
-            training_frame = trainH2O,
-            hyper_params = drf_params)
-
-h2oGridPerf <- h2o.getGrid(grid_id = "h2oGrid",
-                           sort_by = "auc",
-                           decreasing = TRUE)
-
-# Güte im Trainingsset
-print(h2oGridPerf)
-summary(h2oGridPerf)
-best_drf <- h2o.getModel(h2oGridPerf@model_ids[[1]])
-
-
-# Anwendung auf Testset
-predictBestGrid <- h2o.predict(best_drf, newdata = testH2O)
-head(predictBestGrid, 100)
-
-# Güte anhand Testset
-best_drf_perf <- h2o.performance(model = best_drf,
-                                  newdata = testH2O)
-
-best_drf_perf
-
-
-curve_dataGrid <- data.frame(best_drf_perf@metrics$thresholds_and_metric_scores) %>% select(c(tpr,fpr))
-
-best_drf_perf@metrics
-
-ggplot(curve_data, aes(x = fpr, y = tpr)) +
-    geom_point() +
-    geom_line() +
-    geom_segment(
-        aes(x = 0, y = 0, xend = 1, yend = 1),
-        linetype = "dotted",
-        color = "grey50"
-        ) +
-    xlab("False Positive Rate") +
-    ylab("True Positive Rate") +
-    ggtitle("ROC Curve") +
-    theme_bw()
-
-```
-
-##h2o Random Forest und Grid Search (Tuning Hyperparameter) ohne One Hot Encoding
-```{r}
-
-
-
-```
-
-
-
-##Güte
-Ziel unten links klein (false positve)
-
-
-#h2o XGBoost or normal boost
-```{r}
-#nicht mit h2o verwendbar -> xgboost library von r
-xgbFit <- h2o.xgboost(x = predictors,
-                           y = response,
-                           training_frame = trainingH2O,
-                           booster = "dart",
-                           normalize_type = "tree",
-                           seed = 1234)
-
-
-
-```
-
-
 #caret train
 ```{r}
 #test 
@@ -536,30 +564,6 @@ text(treeFit, pretty =0)
 treePredict <- predict(treeFit, newdata = testing)
 #head(treePredict)
 confusionMatrix(data = treePredict, testing$EmployeeChurned)
-```
-# Einfacher Baum
-```{r}
-library(tree)
-
-simpleTreeFit <- tree(training$EmployeeChurned ~ training$Gender + 
-                        training$`Vertical_Horizontal_Developments_1-2`+
-                        training$`decrease_Category_Procurement Services - GP`,
-                        data = training)   
-
-simpleTreeFit <- tree(EmployeeChurned ~ Gender + 
-                        `Vertical_Horizontal_Developments_1-2`+
-                        `decrease_Category_Procurement Services - GP`,
-                        data = training) 
-                        
-                        #why?! Punkt funktioniert nicht... überall trainSample$... davor
-
-simpleTreeFit <- tree(EmployeeChurned ~., data = train)
-
-simpleTreeFit <- tree(EmployeeChurned ~., data = train)
-
-plot(simpleTreeFit)
-text(simpleTreeFit, pretty = 0)
-
 ```
 
 
