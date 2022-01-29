@@ -26,18 +26,17 @@ h2o.init()
 
 ## Datenimport und -vorbereitung
 ```{r}
+# Datenset nach One-Hot-Encoding
 hot_df <- read_xlsx("20220110_dataPrepped_afterOneHot.xlsx")
 hot_df <- subset(hot_df, 
-                  select = -c(EmployeeChurned_1, `start_Cost center`,
+                  select = -c(EmployeeChurned_0, `start_Cost center`,
                               `start_Calendar Year/Month`,
                               `LastActive_Calendar Year/Month`))
 
-
-colnames(hot_df)[colnames(hot_df) == "EmployeeChurned_0"] <- "EmployeeChurned"
-colnames(hot_df)[colnames(hot_df) == "Temporary_0"] <- "Temporary"
+colnames(hot_df)[colnames(hot_df) == "EmployeeChurned_1"] <- "EmployeeChurned"
 
 # Kategorische Variablen
-factorCols <- c("Gender",
+factorColsOneHot <- c("Gender",
                 "TemporaryPersonel",
                 "Part Time Mark",
                 "NonExempt",
@@ -77,12 +76,37 @@ factorCols <- c("Gender",
                 "Paybands_H")
 
 # Umwandlung in kategorische Variablen
-hot_df %<>% mutate_at(factorCols, factor)
+hot_df %<>% mutate_at(factorColsOneHot, factor)
 
 #Indexspalte
 #hot_df$index <- 1:nrow(hot_df)
-str(hot_df)
 
+
+
+# Rohdatenset ohne One-Hot-Encoding
+raw_df <- read_xlsx("20220110_dataPrepped_beforeOneHot.xlsx")
+
+raw_df <- subset(raw_df, 
+                  select = -c(`start_Cost center`,
+                              `start_Calendar Year/Month`,
+                              `LastActive_Calendar Year/Month`))
+
+# Kategorische Variablen
+factorCols <- c("Gender",
+                "TemporaryPersonel",
+                "Part Time Mark",
+                "NonExempt",
+                "start_NonExempt",
+                "development to exempt",
+                "Vertical_Horizontal_Developments",
+                "start_contract type",
+                "start_Part time mark",
+                "EmployeeChurned",
+                "decrease_Category",
+                "Nationality_Classification",
+                "Paybands")
+
+raw_df %<>% mutate_at(factorCols, factor)
 ```
 
 ## Train Test Split (Caret)
@@ -98,34 +122,40 @@ str(training)
 str(testing)
 ```
 
-## Regression h2o Beispiele (Block später löschen)
+## Regression ohne h2o Beispiele (Block später löschen)
 ```{r}
-glm1 <- glm(formula = training$Gender ~ training$EmployeeChurned, family = binomial, data = training)
+glm1 <- glm(formula = training$Age ~ training$EmployeeChurned, family = binomial, data = training)
 glm1
-glm2 <- glm(formula = training$`Part Time Mark` ~ training$EmployeeChurned, family = binomial, data = training)
-glm2
 
 pre1 <- predict(glm1, type = 'response')
 
 summary(glm1)
 summary(pre1)
 
+plot(pre2)
 
 ```
 
 ```{r}
-# Umwandlung in h2o-Dataframe
-trainingH2O <- as.h2o(training)
-testingH2O <- as.h2o(testing)
+# # Umwandlung in h2o-Dataframe
+# trainingH2O <- as.h2o(training)
+# testingH2O <- as.h2o(testing)
+# 
+# predictors <- c(factorCols, "Month Of Service", "Age", "Months Since Last Development")
+# response <- "EmployeeChurned"
+# 
+# h2oFit <- h2o.glm(x = predictors,
+#                   y = response,
+#                   training_frame = trainingH2O)
+```
 
-predictors <- c(factorCols, "Month Of Service", "Age", "Months Since Last Development")
-response <- "EmployeeChurned"
+```{r}
+df_test <- subset(hot_df, select = c("EmployeeChurned", "development to exempt", "Month Of Service"))
+df <- data.frame(df_test)
 
-h2oFit <- h2o.glm(x = predictors,
-                  y = response,
-                  training_frame = trainingH2O)
-
+LRModel <- glm()
 
 ```
+
 
 

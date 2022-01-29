@@ -187,7 +187,7 @@ raw_test$prob <- raw_rpart_prediction$`X1`
 
 # Allgemeine Modellgüte anhand der ROC-Kurve bestimmen
 ```{r}
-fpr_rocr <- perf_rocr@x.values[[1]]
+# fpr_rocr <- perf_rocr@x.values[[1]]
 tpr_rocr <- perf_rocr@y.values[[1]]
 threshold_rocr <- perf_rocr@alpha.values[[1]] 
 
