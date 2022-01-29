@@ -25,7 +25,6 @@ library(rpart.plot)
 library(ROCR)
 library(h2o)
 h2o.init()
-
 ```
 
 
@@ -202,8 +201,9 @@ performance(pred_rocr, "auc")@y.values
 # Darstellung der ROC-Kurve
 plot(perf_rocr, col="blue")
 abline(0,1)
+abline(v=0.2, col="red")
 ```
-Die Fläche unterhalb der ROC-Kurve ist mit 0,71 größer als 0,5 und damit liefert 
+Die Fläche unterhalb der ROC-Kurve ist größer als 0,5 und damit liefert 
 das erstellte Modell eine genauere Vorhersage als bloßes Raten.
 
 # Auswahl Threshold
@@ -214,7 +214,11 @@ classify <- function(x, threshold){
 }
 
 #Auswahl Threshold aus ROC-Kurve ("Ellenbogenpunkt")
-threshold_predict <- 0.25
+threshold_predict <- 0.2
+#Ein genauer "Ellenbogenpunkt" kann aus der Grafik nicht entnommen werden.
+#Ziel sollte es sein FP-Klassifikationen zu vermeiden (kleinerer Threshold), aber dennoch 
+#eine Balance zu finden, welche für eine Überklassifikation von Positiv-Klassifikation
+#führt. Auch FN-Werte sorgen für Kosten im Unternehmen (siehe Kosten für Fehlklassifikation)
 
 #Anwendung auf Testdatensatz
 raw_test$predict <-classify(raw_test$prob, threshold_predict)
@@ -223,14 +227,14 @@ head(raw_test_showPredict <- subset(raw_test, select = c(prob,predict)),10)
 
 # Modellgüte anhand der Konfusionsmatrix bestimmen
 ```{r}
-confusionMatrix(factor(raw_test$predict), raw_test$EmployeeChurned,
+confusionMatrix(factor(raw_test$predict), factor(raw_test$EmployeeChurned),
                 positive = "1")
 ```
 Aufgrund des niedrigen Schwellenwertes, ist die Genauigkeit (Accuracy) gering. 
 Dafür weißt die balanzierte Genauigkeit (Balanced Accuracy) einen höheren Wert
 als die klassische Genauigkeit auf. 
 Es wird tendenziell erhöht auf eine Abwanderung der Mitarbeiter:innen klassifiziert.
-Dabei ist die geringe Spezifizität ist auf die hohe Zahl an FN-klassifizierten Werten 
+Dabei ist die geringe Spezifizität auf die hohe Zahl an FN-klassifizierten Werten 
 zurückzuführen. 
 Im Anwendungsfall ist dies nicht von Nachteil, da besonders FP-Klassifikationen
 vermieden werden sollten. Um dies aktiv in die Modellierung zu integrieren 
@@ -250,7 +254,7 @@ rownames(matrix_overview_cost) <- c("Vorhersage Mitarbeiter:in geht", "Vorhersag
 matrix_overview_cost
 ```
 
-# Optimierung mit Kostenfunktion
+## Optimierung mit Kostenfunktion
 ```{r}
 pred_class <- function(x, threshold){
   ifelse(x < threshold,0,1)
@@ -264,32 +268,34 @@ cost <- function(prob, actual,threshold2, cost_FN_func, cost_FP_func){
     return (cost)
 }
 
-threshold_input <- c(0.05, 0.1, 0.15, 0.16, 0.17, 0.2, 0.23, 0.24, 0.25,
+threshold_input_rpart <- c(0.05, 0.1, 0.15, 0.16, 0.17, 0.2, 0.23, 0.24, 0.25,
                      0.3, 0.35, 0.45, 0.7) 
 
 i <- 1
-costs <- c()
+costs_rpart <- c()
 
-while (i < length(threshold_input)+1) {
-    costs[[(length(costs) +1)]] <- cost(raw_test$prob, raw_test$EmployeeChurned, 
-                                         threshold_input[i], cost_FN, cost_FP)
+while (i < length(threshold_input_rpart)+1) {
+    costs_rpart[[(length(costs_rpart) +1)]] <- cost(raw_test$prob, raw_test$EmployeeChurned, 
+                                         threshold_input_rpart[i], cost_FN, cost_FP)
     i <- i+1
 }
 
-cost_matrix <- matrix(c(threshold_input,costs),nrow=length(threshold_input))
-colnames(cost_matrix) <- c("Threshold", "Kosten in Euro")
-cost_matrix
+cost_matrix_rpart <- matrix(c(threshold_input_rpart,costs_rpart),nrow=length(threshold_input_rpart))
+colnames(cost_matrix_rpart) <- c("Threshold", "Kosten in Euro")
+cost_matrix_rpart
 ```
-Mit Betrachtung der Kosten liegt der optimale Threshold für das Model bei 0,16
-und sollte für Vorhersagen eingesetzt werden.
+Mit Betrachtung der Kosten liegt der optimale Threshold für das Model bei 0,17
+und sollte für Vorhersagen eingesetzt werden. Es wurde der höchst mögliche 
+Threshold bei den geringsten Kosten gewhählt, um ein balanzierteres Ergebnis
+zu erreichen.
 
-# Auswahl Threshold aus ROC-Kurve ("Ellenbogenpunkt")
+## Modellgüte mit optimiertem Threshold anhand der Konfusionsmatrix bestimmen
 ```{r}
-threshold_optimum <- 0.16
+threshold_rpart_opti <- 0.17
 
-raw_test$predict_optimum <-classify(raw_test$prob, threshold_optimum)
+raw_test$predict_rpart_opti <-classify(raw_test$prob, threshold_rpart_opti)
 
-confusionMatrix(factor(raw_test$predict_optimum), raw_test$EmployeeChurned,
+confusionMatrix(factor(raw_test$predict_rpart_opti), factor(raw_test$EmployeeChurned),
                 positive = "1")
 ```
 Es werden fast alle Mitarbeiter:innen erkannt, die das Unternehmen verlassen.
@@ -299,7 +305,7 @@ deren Zuspruch sorgen.
 Doch aufgrund der hohen Sensitivität kann eine noch gute balanzierte Genauigkeit
 von dem Modell bei Anwendung auf die Testdaten erreicht werden.
 
-# Visualisierung des Entscheidungsbaumes
+# Visualisierung des Entscheidungsbaumes (Wichtigkeit der Features)
 ```{r}
 printcp(raw_rpart)
 prp(raw_rpart)
@@ -353,7 +359,8 @@ Min_split_improvement - default 0,00001
 h2oGrid <- h2o.grid("drf", x = predictors, y = target,
             grid_id = "h2oGrid",
             training_frame = raw_trainH2O,
-            hyper_params = drf_params)
+            hyper_params = drf_params,
+            seed = 1234)
 
 #Auswahl der optimalen Parameter anhand der AUC der einzelnen Modelle
 h2oGridPerf <- h2o.getGrid(grid_id = "h2oGrid",
@@ -363,21 +370,32 @@ h2oGridPerf <- h2o.getGrid(grid_id = "h2oGrid",
 # Güte im Trainingsset
 summary(h2oGridPerf)
 best_drf <- h2o.getModel(h2oGridPerf@model_ids[[1]])
-h2o.performance(best_drf, raw_testH2O)
+h2o.performance(best_drf, raw_trainH2O)
 ```
-## Auswahl Threshold
+
+
+## Güte anhand Threshold basierend auf F1-Metrik
 ```{r}
-best_drf
+#Anwendung auf Testdatenset
+best_drf_perf <- h2o.performance(model = best_drf,
+                                  newdata = raw_testH2O)
+best_drf_perf
 ```
 Der Threshold wird automatisch auf die Metrik F1 optimiert.
-Empfohlener Threshold bei Maximierung von F1 bei 0,39.
+Empfohlener Threshold bei Maximierung von F1 bei ca. 0,27.
+Accuracy: ca. 73%
+Balanced Accuracy: ca. 73%  (Spezifizität: ca. 0,63)
 
-## Auswahl Threshold
+Ein deutlich niedriger Threshold (F1) als auf dem Trainingsdatenset ist zu erkennen
+sowie eine hohe FP-Klassifizierungsrate.
+
+
+## Auswahl Threshold anhand der ROC-Kurve
 ```{r}
 # Anwendung auf Testset
 predictBestGrid <- h2o.predict(best_drf, newdata = raw_testH2O)
-#head(predictBestGrid, 20)
 
+# Umwandlung in generic dataframe 
 raw_drfPrediciton_df <- as.data.frame(predictBestGrid)
 raw_testH2O_asdf <- as.data.frame(raw_testH2O)
 raw_testH2O_asdf$prob <- raw_drfPrediciton_df$p1
@@ -397,173 +415,139 @@ performance(pred_rocr, "auc")@y.values
 # Darstellung der ROC-Kurve
 plot(perf_rocr_drf, col="blue")
 abline(0,1)
+abline(v=0.22, col="red")
 ```
-Beschreibung
+Die ROC-Kurve verläuft deutlich oberhalb der Diagonalen. Bei Anwendung des 
+Modells wird somit eine höhere Vorhersagequalität erreicht, als mit reinem
+Raten.
 
 ## Auswahl Threshold aus ROC-Kurve ("Ellenbogenpunkt")
 ```{r}
-threshold_drf <- 0.25
-
+threshold_drf <- 0.22
+#Ein Ellenbogenpunkt ist ablesbar und wird tendenziell eher niedriger gewählt,
+#um die Anzahl an FP-Klassifikationen zu minimieren.
 ```
 
 ## Modellgüte anhand der Konfusionsmatrix bestimmen
 ```{r}
 raw_testH2O_asdf$predict <-classify(raw_testH2O_asdf$prob, threshold_drf)
 
-# Güte anhand Testset
-best_drf_perf <- h2o.performance(model = best_drf,
-                                  newdata = raw_testH2O)
-
-best_drf_perf
-
-curve_dataGrid <- data.frame(best_drf_perf@metrics$thresholds_and_metric_scores) %>% select(c(tpr,fpr))
-
-best_drf_perf@metrics
-
-ggplot(curve_dataGrid, aes(x = fpr, y = tpr)) +
-    geom_point() +
-    geom_line() +
-    geom_segment(
-        aes(x = 0, y = 0, xend = 1, yend = 1),
-        linetype = "dotted",
-        color = "grey50"
-        ) +
-    xlab("False Positive Rate") +
-    ylab("True Positive Rate") +
-    ggtitle("ROC Curve") +
-    theme_bw()
-
+confusionMatrix(factor(raw_testH2O_asdf$predict), factor(raw_testH2O_asdf$EmployeeChurned),
+                positive = "1")
 ```
+Im Vergleich zur Threshold-Wahl basierend auf der Maximierung des F1-Scores ist 
+die Genauigkeit um fast 4 Prozentpunkte geringer, dafür ist die balanzierte
+Genauigkeit nur geringfügig gesunken. Dafür ist die Spezifizität von 0,63 auf
+0,88 stark angestiegen, was im Sinne des Use Cases wünschenswert ist, auch wenn
+dafür die Sensitivität von ca. 0,83 auf 0,56 gesunken ist.
 
-
-##Güte
-Ziel unten links klein (false positve)
-h2o.varimp_plot(pros_gbm)
-
-
-
-# drf first try without hyper
+## Optimierung mit Kostenfunktion
 ```{r}
-predictors <- c(factorCols, "Month Of Service", "Age", "Months Since Last Development")
-target <- "EmployeeChurned"
+pred_class <- function(x, threshold){
+  ifelse(x < threshold,0,1)
+}
 
-h2oFit <- h2o.randomForest(x = predictors,
-                             y = target,
-                             ntrees = 10,
-                             max_depth = 5,
-                             min_rows = 10,
-                             min_split_improvement = 0.0001,
-                             calibrate_model = FALSE,
-                             binomial_double_trees = TRUE,
-                             training_frame = trainH2O,
-                             nfolds = 6)
-#Check: verbose: Print scoring history to the console. For DRF, metrics are per tree. 
-#This option is defaults to false (not enabled).
+cost <- function(prob, actual,threshold2, cost_FN_func, cost_FP_func){
+    predicted_automate2 <- pred_class(prob,threshold2)
+    count_FN <- sum(predicted_automate2 == 1 & actual == "0")
+    count_FP <- sum(predicted_automate2 == 0 & actual == "1")
+    cost <- count_FN * cost_FN_func + count_FP * cost_FP_func
+    return (cost)
+}
 
-# Güte im Trainingsset
-perfH2O <- h2o.performance(h2oFit)
-perfH2O
-h2o.confusionMatrix(h2oFit)
+threshold_input_rdf <- c(0.05, 0.1, 0.14, 0.15, 0.16, 0.17, 0.18,
+                         0.2, 0.23, 0.24, 0.25,
+                         0.3, 0.35, 0.45, 0.7) 
 
-# Anwendung auf Testset
-predict <- h2o.predict(h2oFit, newdata = raw_testH2O)
-head(predict, 100)
+i <- 1
+costs_rdf <- c()
 
-# Güte anhand Testset
-perfTestH2O <- h2o.performance(h2oFit, raw_testH2O)
-h2o.confusionMatrix(perfTestH2O)
+while (i < length(threshold_input_rdf)+1) {
+    costs_rdf[[(length(costs_rdf) +1)]] <- cost(raw_testH2O_asdf$prob, 
+                                        raw_testH2O_asdf$EmployeeChurned, 
+                                        threshold_input_rdf[i], cost_FN, cost_FP)
+    i <- i+1
+}
 
-curve_data <- data.frame(perfTestH2O@metrics$thresholds_and_metric_scores) %>% select(c(tpr,fpr))
+cost_rdf_matrix <- matrix(c(threshold_input_rdf,costs_rdf),nrow=length(threshold_input_rdf))
+colnames(cost_rdf_matrix) <- c("Threshold", "Kosten in Euro")
+cost_rdf_matrix
+```
+Mit Betrachtung der Kosten liegt der optimale Threshold für das Model bei 0,15.
+Aufgrund der geringen Unterschiede wäre auch 0,17 als Threshold sinnvoll und
+sollte für Vorhersagen eingesetzt werden.
 
-ggplot(curve_data, aes(x = fpr, y = tpr)) +
-    geom_point() +
-    geom_line() +
-    geom_segment(
-        aes(x = 0, y = 0, xend = 1, yend = 1),
-        linetype = "dotted",
-        color = "grey40"
-        ) +
-    xlab("False Positive Rate") +
-    ylab("True Positive Rate") +
-    ggtitle("ROC Curve") +
-    theme_bw()
+## Modellgüte mit optimiertem Threshold anhand der Konfusionsmatrix bestimmen
+```{r}
+threshold_drf_opti <- 0.17
 
-h2o.gainsLift(h2oFit, testH2O)
-h2o.auc(perfH2O)
-h2o.aucpr(perfH2O)
-h2o.accuracy(perfH2O)
+raw_testH2O_asdf$predict_opti <-classify(raw_testH2O_asdf$prob, threshold_drf_opti)
 
-#https://docs.h2o.ai/h2o/latest-stable/h2o-docs/performance-and-prediction.html?highlight=confusion%20matrix
+confusionMatrix(factor(raw_testH2O_asdf$predict_opti), factor(raw_testH2O_asdf$EmployeeChurned),
+                positive = "1")
+
+```
+Verglichen mit vorher eingesetten Thresholds ist dies der niedrigste, da eine 
+FP-Klassifikation stärker bestraft wird, als eine FN-Klassifikation. Das bestätigt
+auch die hohe Sensitivität.
+Dadurch sinkt die Genauigkeit sowie die balanzierte Genauigkeit, wobei letztere
+größer ist und verglichen zum Ausgangswert (F1-Score-optimierter Threshold) nur 
+um 0,04 niedriger ist. 
+Die 311 FP-Klassifizierten Werte sollten im Rahmen des Use-Cases kritisch betrachtet
+werden, da diese Daten zur Unterstützung von Managern gelten soll und mti diesem
+Ergebnis viel Arbeit für diese Nutzergruppe entstehen würde. 
+
+## Wichtigkeit der Features
+```{r}
+varimp_drf <- h2o.varimp(best_drf) 
+varimp_drf
+```
+Wie im vorher eingesetzten Algorithmus (rpart) sind der Funktionsbereich,
+die Dauer der Zugehörigkeit, die Dauer seit letzter Entwciklung, das Alter sowie
+die Zuordnung in die Gehaltsbänder ausschlaggebend für die Vorhersage einer
+Mitarbeiter:innen-Abwanderung. 
+Auffällig ist, dass die Zuordnung in Befristung (TemporaryPersonel) eine weniger 
+wichtige Rolle als im Modell basierend auf dem  rpart-Algorithmus einnimmt.
+
+
+## Vergleich rpart und H2O D
+```{r}
+confusionMatrix(factor(raw_test$predict_rpart), factor(raw_test$EmployeeChurned),
+                positive = "1")
+
+confusionMatrix(factor(raw_testH2O_asdf$predict_opti), factor(raw_testH2O_asdf$EmployeeChurned),
+                positive = "1")
+```
+Der Distributed Random Forest erzielt nicht nur allgemein eine größere AUC, auch
+die Genauigkeit (inklusive balanzierter Genauigkeit) sind in den optimierten 
+Modellen deutlich höher.
+Gleicher Threshold nach Kostenfunktion(kann zufällig sein)
+
+
+
+## Vergleich der Algorithmen anhand der einzelnen ROC-Kurven
+```{r}
+pred_rocr_drf <- prediction(raw_testH2O_asdf$prob, raw_testH2O_asdf$EmployeeChurned)
+perf_rocr_drf <- performance(pred_rocr_drf, "tpr", "fpr" )
+pred_rocr <- prediction(raw_test$prob, raw_test$EmployeeChurned)
+perf_rocr <- performance(pred_rocr, "tpr", "fpr" )
+
+
+# Darstellung der ROC-Kurve
+plot(perf_rocr, col="red")
+plot(perf_rocr_drf, col="blue", add=TRUE)
+abline(0,1)
+legend(x = "bottomright",
+       legend = c("Einfacher Baum (rpart)", "Distributed Random Forest (H2O"),
+       lty = c(1, 1),
+       col = c("red", "blue"))
+title(main = "Vergleich der Algorithmen anhand der einzelnen ROC-Kurven")
 ```
 
-##h2o Random Forest (Teilset)
+## Vergleich der Algorithmen anhand der Konfusionsmatrix
 ```{r}
 
-predictorsSmall <- c("Gender", "Month Of Service" ,
-                "Months Since Last Development",
-                "Part Time Mark", "Age",
-                "Paybands_A", "Paybands_B", "Paybands_C", "Paybands_D", "Paybands_E")
-
-targetSmall <- "EmployeeChurned"
-
-h2oFitS <- h2o.randomForest(x = predictorsSmall,
-                             y = targetSmall,
-                             ntrees = 10,
-                             max_depth = 5,
-                             min_rows = 10,
-                             min_split_improvement = 0.0001,
-                             calibrate_model = FALSE,
-                             binomial_double_trees = TRUE,
-                             training_frame = trainingH2O,
-                             nfolds = 6)
-
-
-# Güte im Trainingsset
-perfS <- h2o.performance(h2oFitS)
-perfS
-h2o.confusionMatrix(h2oFitS)
-
-# Anwendung auf Testset
-predictS <- h2o.predict(h2oFitS, newdata = testingH2O)
-head(predictS, 100)
-
-# Güte anhand Testset
-perfTestS <- h2o.performance(h2oFitS, raw_testH2O)
-h2o.confusionMatrix(perfTestS)
-
-curve_dataS <- data.frame(perfTestS@metrics$thresholds_and_metric_scores) %>% select(c(tpr,fpr))
-
-ggplot(curve_dataS, aes(x = fpr, y = tpr)) +
-    geom_point() +
-    geom_line() +
-    geom_segment(
-        aes(x = 0, y = 0, xend = 1, yend = 1),
-        linetype = "dotted",
-        color = "grey50"
-        ) +
-    xlab("False Positive Rate") +
-    ylab("True Positive Rate") +
-    ggtitle("ROC Curve") +
-    theme_bw()
-```
-
-#caret train
-```{r}
-#test 
-#hot_df$`Months Since Last Development`
-treeFit <- train(EmployeeChurned ~ `Month Of Service`,
-                     data = training,
-                     method = "bstTree")
-plot(treeFit)
-text(treeFit, pretty =0)
-
-#keine metrischen Werte
-```
-#caret predict
-```{r}
-treePredict <- predict(treeFit, newdata = testing)
-#head(treePredict)
-confusionMatrix(data = treePredict, testing$EmployeeChurned)
 ```
 
 
+## Ergebnis, nächste Schritte
