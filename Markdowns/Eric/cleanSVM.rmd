@@ -1,0 +1,126 @@
+---
+title: "cleanSVM"
+author: "Eric Beier"
+date: "29/01/2022"
+output: html_document
+---
+
+## Biblioheksimporte
+```{r}
+library(readxl)
+
+library(h2o)
+h2o.init()
+
+```
+
+
+##Datenimport und Vorbereitung
+```{r}
+df <- read_xlsx("20220110_dataPrepped_beforeOneHot.xlsx")
+
+# Kategorische Variablen umwandeln
+factorCols <- c("EmployeeChurned",
+                "decrease_Category",
+                "Nationality_Classification",
+                "Paybands")
+
+df %<>% mutate_at(factorCols, factor)
+# Auswählen der zu nutzenden Spalten auf Grund der ERgebnisse von Random Forrest
+df <- subset(df, select = c(EmployeeChurned, decrease_Category, `Month Of Service`, `Months Since Last Development`, Age, Paybands, Nationality_Classification))
+
+# Ansehen der Daten
+plot(df, col=df$EmployeeChurned)
+```
+
+## Erstellen der Train und Test Datensets
+```{r}
+n <- nrow(df)
+train_indices <- sample(1:n, round(2/3 * n))
+train <- df[train_indices,]
+test <- df[-train_indices,]
+
+# erstmal 2 Features auswählen die die stärkste Abhängikeit nach den Trees haben
+features <- c("decrease_Category", "Month Of Service")
+cols <- c(features, "EmployeeChurned")
+
+```
+
+## H2O Vorbereitung und Umwandlung der Daten
+```{r}
+
+dfH2O <- as.h2o(df)
+
+splits <- h2o.splitFrame(data =  dfH2O, ratios = 0.75, seed = 1234)
+trainH2O <- splits[[1]]
+testH2O <- splits[[2]]
+
+target <- "EmployeeChurned"
+#predictors <- c(factorCols, "Month Of Service", "Age", "Months Since Last Development")
+# erstmal 2 Features auswählen die die stärkste Abhängikeit nach den Trees haben
+predictors <- c("decrease_Category", "Month Of Service")
+
+
+#Cartesian Grid Search
+params <- list( balance_classes = c(TRUE, FALSE),
+                    ntrees = c(30, 50, 70),
+                    max_depth = c(10, 15, 20, 25),
+                    min_split_improvement = c(0.001, 0.0001, 0.00001, 0.000001))
+params
+
+#number of Models:
+sapply(hyper_grid.h2o, length) %>% prod()
+
+
+```
+##SVM mit H2O
+```{r}
+#https://docs.h2o.ai/h2o/latest-stable/h2o-docs/data-science/svm.html
+#SVM durchführen 
+svm_model <- h2o.psvm(
+  x= predictors,
+  gamma = 0.01,
+  rank_ratio = 0.1,
+  y ="EmployeeChurned",
+  training_frame = trainH2O, 
+  disable_training_metrics = FALSE
+                      )
+
+# mehr Infos über Model und support Vektoren
+summary(svm_model)            
+
+
+best_drf <- h2o.getModel(svm_model@model_id)
+best_drf
+perf <- h2o.performance(best_drf, testH2O)
+perf
+```
+
+
+
+## Auswahl Threshold
+```{r}
+# Anwendung auf Testset
+pred <- h2o.predict(best_drf, newdata = testH2O)
+
+Prediciton_df <- as.data.frame(pred)
+asdf <- as.data.frame(testH2O)
+asdf$prob <- Prediciton_df$p1
+
+asdf$EmployeeChurned <- as.numeric(as.character(asdf$EmployeeChurned))
+
+pred_rocr <- prediction(asdf$prob, asdf$EmployeeChurned)
+perf_rocr <- performance(pred_rocr, "tpr", "fpr" )
+
+fpr_rocr <- perf_rocr@x.values[[1]]
+tpr_rocr <- perf_rocr@y.values[[1]]
+threshold_rocr <- perf_rocr@alpha.values[[1]] 
+
+performance(pred_rocr, "auc")@y.values
+# Darstellung der ROC-Kurve
+plot(perf_rocr, col="blue")
+abline(0,1)
+
+```
+
+
