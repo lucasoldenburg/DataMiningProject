@@ -314,6 +314,25 @@ max_depth - default 20
 Min_split_improvement - default 0,00001
 
 ## ---Hyperparameterwahl
+GLM Hyperparameters
+alpha
+
+lambda
+
+missing_values_handling
+
+seed
+
+standardize
+
+theta
+
+tweedie_link_power
+
+tweedie_variance_power
+https://docs.h2o.ai/h2o/latest-stable/h2o-docs/grid-search.html#supported-grid-search-hyperparameters
+https://docs.h2o.ai/h2o/latest-stable/h2o-docs/grid-search.html
+
 ```{r}
 #search_criteria strategy “Cartesian”
 h2oGrid <- h2o.grid("drf", x = predictors, y = target,
