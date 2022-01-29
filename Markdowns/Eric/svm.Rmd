@@ -26,23 +26,25 @@ library(magrittr)
 
 library(caret)
 library(e1071) # for SVMs
+library(h2o)
+h2o.init()
 
 
 
 ```
 ## Datenimport und -vorbereitung
 ```{r}
+# Datenset nach One-Hot-Encoding
 hot_df <- read_xlsx("20220110_dataPrepped_afterOneHot.xlsx")
 hot_df <- subset(hot_df, 
-                  select = -c(EmployeeChurned_1, `start_Cost center`,
+                  select = -c(EmployeeChurned_0, `start_Cost center`,
                               `start_Calendar Year/Month`,
                               `LastActive_Calendar Year/Month`))
 
-colnames(hot_df)[colnames(hot_df) == "EmployeeChurned_0"] <- "EmployeeChurned"
-colnames(hot_df)[colnames(hot_df) == "Temporary_0"] <- "Temporary"
+colnames(hot_df)[colnames(hot_df) == "EmployeeChurned_1"] <- "EmployeeChurned"
 
 # Kategorische Variablen
-factorCols <- c("Gender",
+factorColsOneHot <- c("Gender",
                 "TemporaryPersonel",
                 "Part Time Mark",
                 "NonExempt",
@@ -82,11 +84,37 @@ factorCols <- c("Gender",
                 "Paybands_H")
 
 # Umwandlung in kategorische Variablen
-hot_df %<>% mutate_at(factorCols, factor)
+hot_df %<>% mutate_at(factorColsOneHot, factor)
 
 #Indexspalte
 #hot_df$index <- 1:nrow(hot_df)
-str(hot_df)
+
+
+
+# Rohdatenset ohne One-Hot-Encoding
+raw_df <- read_xlsx("20220110_dataPrepped_beforeOneHot.xlsx")
+
+raw_df <- subset(raw_df, 
+                  select = -c(`start_Cost center`,
+                              `start_Calendar Year/Month`,
+                              `LastActive_Calendar Year/Month`))
+
+# Kategorische Variablen
+factorCols <- c("Gender",
+                "TemporaryPersonel",
+                "Part Time Mark",
+                "NonExempt",
+                "start_NonExempt",
+                "development to exempt",
+                "Vertical_Horizontal_Developments",
+                "start_contract type",
+                "start_Part time mark",
+                "EmployeeChurned",
+                "decrease_Category",
+                "Nationality_Classification",
+                "Paybands")
+
+raw_df %<>% mutate_at(factorCols, factor)
 
 ```
 
@@ -125,6 +153,50 @@ plot(df[,features], col=df$EmployeeChurned, pch=as.numeric(unclass(knnPredict)))
 
 
 ```
+##Tran Test nach H2O
+```{r}
+h20_data <- hot_df |> mutate(across(c(EmployeeChurned, "Month Of Service"), as.factor)) |> select(-Gender)
+
+hot_dfH2O <- as.h2o(h20_data)
+
+splits <- h2o.splitFrame(data =  hot_dfH2O, ratios = 0.75, seed = 1234)
+trainH2O <- splits[[1]]
+testH2O <- splits[[2]]
+
+target <- "EmployeeChurned"
+features <- setdiff(colnames(hot_dfH2O), target)
+
+hyper_grid.h2o <- list(ntrees = seq(100, 300, by = 50),
+                       mtries = 2:6)
+hyper_grid.h2o
+#number of Models:
+sapply(hyper_grid.h2o, length) %>% prod()
+
+
+
+
+
+
+#raw_dfH2O <- as.h2o(raw_df)
+#splits <- h2o.splitFrame(data =  raw_dfH2O, ratios = 0.75, seed = 1234)
+#raw_trainH2O <- splits[[1]]
+#raw_testH2O <- splits[[2]]
+```
+##SVM mit H2O
+```{r}
+#https://docs.h2o.ai/h2o/latest-stable/h2o-docs/data-science/svm.html
+
+svm_model <- h2o.psvm(gamma = 0.01,
+                      rank_ratio = 0.1,
+                      y ="EmployeeChurned",
+                      training_frame = trainH2O, 
+                      disable_training_metrics = FALSE
+                      )
+perf <- h2o.performance(svm_model)
+perf
+```
+
+
 
 ##SVM
 ```{r}
