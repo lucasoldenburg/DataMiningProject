@@ -26,6 +26,9 @@ library(magrittr)
 
 library(caret)
 library(e1071) # for SVMs
+library(rpart)
+library(rpart.plot)
+library(ROCR)
 library(h2o)
 h2o.init()
 
@@ -127,7 +130,11 @@ n <- nrow(df)
 train_indices <- sample(1:n, round(2/3 * n))
 test_train <- df[train_indices,]
 test_test <- df[-train_indices,]
+```
 
+
+## Knn
+```{r}
 features <- c("development.to.exempt", "Month.Of.Service")
 cols <- c(features, "EmployeeChurned")
 
@@ -145,6 +152,12 @@ knnfit <- train(EmployeeChurned ~ ., data = df[, cols], method = "knn", trContro
 # predict the classes in the entire data set using the best model
 knnPredict <- predict(knnfit, newdata = df[, cols] )
 
+rpart <- rpart(EmployeeChurned ~., y = TRUE, x = TRUE,
+                  data=test_train)
+test_test$prob <- rpart.predict(rpart, test_test)
+
+knnPrediction <- prediction(test_test$prob, test_test$EmployeeChurned)
+knnPerf <- performance(knnPredict, "tpr", "fpr")
 # Get the confusion matrix to see accuracy value and other quality measures
 confusionMatrix(knnPredict, df$EmployeeChurned)
 
@@ -153,50 +166,6 @@ plot(df[,features], col=df$EmployeeChurned, pch=as.numeric(unclass(knnPredict)))
 
 
 ```
-##Tran Test nach H2O
-```{r}
-h20_data <- hot_df |> mutate(across(c(EmployeeChurned, "Month Of Service"), as.factor)) |> select(-Gender)
-
-hot_dfH2O <- as.h2o(h20_data)
-
-splits <- h2o.splitFrame(data =  hot_dfH2O, ratios = 0.75, seed = 1234)
-trainH2O <- splits[[1]]
-testH2O <- splits[[2]]
-
-target <- "EmployeeChurned"
-features <- setdiff(colnames(hot_dfH2O), target)
-
-hyper_grid.h2o <- list(ntrees = seq(100, 300, by = 50),
-                       mtries = 2:6)
-hyper_grid.h2o
-#number of Models:
-sapply(hyper_grid.h2o, length) %>% prod()
-
-
-
-
-
-
-#raw_dfH2O <- as.h2o(raw_df)
-#splits <- h2o.splitFrame(data =  raw_dfH2O, ratios = 0.75, seed = 1234)
-#raw_trainH2O <- splits[[1]]
-#raw_testH2O <- splits[[2]]
-```
-##SVM mit H2O
-```{r}
-#https://docs.h2o.ai/h2o/latest-stable/h2o-docs/data-science/svm.html
-
-svm_model <- h2o.psvm(gamma = 0.01,
-                      rank_ratio = 0.1,
-                      y ="EmployeeChurned",
-                      training_frame = trainH2O, 
-                      disable_training_metrics = FALSE
-                      )
-perf <- h2o.performance(svm_model)
-perf
-```
-
-
 
 ##SVM
 ```{r}
@@ -214,7 +183,7 @@ summary(svmfit)
 svmfit$index
 
 # plot it including the separation lines (hyperplanes)
-plot(svmfit, test_train[,cols])
+#plot(svmfit, test_train[,cols])
 
 # predict on the test data set
 prediction <- predict(svmfit, test_test, type = "class")
@@ -266,4 +235,7 @@ run_iris_svm(df[,cols], "linear")
 run_iris_svm(df[,cols], "radial")
 
 ```
+
+
+
 

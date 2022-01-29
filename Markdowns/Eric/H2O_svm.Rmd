@@ -1,0 +1,272 @@
+```{r}
+library(readxl)
+library(tidyverse)
+library(magrittr)
+library(caret)
+library(e1071) # for SVMs
+library(rpart)
+library(rpart.plot)
+library(ROCR)
+
+library(h2o)
+h2o.init()
+
+
+
+```
+
+## Datenimport und -vorbereitung
+```{r}
+# Datenset nach One-Hot-Encoding
+hot_df <- read_xlsx("20220110_dataPrepped_afterOneHot.xlsx")
+hot_df <- subset(hot_df, 
+                  select = -c(EmployeeChurned_0, `start_Cost center`,
+                              `start_Calendar Year/Month`,
+                              `LastActive_Calendar Year/Month`))
+
+colnames(hot_df)[colnames(hot_df) == "EmployeeChurned_1"] <- "EmployeeChurned"
+
+# Kategorische Variablen
+factorColsOneHot <- c("Gender",
+                "TemporaryPersonel",
+                "Part Time Mark",
+                "NonExempt",
+                "start_NonExempt",
+                "development to exempt",
+                "Vertical_Horizontal_Developments_>= 3",
+                "Vertical_Horizontal_Developments_0",
+                "Vertical_Horizontal_Developments_1-2",
+                "start_contract type_apprentice",
+                "start_contract type_permanent staff",
+                "start_contract type_temporary personnel",
+                "start_Part time mark",
+                "EmployeeChurned",
+                "decrease_Category_Customer",
+                "decrease_Category_GB Management",
+                "decrease_Category_GBR/N",
+                "decrease_Category_GTU GD",
+                "decrease_Category_Human Resources GBS",
+                "decrease_Category_Intellectual Property",
+                "decrease_Category_IT Service CC",
+                "decrease_Category_People",
+                "decrease_Category_Planning & Development",
+                "decrease_Category_Procurement Services - GP",
+                "decrease_Category_RAA/A Competence",
+                "decrease_Category_Safety",
+                "decrease_Category_Supplier & Reporting",
+                "Nationality_Classification_EU",
+                "Nationality_Classification_German",
+                "Nationality_Classification_Other",
+                "Paybands_A",
+                "Paybands_B",
+                "Paybands_C",
+                "Paybands_D",
+                "Paybands_E",
+                "Paybands_F",
+                "Paybands_G",
+                "Paybands_H")
+
+# Umwandlung in kategorische Variablen
+hot_df %<>% mutate_at(factorColsOneHot, factor)
+
+
+```
+
+##RawData
+```{r}
+raw_df <- read_xlsx("20220110_dataPrepped_beforeOneHot.xlsx")
+
+raw_df <- subset(raw_df, 
+                  select = -c(`start_Cost center`,
+                              `start_Calendar Year/Month`,
+                              `LastActive_Calendar Year/Month`))
+
+# Kategorische Variablen
+factorCols <- c("Gender",
+                "TemporaryPersonel",
+                "Part Time Mark",
+                "NonExempt",
+                "start_NonExempt",
+                "development to exempt",
+                "Vertical_Horizontal_Developments",
+                "start_contract type",
+                "start_Part time mark",
+                "EmployeeChurned",
+                "decrease_Category",
+                "Nationality_Classification",
+                "Paybands")
+
+raw_df %<>% mutate_at(factorCols, factor)
+
+raw_dfH2O <- as.h2o(raw_df)
+
+splits <- h2o.splitFrame(data =  raw_dfH2O, ratios = 0.75, seed = 1234)
+raw_trainH2O <- splits[[1]]
+raw_testH2O <- splits[[2]]
+
+```
+
+
+##Train Test nach H2O
+```{r}
+
+hot_dfH2O <- as.h2o(hot_df)
+
+splits <- h2o.splitFrame(data =  hot_dfH2O, ratios = 0.75, seed = 1234)
+trainH2O <- splits[[1]]
+testH2O <- splits[[2]]
+
+target <- "EmployeeChurned"
+predictors <- c(factorCols, "Month Of Service", "Age", "Months Since Last Development")
+
+
+#Cartesian Grid Search
+params <- list( balance_classes = c(TRUE, FALSE),
+                    ntrees = c(30, 50, 70),
+                    max_depth = c(10, 15, 20, 25),
+                    min_split_improvement = c(0.001, 0.0001, 0.00001, 0.000001))
+params
+
+#number of Models:
+sapply(hyper_grid.h2o, length) %>% prod()
+
+```
+```{r}
+#search_criteria strategy “Cartesian”
+#h2oGrid <- h2o.grid("drf", x = predictors, y = target,
+#            grid_id = "h2oGrid",
+#            training_frame = raw_trainH2O,
+#            hyper_params = params)
+
+
+#Auswahl der optimalen Parameter anhand der AUC der einzelnen Modelle
+#h2oGridPerf <- h2o.getGrid(grid_id = "h2oGrid",
+#                           sort_by = "auc",
+#                           decreasing = TRUE)
+```
+
+```{r}
+
+
+# Güte im Trainingsset
+#summary(h2oGridPerf)
+#best_drf <- h2o.getModel(h2oGridPerf@model_ids[[1]])
+#h2o.performance(best_drf, raw_testH2O)
+```
+
+
+##SVM mit H2O
+```{r}
+#https://docs.h2o.ai/h2o/latest-stable/h2o-docs/data-science/svm.html
+
+svm_model <- h2o.psvm(gamma = 0.01,
+                      rank_ratio = 0.1,
+                      y ="EmployeeChurned",
+                      training_frame = trainH2O, 
+                      disable_training_metrics = FALSE
+                      )
+summary(svm_model)                      
+best_drf <- h2o.getModel(svm_model@model_id)
+best_drf
+perf <- h2o.performance(best_drf, testH2O)
+perf
+```
+
+## Auswahl Threshold
+```{r}
+# Anwendung auf Testset
+pred <- h2o.predict(best_drf, newdata = testH2O)
+
+Prediciton_df <- as.data.frame(pred)
+asdf <- as.data.frame(testH2O)
+asdf$prob <- Prediciton_df$p1
+
+asdf$EmployeeChurned <- as.numeric(as.character(asdf$EmployeeChurned))
+
+pred_rocr <- prediction(asdf$prob, asdf$EmployeeChurned)
+perf_rocr <- performance(pred_rocr, "tpr", "fpr" )
+
+fpr_rocr <- perf_rocr@x.values[[1]]
+tpr_rocr <- perf_rocr@y.values[[1]]
+threshold_rocr <- perf_rocr@alpha.values[[1]] 
+
+performance(pred_rocr, "auc")@y.values
+# Darstellung der ROC-Kurve
+plot(perf_rocr, col="blue")
+abline(0,1)
+```
+
+##SVM mit H2O
+```{r}
+#https://docs.h2o.ai/h2o/latest-stable/h2o-docs/data-science/svm.html
+
+svm_model <- h2o.psvm(gamma = 0.01,
+                      rank_ratio = 0.1,
+                      y ="EmployeeChurned",
+                      training_frame = raw_trainH2O, 
+                      disable_training_metrics = FALSE
+                      )
+summary(svm_model)                      
+best_drf <- h2o.getModel(svm_model@model_id)
+best_drf
+perf <- h2o.performance(best_drf, raw_testH2O)
+perf
+```
+
+## Auswahl Threshold
+```{r}
+# Anwendung auf Testset
+pred <- h2o.predict(best_drf, newdata = raw_testH2O)
+
+Prediciton_df <- as.data.frame(pred)
+asdf <- as.data.frame(raw_testH2O)
+asdf$prob <- Prediciton_df$p1
+
+asdf$EmployeeChurned <- as.numeric(as.character(asdf$EmployeeChurned))
+
+pred_rocr <- prediction(asdf$prob, asdf$EmployeeChurned)
+perf_rocr <- performance(pred_rocr, "tpr", "fpr" )
+
+fpr_rocr <- perf_rocr@x.values[[1]]
+tpr_rocr <- perf_rocr@y.values[[1]]
+threshold_rocr <- perf_rocr@alpha.values[[1]] 
+
+performance(pred_rocr, "auc")@y.values
+# Darstellung der ROC-Kurve
+plot(perf_rocr, col="blue")
+abline(0,1)
+```
+## Auswahl Threshold aus ROC-Kurve ("Ellenbogenpunkt")
+```{r}
+threshold_drf <- 0.35
+
+```
+
+## Modellgüte anhand der Konfusionsmatrix bestimmen
+```{r}
+asdf$predict <-classify(asdf$prob, threshold_drf)
+
+# Güte anhand Testset
+bestPerf <- h2o.performance(model = best_drf,
+                                  newdata = raw_testH2O)
+
+bestPerf
+
+curve_dataGrid <- data.frame(bestPerf@metrics$thresholds_and_metric_scores) %>% select(c(tpr,fpr))
+
+bestPerf@metrics
+
+ggplot(curve_dataGrid, aes(x = fpr, y = tpr)) +
+    geom_point() +
+    geom_line() +
+    geom_segment(
+        aes(x = 0, y = 0, xend = 1, yend = 1),
+        linetype = "dotted",
+        color = "grey50"
+        ) +
+    xlab("False Positive Rate") +
+    ylab("True Positive Rate") +
+    ggtitle("ROC Curve") +
+    theme_bw()
+
+```
