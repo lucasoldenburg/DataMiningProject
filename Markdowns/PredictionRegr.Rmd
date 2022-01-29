@@ -124,7 +124,7 @@ str(testing)
 
 ## Regression ohne h2o Beispiele (Block später löschen)
 ```{r}
-glm1 <- glm(formula = training$Age ~ training$EmployeeChurned, family = binomial, data = training)
+glm1 <- glm(formula = training$EmployeeChurned ~ training$Age, family = binomial, data = training)
 glm1
 
 pre1 <- predict(glm1, type = 'response')
@@ -132,7 +132,20 @@ pre1 <- predict(glm1, type = 'response')
 summary(glm1)
 summary(pre1)
 
-plot(pre2)
+head(training)
+
+plot(pre1)
+
+
+training$predAge0.3 <- pre1
+classify <- function(x, threshold){
+  ifelse(x>threshold, 1, 0)
+}
+
+training$predAge0.3 <- classify(training$predAge0.3, 0.35)
+c_matrix <- table(training$predAge0.5, training$EmployeeChurned)
+c_matrix
+
 
 ```
 
