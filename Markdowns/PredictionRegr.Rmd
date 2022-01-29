@@ -25,67 +25,157 @@ h2o.init()
 
 ```
 
-##Datenimport und Vorbereitung
+##Datenimport und Vorbereitung ohne One-Hot
 ```{r}
-df <- read_xlsx("20220110_dataPrepped_beforeOneHot.xlsx")
+# df <- read_xlsx("20220110_dataPrepped_beforeOneHot.xlsx")
+# 
+# # Kategorische Variablen umwandeln
+# factorCols <- c("EmployeeChurned",
+#                 "decrease_Category",
+#                 "Nationality_Classification",
+#                 "Paybands")
+# 
+# df %<>% mutate_at(factorCols, factor)
+# # Auswählen der zu nutzenden Spalten auf Grund der ERgebnisse von Random Forrest
+# df <- subset(df, select = c(EmployeeChurned, decrease_Category, `Month Of Service`, `Months Since Last Development`, Age, Paybands, Nationality_Classification))
+# 
+# # Ansehen der Daten
+# plot(df, col=df$EmployeeChurned)
+```
 
-# Kategorische Variablen umwandeln
-factorCols <- c("EmployeeChurned",
+## Datenimport und -vorbereitung
+```{r}
+# Rohdatenset ohne One-Hot-Encoding
+raw_df <- read_xlsx("20220110_dataPrepped_beforeOneHot.xlsx")
+
+raw_df <- subset(raw_df, 
+                  select = -c(`start_Cost center`,
+                              `start_Calendar Year/Month`,
+                              `LastActive_Calendar Year/Month`))
+# Kategorische Variablen
+factorCols <- c("Gender",
+                "TemporaryPersonel",
+                "Part Time Mark",
+                "NonExempt",
+                "start_NonExempt",
+                "development to exempt",
+                "Vertical_Horizontal_Developments",
+                "start_contract type",
+                "start_Part time mark",
+                "EmployeeChurned",
                 "decrease_Category",
                 "Nationality_Classification",
                 "Paybands")
+raw_df %<>% mutate_at(factorCols, factor)
 
-df %<>% mutate_at(factorCols, factor)
-# Auswählen der zu nutzenden Spalten auf Grund der ERgebnisse von Random Forrest
-df <- subset(df, select = c(EmployeeChurned, decrease_Category, `Month Of Service`, `Months Since Last Development`, Age, Paybands, Nationality_Classification))
+# Datenset nach One-Hot-Encoding
+hot_df <- read_xlsx("20220110_dataPrepped_afterOneHot.xlsx")
+hot_df <- subset(hot_df, 
+                 select = -c(EmployeeChurned_0,
+                                     `start_Cost center`,
+                                     `start_Calendar Year/Month`,
+                                     `LastActive_Calendar Year/Month`))
 
-# Ansehen der Daten
-plot(df, col=df$EmployeeChurned)
+colnames(hot_df)[colnames(hot_df) == "EmployeeChurned_1"] <- "EmployeeChurned"
+
+# Kategorische Variablen
+factorColsOneHot <- c("Gender",
+                "TemporaryPersonel",
+                "Part Time Mark",
+                "NonExempt",
+                "start_NonExempt",
+                "development to exempt",
+                "Vertical_Horizontal_Developments_>= 3",
+                "Vertical_Horizontal_Developments_0",
+                "Vertical_Horizontal_Developments_1-2",
+                "start_contract type_apprentice",
+                "start_contract type_permanent staff",
+                "start_contract type_temporary personnel",
+                "start_Part time mark",
+                "EmployeeChurned",
+                "decrease_Category_Customer",
+                "decrease_Category_GB Management",
+                "decrease_Category_GBR/N",
+                "decrease_Category_GTU GD",
+                "decrease_Category_Human Resources GBS",
+                "decrease_Category_Intellectual Property",
+                "decrease_Category_IT Service CC",
+                "decrease_Category_People",
+                "decrease_Category_Planning & Development",
+                "decrease_Category_Procurement Services - GP",
+                "decrease_Category_RAA/A Competence",
+                "decrease_Category_Safety",
+                "decrease_Category_Supplier & Reporting",
+                "Nationality_Classification_EU",
+                "Nationality_Classification_German",
+                "Nationality_Classification_Other",
+                "Paybands_A",
+                "Paybands_B",
+                "Paybands_C",
+                "Paybands_D",
+                "Paybands_E",
+                "Paybands_F",
+                "Paybands_G",
+                "Paybands_H")
+
+# Umwandlung in kategorische Variablen
+hot_df %<>% mutate_at(factorColsOneHot, factor)
+
+#Indexspalte
+#hot_df$index <- 1:nrow(hot_df)
 ```
 
-## Erstellen der Train und Test Datensets
+## H2O Vorbereitung und Umwandlung der Daten, Erstellen der Train und Test Datensets
 ```{r}
-# n <- nrow(df)
-# train_indices <- sample(1:n, round(2/3 * n))
-# train <- df[train_indices,]
-# test <- df[-train_indices,]
-# 
-# # erstmal 2 Features auswählen die die stärkste Abhängikeit nach den Trees haben
-# features <- c("decrease_Category", "Month Of Service")
-# cols <- c(features, "EmployeeChurned")
+raw_df <- as.h2o(raw_df)
+splits <- h2o.splitFrame(data =  raw_df, ratios = 0.75, seed = 1234)
+raw_train <- splits[[1]]
+raw_test <- splits[[2]]
 
+hot_df <- as.h2o(hot_df)
+splits1 <- h2o.splitFrame(data =  hot_df, ratios = 0.75, seed = 1234)
+hot_train <- splits1[[1]]
+hot_test <- splits1[[2]]
 ```
 
-## H2O Vorbereitung und Umwandlung der Daten
+## Predictors und response
 ```{r}
-dfH2O <- as.h2o(df)
-
-splits <- h2o.splitFrame(data =  dfH2O, ratios = 0.75, seed = 1234)
-trainH2O <- splits[[1]]
-testH2O <- splits[[2]]
-
-
-#predictors <- c(factorCols, "Month Of Service", "Age", "Months Since Last Development")
-# 6 Features auswählen die die stärkste Abhängikeit nach den Trees haben
-
-predictors <- c("decrease_Category", 
+# zuerst die 6 Features auswählen, die die stärkste Abhängikeit nach den Trees haben
+predictors_drf <- c("decrease_Category",
                 "Month Of Service",
-                "Nationality_Classification",
                 "Months Since Last Development",
                 "Age",
                 "Paybands",
                 "Nationality_Classification")
+# alle Features, da H2O durch das setzen von alpha = 1 automatisch die besten Features auswählt
+predictors <- c("Gender",
+                "Part Time Mark",
+                "TemporaryPersonel",
+                "development to exempt",
+                "Vertical_Horizontal_Developments",
+                "start_contract type",
+                "start_Part time mark",
+                "decrease_Category",
+                "Nationality_Classification",
+                "Month Of Service",
+                "Age",
+                "Months Since Last Development",
+                "NonExempt",
+                "Paybands",
+                "start_NonExempt")
+# one-Hot
+predictors_hot <- 
 response <- "EmployeeChurned"
-
 ```
 
 ```{r}
 glm_model <- h2o.glm(family = "binomial",
-                        x = predictors,
-                        y = response,
-                        training_frame = trainH2O,
-                        lambda = 0,
-                        compute_p_values = TRUE)
+                     x = predictors,
+                     y = response,
+                     training_frame = raw_train, 
+                     alpha = 1,
+                     lambda = 0,
+                     compute_p_values = TRUE)
 summary(glm_model)
 
 h2o.std_coef_plot(glm_model)
@@ -111,14 +201,29 @@ pred_rocr <- prediction(asdf$prob, asdf$EmployeeChurned)
 perf_rocr <- performance(pred_rocr, "tpr", "fpr" )
 
 performance(pred_rocr, "auc")@y.values
-# Darstellung der ROC-Kurve
+# Darstellung der ROC-Kurve mit 
 plot(perf_rocr, col="blue")
 abline(0,1)
-
+abline(v=0.29, col="red")
 ```
 
+## Auswahl Threshold aus ROC-Kurve ("Ellenbogenpunkt")
+```{r}
+threshold_glm <- 0.29
+#Ein Ellenbogenpunkt ist ablesbar und wird tendenziell eher niedriger gewählt,
+#um die Anzahl an FP-Klassifikationen zu minimieren.
+```
 
+## Modellgüte anhand der Konfusionsmatrix bestimmen
+```{r}
+classify <- function(x, threshold){
+  ifelse(x < threshold,0,1)
+}
+raw_testH2O_asdf$predict <- classify(testH2O_asdf$prob, threshold_glm)
 
+confusionMatrix(factor(raw_testH2O_asdf$predict), factor(raw_testH2O_asdf$EmployeeChurned),
+                positive = "1")
+```
 
 
 
