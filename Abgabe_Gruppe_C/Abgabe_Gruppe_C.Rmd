@@ -94,8 +94,7 @@ hot_df %<>% mutate_at(factorColsOneHot, factor)
 # Rohdatenset ohne One-Hot-Encoding
 df <- read_xlsx("20220110_dataPrepped_beforeOneHot.xlsx")
 
-df <- subset(df, 
-                  select = -c(`start_Cost center`,
+df <- subset(df, select = -c(`start_Cost center`,
                               `start_Calendar Year/Month`,
                               `LastActive_Calendar Year/Month`))
 # Kategorische Variablen
@@ -126,8 +125,8 @@ trainH2O <- splits[[1]]
 testH2O <- splits[[2]]
 
 #h2o hot
-hot_df <- as.h2o(hot_df)
-splits1 <- h2o.splitFrame(data =  hot_df, ratios = 0.75, seed = 1234)
+hot_dfH2O <- as.h2o(hot_df)
+splits1 <- h2o.splitFrame(data =  hot_dfH2O, ratios = 0.75, seed = 1234)
 hot_train <- splits1[[1]]
 hot_test <- splits1[[2]]
 
@@ -754,7 +753,232 @@ Ergebnis viel Arbeit für diese Nutzergruppe entstehen würde.
 
 ## Wichtigkeit der Features
 ```{r}
-varimp_drf <- h2o.varimp(best_glm)
-varimp_drf
+varimp_glm <- h2o.varimp(best_glm)
+varimp_glm
 ```
+
+# Support Vecto Machine
+## Datenimport und Vorbereitung
+```{r}
+df_svm <- read_xlsx("20220110_dataPrepped_beforeOneHot.xlsx")
+
+# Kategorische Variablen umwandeln
+factorCols <- c("EmployeeChurned",
+                "decrease_Category",
+                "Nationality_Classification",
+                "Paybands")
+
+df_svm %<>% mutate_at(factorCols, factor)
+# Auswählen der zu nutzenden Spalten auf Grund der Ergebnisse von Random Forrest, die Nutzung aller Features ist mit einem sehr hohen Rechenaufwand verbunden, der nicht geleistet werden konnte.
+df_svm <- subset(df_svm, select = c(EmployeeChurned, decrease_Category, `Month Of Service`, `Months Since Last Development`, Age, Paybands, Nationality_Classification))
+
+# Ansehen der Daten
+plot(df_svm, col=df_svm$EmployeeChurned)
+```
+
+## Erstellen der Train und Test Datensets
+```{r}
+data_test <- subset(hot_df, select = c("EmployeeChurned", "Age", "Month Of Service"))
+df_test <- data.frame(data_test)
+n <- nrow(df_test)
+
+train_indices <- sample(1:n, round(2/3 * n))
+train <- df_test[train_indices,]
+test <- df_test[-train_indices,]
+
+# erstmal 2 Features auswählen 
+features <- c("Age", "Month.Of.Service")
+cols <- c(features, "EmployeeChurned")
+
+```
+
+
+## SVM
+```{r}
+
+# erstmal 2 Features auswählen 
+features <- c("Age", "Month.Of.Service")
+cols <- c(features, "EmployeeChurned")
+
+# fit an SVM with linear kernel
+svmfit <- svm(EmployeeChurned ~ ., data = train[,cols], kernel = "linear", 
+              cost = 1, scale = TRUE)
+
+# information about the model including the support vectors
+summary(svmfit)
+
+# plot it including the separation lines (hyperplanes)
+plot(svmfit, train[,cols])
+
+# predict on the test data set
+prediction <- predict(svmfit, test, type = "class")
+
+# confusion matrix with quality measures
+confusionMatrix(prediction, test[,"EmployeeChurned"])
+
+```
+Wir erkennen sowohl an der Confusions Matrix, als auch am Plot, dass die svm Methode hier nicht zum Erfolg führt, da alle Predictions 0 sind. Dies wird an der Art unserer Daten liegen und wie das Data Frame nach dem One-Hot-Encoding aufgebaut ist. Daher haben wir uns entschieden auf das H2O-Paket umzusteigen, welches selbst die Daten richtig aufbereitet und wir die Rohdaten nutzen konnten.
+
+
+
+Wir haben bewusst nicht alle Features betrachtet, da nicht alle Merkmale einen signifikanten Einfluss haben. Mehr wollten wir auf den Ergebnissen der anderen Methoden aufbauen und ermitteln, ob wir eine noch bessere Vorhersage mit der Support-Vector-Machine erreichen können. Des Weiteren stand uns nicht genügend Rechenkraft zur Seite beim Tuning um alle Features zu berücksichtigen. 
+
+
+## H2O Vorbereitung und Umwandlung der Daten
+```{r}
+df_svmH2O <- as.h2o(df_svm)
+
+#in H2o Test und Train erzeugen, da sonst keine validen Ergebnisse
+splits <- h2o.splitFrame(data =  df_svmH2O, ratios = 0.75, seed = 1234)
+trainH2O_svm <- splits[[1]]
+testH2O_svm <- splits[[2]]
+
+target <- "EmployeeChurned"
+# erstmal 2 Features auswählen die die stärkste Abhängikeit nach den Trees haben
+predictors <- c( "decrease_Category", "Month Of Service")
+
+```
+
+## SVM mit H2O
+```{r}
+#https://docs.h2o.ai/h2o/latest-stable/h2o-docs/data-science/svm.html
+#SVM durchführen 
+svm_model <- h2o.psvm(
+  rank_ratio = 0.1,
+  y ="EmployeeChurned",
+  training_frame = trainH2O_svm, 
+  disable_training_metrics = FALSE
+  )
+
+#svm auf Testdatensatz testen
+svm_model_h20 <- h2o.getModel(svm_model@model_id)
+perf_svm <- h2o.performance(svm_model_h20, testH2O_svm)
+perf_svm
+```
+Die H20.psvm Methode führt eine svm aus und legt zusätzlich alle Informationen in das Model wie zum Beispiel die Confusions Matrix. Darüber hinaus wurde das Model auf den Testdatensatz angewendet. Das Ergebnis ist eine durchschnittlicher Error von ca. 40%. Dies ist wesentlich weniger als 50% und damit besser als raten (50%). Jedoch ist es noch weit entfernt von einer Vorhersage, die wir uns wünschen. 
+Wir hätten gern wie beim DRF eine Optimierung der Parameter "Gamma" und "Cost" vorgenommen, nur leider ist dies in der H2O Bibliothek nicht möglich. Dies haben wir daher mit der e1071 Bibliothek realisiert, da wir rausgefunden haben, dass diese wieder anwendbar ist, nachdem umwandeln der der Daten von H20 und wieder zurück in ein "normales" DataFrame.
+
+
+## SVM Tune Funktion mit e1071
+Folgend verwenden wir die Tune Funktion um das beste "Gamma" und "Cost" zu ermitteln für eine optimale Vorhersage. 
+```{r}
+# Umwandeln der H20 DataFrames in "normale" DataFrames, um das Tuning der e1071 Methode ausführen können.
+tunedf_svm <- as.data.frame(df_svmH2O)
+trainDF_svm <- as.data.frame(trainH2O_svm)
+testDF_svm <- as.data.frame(testH2O_svm)
+
+#Tuning der Parameter -> hier hätten wir gern eine größere Bandbreite an gamma und cost Variablen durchlaufen lassen, wurde aber von unserer Rechenleistung nicht gewährleistet. Daher haben wir in einzelnen Schritten uns den jetztigen WErten angenähert um so einen möglichst optimalen Wert zu finden. Auch ist zu ebachten, dass wir keinen Gamma-Wert unter 0.01 nutzen konnten, da diese nicht mehr von den folgenden Methoden unterstützt werden.
+
+tuneSVM <- function(svm_type) {
+
+     tuned_svm <- tune(svm, EmployeeChurned ~ ., 
+              data = trainDF_svm, 
+              kernel = svm_type, 
+              scale = TRUE, 
+              ranges = list(cost = c(0.05, 0.075),  gamma = c(0.01, 0.02,0.25)), 
+              tunecontrol = tune.control(cross=5)
+              )
+    tuned_svm
+    
+    # train on the entire data set using best value for cost
+    best_cost <- as.numeric(tuned_svm$best.parameters[1])
+    print(paste0("Cost: ", best_cost))
+    
+    best_gamma <- as.numeric(tuned_svm$best.parameters[2])
+    print(paste0("Gamma: ", best_gamma))
+        
+    svmfit_best <- svm(EmployeeChurned ~ ., 
+                  data = trainDF_svm, 
+                  kernel = svm_type, 
+                  cost = best_cost, 
+                  gamma = best_gamma, 
+                  scale = TRUE)
+  return(svmfit_best)
+}
+
+```
+
+## Linear SVM
+```{r}
+linear_svm <- tuneSVM("linear")
+
+#plot(linear_svm, trainDF_svm[,cols])
+#Leider ist die Plotfunktion nicht mehr möglich nach dem umwandeln der Daten in H20 und wieder zurück
+
+#predict
+prediction_linear <- predict(linear_svm, testDF_svm, type = "class")
+    
+# confusion matrix with quality measures
+confusionMatrix(prediction_linear, testDF_svm[, "EmployeeChurned"])
+```
+
+## Radial SVM
+```{r}
+radial_svm <- tuneSVM("radial")
+
+#predict
+prediction_radial <- predict(radial_svm, testDF_svm, type = "class")
+    
+# confusion matrix with quality measures
+confusionMatrix(prediction_radial, testDF_svm[, "EmployeeChurned"])
+```
+
+## SVM mit besten Parametern
+Für H2O nutzen wir die ermittelten Gamma Werte von Linear, da diese ein höhere Accuracy haben.
+```{r}
+#https://docs.h2o.ai/h2o/latest-stable/h2o-docs/data-science/svm.html
+#SVM durchführen 
+svm_model <- h2o.psvm(
+  hyper_param = 0.075,
+  gamma = 0.01,
+  rank_ratio = 0.1,
+  y ="EmployeeChurned",
+  training_frame = trainH2O_svm, 
+  disable_training_metrics = FALSE
+  )
+
+# mehr Infos über Model und support Vektoren
+summary(svm_model)            
+
+#svm auf Testdatensatz testen
+best_svm_model_h20 <- h2o.getModel(svm_model@model_id)
+best_perf_svm <- h2o.performance(best_svm_model_h20, testH2O_svm)
+best_perf_svm
+```
+
+## Auswahl Threshold anhand ROC Kurve
+```{r}
+# Anwendung auf Testset
+#predict
+pred <- h2o.predict(best_svm_model_h20, newdata = testH2O_svm)
+
+prediciton_DF_svm <- as.data.frame(pred)
+
+asdf_svm <- testDF_svm
+asdf_svm$prob <- prediciton_DF_svm$p1
+
+asdf_svm$EmployeeChurned <- as.numeric(as.character(asdf_svm$EmployeeChurned))
+
+pred_rocr <- prediction(asdf_svm$prob, asdf_svm$EmployeeChurned)
+perf_rocr <- performance(pred_rocr, "tpr", "fpr" )
+
+performance(pred_rocr, "auc")@y.values
+# Darstellung der ROC-Kurve
+plot(perf_rocr, col="blue")
+abline(0,1)
+
+```
+Die Fläche unterhalb der ROC-Kurve ist mit 0.6 größer als 0,5 und damit liefert 
+das erstellte Modell eine genauere Vorhersage als bloßes Raten.
+
+
+## Auswahl Threshold
+Die Auswahl eines Thresholds ist bei einer SVM nicht sinnvoll, da das Ergebnis immer 1 oder 0 ist, d.h. entweder es ist auf der einen Seite der Linie oder der anderen. Daher ist der Threshold immer 1. Dies führt ebenfalls dazu, dass die Kostenfunktion nicht anwendbar ist, da der Threshold immer 1 ist, verändert sich das Ergebnis bei der Kostenfunktion ebenfalls nicht.
+
+## Zusammenfassung SVM
+Es wurden diverse Möglickeiten genutzt die beste Vorhersage durch das SVM-Modell zu bestimmen. Zu erst wurde das klassische Verfahren durch die e1071-Bibliothek angewendet. Auf Grund der Datenstruktur die vorliegt konnten keine Statistisch sinnvollen Vorhersagen gemacht werde, da diese alle auf "0" gesetzt wurden. Somit wurden keine unterschiedlicen Bereiche entdeckt. 
+Aus diesem Grund wurde mit der H2O-Bibliothek ein neuer Ansatz gestartet, da hier die DataFrames in eigene h20-DataFrames umgewandelt werden. Dies war jedoch nur auf den Rohdaten anwendbar und nicht mehr auf den One-Hot-Encodeten Daten. Hierbei wurden nicht alle Daten eingelesen, sondern nur diese, die durch das RandomForest-Modell den stärksten Einfluss haben, da sonst die Rechenleistung beim Tuning nicht ausreicht. 
+Die Ergebnisse der H2O Vorhersage lagen bei einem Error von ca. 40%.
+Darauf hin wurde getestet, ob die SVM-Methode von e1071 mit dem H2O-DataFram funktioniert, da dort die Daten wieder abgewandelt wurden. Dies hat funktioniert und dadurch konnte ein Tuning des "Gamma" und "Cost" Wertes vorgenommen werden. Dies führte zu einer Genauigkeit von: 60% für die Radial-Methode und 67% bei der Linearen-Methode. 
+Zur Vergelichbarkeit wurde eine ROC-Kurve konstuiert. Dabei war es leider nicht möglich die Modelle der e1071-Bibliothek zu nutzen, weshalb noch einmal die H2O-SVM methode mit den optimierten Parametern der e1071-tune-Funktion durchgeführt wurde. Dies führte zu einer Fehleranfälligkeit von 37% jedoch bei der uns wichtigen False-Negative Rate einen Error von 28%. Dies ist nochmals eine deutliche Verbessung zum Anfang und somit das beste Ergbnis des SVM-Modells.
 
