@@ -141,7 +141,7 @@ raw_testH2O <- splits[[2]]
 ```
 
 
-# Einfacher Entscheidungsbaum mit rpart-Bibliothek
+## Einfacher Entscheidungsbaum mit rpart-Bibliothek
 ```{r}
 raw_rpart_control <- trainControl(
     method = "repeatedcv",
@@ -164,7 +164,8 @@ raw_rpart_fit <- train(EmployeeChurned ~ .,
 best_cp <- raw_rpart_fit$bestTune[1,1]
 best_cp 
 ```
-# Modell mit optimalen Parametern trainieren
+
+## Modell mit optimalen Parametern trainieren
 ```{r}
 raw_rpart <- rpart(EmployeeChurned ~., y = TRUE, x = TRUE,
                   data=raw_train,
@@ -178,7 +179,7 @@ raw_test
 ```
 
 
-# Allgemeine Modellgüte anhand der ROC-Kurve bestimmen
+## Allgemeine Modellgüte anhand der ROC-Kurve bestimmen
 ```{r}
 # fpr_rocr <- perf_rocr@x.values[[1]]
 pred_rocr <- prediction(raw_test$prob, raw_test$EmployeeChurned)
@@ -199,7 +200,7 @@ abline(v=0.2, col="red")
 Die Fläche unterhalb der ROC-Kurve ist größer als 0,5 und damit liefert 
 das erstellte Modell eine genauere Vorhersage als bloßes Raten.
 
-# Auswahl Threshold
+## Auswahl Threshold
 ```{r}
 #Funktion zur Klassifizierung der Vorhersage
 classify <- function(x, threshold){
@@ -218,7 +219,7 @@ raw_test$predict <-classify(raw_test$prob, threshold_predict)
 head(raw_test_showPredict <- subset(raw_test, select = c(prob,predict)),10)
 ```
 
-# Modellgüte anhand der Konfusionsmatrix bestimmen
+## Modellgüte anhand der Konfusionsmatrix bestimmen
 ```{r}
 confusionMatrix(factor(raw_test$predict), factor(raw_test$EmployeeChurned),
                 positive = "1")
@@ -234,7 +235,7 @@ vermieden werden sollten. Um dies aktiv in die Modellierung zu integrieren
 sollen die mit den Fehlklassifikationen verbundenen Kosten in die Betrachtung
 mit einbezogen werden.
 
-# Kosten für Fehlklassifikationen
+## Kosten für Fehlklassifikationen
 ```{r}
 #Kosten für neues Recruiting (Suchauftrag, Recruitingaufwand wie Planung, Gespräche, Onboarding)
 cost_FP <- 500  
@@ -298,7 +299,7 @@ deren Zuspruch sorgen.
 Doch aufgrund der hohen Sensitivität kann eine noch gute balanzierte Genauigkeit
 von dem Modell bei Anwendung auf die Testdaten erreicht werden.
 
-# Visualisierung des Entscheidungsbaumes (Wichtigkeit der Features)
+## Visualisierung des Entscheidungsbaumes (Wichtigkeit der Features)
 ```{r}
 printcp(raw_rpart)
 prp(raw_rpart)
@@ -320,7 +321,7 @@ Nicht zum Einsatz kommen: "Part Time Mark", "NonExempt", "start_NonExempt",
                 "Nationality_Classification", "Paybands"
 
 
-# h2o Distributed Random Forest (DRF)
+## H2O Distributed Random Forest (DRF)
 Im DRF werden eine Reihe an Bäumen erzeugt. Jeder dieser lernt basierend auf einen Teil
 des Datensets (Spalten und Reihen). Für die finale Vorhersage wird dann der Durchschnitt 
 aus den Vorhersagen der einzelnen Bäume berechnet. Das verringert die Varianz.
@@ -328,7 +329,7 @@ Um robuste Bäume zu erhalten werden darüber hinaus auf jedem Level je Baum
 zufällig die betrachteten Spalten (Features) gewählt. Die Anzahl der verwendeten
 Spalten wird dabei durch die Wurzel aus der Gesamtanzahl der Spalten definiert.
 
-##H2O Distributed Random Forest und Grid-Search (Tuning Hyperparameter)
+## H2O Distributed Random Forest und Grid-Search (Tuning Hyperparameter)
 ```{r}
 predictors <- c(factorCols, "Month Of Service", "Age", "Months Since Last Development")
 target <- "EmployeeChurned"
@@ -340,13 +341,13 @@ drf_params <- list( balance_classes = c(TRUE, FALSE),
                     min_split_improvement = c(0.001, 0.0001, 0.00001, 0.000001))
 #0.0000001
 ```
-##Hyperparameter
+## Hyperparameter
 balance classes - default False
 ntrees - default 50
 max_depth - default 20
 Min_split_improvement - default 0,00001
 
-##Hyperparameterwahl
+## Hyperparameterwahl
 ```{r}
 #search_criteria strategy “Cartesian”
 h2oGrid_drf <- h2o.grid("drf", x = predictors, y = target,
@@ -537,6 +538,3 @@ title(main = "Vergleich der Algorithmen anhand der einzelnen ROC-Kurven")
 ```{r}
 
 ```
-
-
-## Ergebnis, nächste Schritte
