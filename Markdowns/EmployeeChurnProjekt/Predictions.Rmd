@@ -188,10 +188,10 @@ tpr_rocr_rpart <- perf_rocr_rpart@y.values[[1]]
 threshold_rocr_rpart <- perf_rocr_rpart@alpha.values[[1]] 
 
 #AUC - Fläche unter der ROC-Kurve als Gütemerkmal
-performance(pred_rocr, "auc")@y.values
+performance(pred_rocr_rpart, "auc")@y.values
 
 # Darstellung der ROC-Kurve
-plot(perf_rocr, col="blue")
+plot(perf_rocr_rpart, col="blue")
 abline(0,1)
 abline(v=0.2, col="red")
 ```
