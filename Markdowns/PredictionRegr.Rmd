@@ -215,11 +215,10 @@ https://docs.h2o.ai/h2o/latest-stable/h2o-docs/grid-search.html#supported-grid-s
 https://docs.h2o.ai/h2o/latest-stable/h2o-docs/grid-search.html#supported-grid-search-hyperparameters
 https://docs.h2o.ai/h2o/latest-stable/h2o-docs/grid-search.html
 ```{r}
-#Hyperparameter
 glm_params <- list( alpha = c(0.01, 0.25, 0.5, 0.75, 1),
                     lambda = c(1, 0.5, 0.1, 0.01, 0.001, 0.0001, 0.00001, 0)
                     # missing_values_handling = c("Skip", "MeanImputation", "PlugValues")
-                    # standardize = c(TRUE, FALSE) "highly recommended"
+                    # standardize = c(TRUE, FALSE)
                     )
 #search_criteria strategy “Cartesian”
 h2oGrid <- h2o.grid("glm", x = predictors, y = response,
@@ -264,7 +263,10 @@ abline(0,1)
 abline(v=0.29, col="green")
 abline(v=0.292874, col="red")
 ```
-Die grüne Linie zeigt den selbst geschätzten bzw. gesehenen Treshold am Ellenbogenpunkt. Die rote Line zeigt den berechneten Treshold.
+Die ROC-Kurve verläuft deutlich oberhalb der Diagonalen. Bei Anwendung des 
+Modells wird somit eine höhere Vorhersagequalität erreicht, als mit reinem
+Raten. Die grüne Linie zeigt den selbst geschätzten bzw. gesehenen Treshold am Ellenbogenpunkt. 
+Die rote Line zeigt den berechneten Treshold.
 
 ## Auswahl Threshold aus ROC-Kurve ("Ellenbogenpunkt")
 ```{r}
@@ -346,5 +348,4 @@ Ergebnis viel Arbeit für diese Nutzergruppe entstehen würde.
 varimp_drf <- h2o.varimp(best_glm)
 varimp_drf
 ```
-
 
