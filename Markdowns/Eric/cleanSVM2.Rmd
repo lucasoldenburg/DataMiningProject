@@ -83,7 +83,7 @@ hot_df %<>% mutate_at(factorColsOneHot, factor)
 
 ## Datenimport und Vorbereitung
 ```{r}
-df <- read_xlsx("20220110_dataPrepped_beforeOneHot.xlsx")
+df_svm <- read_xlsx("20220110_dataPrepped_beforeOneHot.xlsx")
 
 # Kategorische Variablen umwandeln
 factorCols <- c("EmployeeChurned",
@@ -91,12 +91,12 @@ factorCols <- c("EmployeeChurned",
                 "Nationality_Classification",
                 "Paybands")
 
-df %<>% mutate_at(factorCols, factor)
+df_svm %<>% mutate_at(factorCols, factor)
 # Auswählen der zu nutzenden Spalten auf Grund der Ergebnisse von Random Forrest, die Nutzung aller Features ist mit einem sehr hohen Rechenaufwand verbunden, der nicht geleistet werden konnte.
-df <- subset(df, select = c(EmployeeChurned, decrease_Category, `Month Of Service`, `Months Since Last Development`, Age, Paybands, Nationality_Classification))
+df_svm <- subset(df_svm, select = c(EmployeeChurned, decrease_Category, `Month Of Service`, `Months Since Last Development`, Age, Paybands, Nationality_Classification))
 
 # Ansehen der Daten
-plot(df, col=df$EmployeeChurned)
+plot(df_svm, col=df_svm$EmployeeChurned)
 ```
 
 ## Erstellen der Train und Test Datensets
@@ -118,6 +118,11 @@ cols <- c(features, "EmployeeChurned")
 
 ## SVM
 ```{r}
+
+# erstmal 2 Features auswählen 
+features <- c("Age", "Month.Of.Service")
+cols <- c(features, "EmployeeChurned")
+
 # fit an SVM with linear kernel
 svmfit <- svm(EmployeeChurned ~ ., data = train[,cols], kernel = "linear", 
               cost = 1, scale = TRUE)
@@ -144,12 +149,12 @@ Wir haben bewusst nicht alle Features betrachtet, da nicht alle Merkmale einen s
 
 ## H2O Vorbereitung und Umwandlung der Daten
 ```{r}
-dfH2O <- as.h2o(df)
+df_svmH2O <- as.h2o(df_svm)
 
 #in H2o Test und Train erzeugen, da sonst keine validen Ergebnisse
-splits <- h2o.splitFrame(data =  dfH2O, ratios = 0.75, seed = 1234)
-trainH2O <- splits[[1]]
-testH2O <- splits[[2]]
+splits <- h2o.splitFrame(data =  df_svmH2O, ratios = 0.75, seed = 1234)
+trainH2O_svm <- splits[[1]]
+testH2O_svm <- splits[[2]]
 
 target <- "EmployeeChurned"
 # erstmal 2 Features auswählen die die stärkste Abhängikeit nach den Trees haben
@@ -164,13 +169,13 @@ predictors <- c( "decrease_Category", "Month Of Service")
 svm_model <- h2o.psvm(
   rank_ratio = 0.1,
   y ="EmployeeChurned",
-  training_frame = trainH2O, 
+  training_frame = trainH2O_svm, 
   disable_training_metrics = FALSE
   )
 
 #svm auf Testdatensatz testen
 svm_model_h20 <- h2o.getModel(svm_model@model_id)
-perf_svm <- h2o.performance(svm_model_h20, testH2O)
+perf_svm <- h2o.performance(svm_model_h20, testH2O_svm)
 perf_svm
 ```
 Die H20.psvm Methode führt eine svm aus und legt zusätzlich alle Informationen in das Model wie zum Beispiel die Confusions Matrix. Darüber hinaus wurde das Model auf den Testdatensatz angewendet. Das Ergebnis ist eine durchschnittlicher Error von ca. 40%. Dies ist wesentlich weniger als 50% und damit besser als raten (50%). Jedoch ist es noch weit entfernt von einer Vorhersage, die wir uns wünschen. 
@@ -181,16 +186,16 @@ Wir hätten gern wie beim DRF eine Optimierung der Parameter "Gamma" und "Cost" 
 Folgend verwenden wir die Tune Funktion um das beste "Gamma" und "Cost" zu ermitteln für eine optimale Vorhersage. 
 ```{r}
 # Umwandeln der H20 DataFrames in "normale" DataFrames, um das Tuning der e1071 Methode ausführen können.
-tuneDF <- as.data.frame(dfH2O)
-trainDF <- as.data.frame(trainH2O)
-testDF <- as.data.frame(testH2O)
+tunedf_svm <- as.data.frame(df_svmH2O)
+trainDF_svm <- as.data.frame(trainH2O_svm)
+testDF_svm <- as.data.frame(testH2O_svm)
 
 #Tuning der Parameter -> hier hätten wir gern eine größere Bandbreite an gamma und cost Variablen durchlaufen lassen, wurde aber von unserer Rechenleistung nicht gewährleistet. Daher haben wir in einzelnen Schritten uns den jetztigen WErten angenähert um so einen möglichst optimalen Wert zu finden. Auch ist zu ebachten, dass wir keinen Gamma-Wert unter 0.01 nutzen konnten, da diese nicht mehr von den folgenden Methoden unterstützt werden.
 
 tuneSVM <- function(svm_type) {
 
      tuned_svm <- tune(svm, EmployeeChurned ~ ., 
-              data = trainDF, 
+              data = trainDF_svm, 
               kernel = svm_type, 
               scale = TRUE, 
               ranges = list(cost = c(0.05, 0.075),  gamma = c(0.01, 0.02,0.25)), 
@@ -206,7 +211,7 @@ tuneSVM <- function(svm_type) {
     print(paste0("Gamma: ", best_gamma))
         
     svmfit_best <- svm(EmployeeChurned ~ ., 
-                  data = trainDF, 
+                  data = trainDF_svm, 
                   kernel = svm_type, 
                   cost = best_cost, 
                   gamma = best_gamma, 
@@ -220,14 +225,14 @@ tuneSVM <- function(svm_type) {
 ```{r}
 linear_svm <- tuneSVM("linear")
 
-#plot(linear_svm, trainDF[,cols])
+#plot(linear_svm, trainDF_svm[,cols])
 #Leider ist die Plotfunktion nicht mehr möglich nach dem umwandeln der Daten in H20 und wieder zurück
 
 #predict
-prediction_linear <- predict(linear_svm, testDF, type = "class")
+prediction_linear <- predict(linear_svm, testDF_svm, type = "class")
     
 # confusion matrix with quality measures
-confusionMatrix(prediction_linear, testDF[, "EmployeeChurned"])
+confusionMatrix(prediction_linear, testDF_svm[, "EmployeeChurned"])
 ```
 
 ## Radial SVM
@@ -235,10 +240,10 @@ confusionMatrix(prediction_linear, testDF[, "EmployeeChurned"])
 radial_svm <- tuneSVM("radial")
 
 #predict
-prediction_radial <- predict(radial_svm, testDF, type = "class")
+prediction_radial <- predict(radial_svm, testDF_svm, type = "class")
     
 # confusion matrix with quality measures
-confusionMatrix(prediction_radial, testDF[, "EmployeeChurned"])
+confusionMatrix(prediction_radial, testDF_svm[, "EmployeeChurned"])
 ```
 
 ## SVM mit besten Parametern
@@ -251,7 +256,7 @@ svm_model <- h2o.psvm(
   gamma = 0.01,
   rank_ratio = 0.1,
   y ="EmployeeChurned",
-  training_frame = trainH2O, 
+  training_frame = trainH2O_svm, 
   disable_training_metrics = FALSE
   )
 
@@ -260,7 +265,7 @@ summary(svm_model)
 
 #svm auf Testdatensatz testen
 best_svm_model_h20 <- h2o.getModel(svm_model@model_id)
-best_perf_svm <- h2o.performance(best_svm_model_h20, testH2O)
+best_perf_svm <- h2o.performance(best_svm_model_h20, testH2O_svm)
 best_perf_svm
 ```
 
@@ -268,12 +273,12 @@ best_perf_svm
 ```{r}
 # Anwendung auf Testset
 #predict
-pred <- h2o.predict(best_svm_model_h20, newdata = testH2O)
+pred <- h2o.predict(best_svm_model_h20, newdata = testH2O_svm)
 
-prediciton_df <- as.data.frame(pred)
+prediciton_DF_svm <- as.data.frame(pred)
 
-asdf_svm <- testDF
-asdf_svm$prob <- prediciton_df$p1
+asdf_svm <- testDF_svm
+asdf_svm$prob <- prediciton_DF_svm$p1
 
 asdf_svm$EmployeeChurned <- as.numeric(as.character(asdf_svm$EmployeeChurned))
 

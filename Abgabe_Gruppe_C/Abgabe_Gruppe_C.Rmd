@@ -449,29 +449,29 @@ pred_class <- function(x, threshold){
 
 cost <- function(prob, actual,threshold2, cost_FN_func, cost_FP_func){
     predicted_automate2 <- pred_class(prob,threshold2)
-    count_FN <- sum(predicted_automate2 == 1 & actual == "0")
-    count_FP <- sum(predicted_automate2 == 0 & actual == "1")
+    count_FN <- sum(predicted_automate2 == 0 & actual == "1")
+    count_FP <- sum(predicted_automate2 == 1 & actual == "0")
     cost <- count_FN * cost_FN_func + count_FP * cost_FP_func
     return (cost)
 }
 
-threshold_input_rdf <- c(0.05, 0.1, 0.14, 0.15, 0.16, 0.17, 0.18,
+threshold_input_drf <- c(0.05, 0.1, 0.14, 0.15, 0.16, 0.17, 0.18,
                          0.2, 0.23, 0.24, 0.25,
                          0.3, 0.35, 0.45, 0.7) 
 
 i <- 1
-costs_rdf <- c()
+costs_drf <- c()
 
-while (i < length(threshold_input_rdf)+1) {
-    costs_rdf[[(length(costs_rdf) +1)]] <- cost(testH2O_asdf_drf$prob, 
+while (i < length(threshold_input_drf)+1) {
+    costs_drf[[(length(costs_drf) +1)]] <- cost(testH2O_asdf_drf$prob, 
                                         testH2O_asdf_drf$EmployeeChurned, 
-                                        threshold_input_rdf[i], cost_FN, cost_FP)
+                                        threshold_input_drf[i], cost_FN, cost_FP)
     i <- i+1
 }
 
-cost_rdf_matrix <- matrix(c(threshold_input_rdf,costs_rdf),nrow=length(threshold_input_rdf))
-colnames(cost_rdf_matrix) <- c("Threshold", "Kosten in Euro")
-cost_rdf_matrix
+cost_drf_matrix <- matrix(c(threshold_input_drf,costs_drf),nrow=length(threshold_input_drf))
+colnames(cost_drf_matrix) <- c("Threshold", "Kosten in Euro")
+cost_drf_matrix
 ```
 Mit Betrachtung der Kosten liegt der optimale Threshold für das Model bei 0,15.
 Aufgrund der geringen Unterschiede wäre auch 0,17 als Threshold sinnvoll und
@@ -711,25 +711,25 @@ cost <- function(prob, actual,threshold2, cost_FN_func, cost_FP_func){
     return (cost)
 }
 
-threshold_input_rdf <- c(0.05, 0.1, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19,
+threshold_input_glm <- c(0.05, 0.1, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19,
                          0.2, 0.23, 0.24, 0.25, 0.29, 0.292874,
                          0.3, 0.35, 0.45, 0.7) 
 
 i <- 1
-costs_rdf <- c()
+costs_glm <- c()
 cost_FN <- 3000
 cost_FP <- 500
 
-while (i < length(threshold_input_rdf)+1) {
-    costs_rdf[[(length(costs_rdf) +1)]] <- cost(test_asdf$prob, 
+while (i < length(threshold_input_glm)+1) {
+    costs_glm[[(length(costs_glm) +1)]] <- cost(test_asdf$prob, 
                                                 test_asdf$EmployeeChurned, 
-                                                threshold_input_rdf[i], cost_FN, cost_FP)
+                                                threshold_input_glm[i], cost_FN, cost_FP)
     i <- i+1
 }
 
-cost_rdf_matrix <- matrix(c(threshold_input_rdf,costs_rdf),nrow=length(threshold_input_rdf))
-colnames(cost_rdf_matrix) <- c("Threshold", "Kosten in Euro")
-cost_rdf_matrix
+cost_glm_matrix <- matrix(c(threshold_input_glm,costs_glm),nrow=length(threshold_input_glm))
+colnames(cost_glm_matrix) <- c("Threshold", "Kosten in Euro")
+cost_glm_matrix
 
 ```
 Mit Betrachtung der Kosten liegt der optimale Threshold für das Model bei 0,18.
@@ -982,6 +982,7 @@ Die Ergebnisse der H2O Vorhersage lagen bei einem Error von ca. 40%.
 Darauf hin wurde getestet, ob die SVM-Methode von e1071 mit dem H2O-DataFram funktioniert, da dort die Daten wieder abgewandelt wurden. Dies hat funktioniert und dadurch konnte ein Tuning des "Gamma" und "Cost" Wertes vorgenommen werden. Dies führte zu einer Genauigkeit von: 60% für die Radial-Methode und 67% bei der Linearen-Methode. 
 Zur Vergelichbarkeit wurde eine ROC-Kurve konstuiert. Dabei war es leider nicht möglich die Modelle der e1071-Bibliothek zu nutzen, weshalb noch einmal die H2O-SVM methode mit den optimierten Parametern der e1071-tune-Funktion durchgeführt wurde. Dies führte zu einer Fehleranfälligkeit von 37% jedoch bei der uns wichtigen False-Negative Rate einen Error von 28%. Dies ist nochmals eine deutliche Verbessung zum Anfang und somit das beste Ergbnis des SVM-Modells.
 
+# Vergleich aller Modelle
 
 ## Vergleich der Algorithmen anhand der einzelnen ROC-Kurven
 ```{r}
@@ -1003,6 +1004,33 @@ legend(x = "bottomright",
        col = c("red", "blue", "purple", "green"))
 title(main = "Vergleich der Algorithmen anhand der einzelnen ROC-Kurven")
 ```
+
+
+
+
+## Vergleich anhand der Konfusionsmatrizen
+
+Zum Vergleich aller Modelle, betrachten wir die Eintrittswahrscheinlichkeit von False-Positive Klassifikation unter allen False-Predictions, d.h. die Wahrscheinlichkeit, dass vorrausgesagt wird der Mitarbeitende bleibt im Unternehmen ist falsch. Des Weiteren betrachten wir die allgemeine Acurracy. Dabei betrachten wir lediglich die besten Vorhersagen je Modell.
+
+```{r}
+false_positive <- c(10, 7, 29)
+acurracy <- c(65,59, 62)
+auswertung <- matrix(c(false_positive, acurracy), nrow=3)
+colnames(auswertung) <- c("False-Positve-Rate", "Acurracy in %")
+rownames(auswertung) <- c("Distributed Random Forrest", "Logistic Regression", "Support-Vector Machine")
+print(auswertung)
+
+```
+
+Die Matrix zeigt die zusammengefassten und berechneten Werte der besten Konfusionsmatrizen der verschiedenen Modelle. Klar erkennbar ist, dass die Anwendung des Support-Vector Machine Modells eine vergleichweise gute Genauigkeit vorweist wie die anderen. Jedoch schneidet die False-Positive-Rate wesentlich schlechter als die beiden anderen ab, was im Kontext des Anwendungsfalls zu höheren Kosten führen würde. Dies liegt daran, dass das Modell nicht extra daruaf trainiert werden konnte, da der Threshold wie oben beschrieben immer "1" ist. 
+Daher wird jetzt der Unterschied der beiden anderen Modelle betrachtet. Dafür werden Kostenfunktion betrachtet.
+
+Kosten für DRF: 240.000
+Kosten für GLM: 233.500
+
+
+Nach dem aktuellen Modell und den aktuell berechneten Kosten ist das GLM-Modell wirtschaftlich besser.
+
 
 
 
