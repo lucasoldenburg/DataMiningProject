@@ -87,17 +87,16 @@ factorColsOneHot <- c("Gender",
 hot_df %<>% mutate_at(factorColsOneHot, factor)
 ```
 
-### 1. Versuch svm durchzuführen mit caret und e1071
 
 ## Erstellen der Train und Test Datensets
 ```{r}
-df_test <- subset(hot_df, select = c("EmployeeChurned", "Age", "Month Of Service"))
-df <- data.frame(df_test)
-n <- nrow(df)
+data_test <- subset(hot_df, select = c("EmployeeChurned", "Age", "Month Of Service"))
+df_test <- data.frame(data_test)
+n <- nrow(df_test)
 
 train_indices <- sample(1:n, round(2/3 * n))
-train <- df[train_indices,]
-test <- df[-train_indices,]
+train <- df_test[train_indices,]
+test <- df_test[-train_indices,]
 
 # erstmal 2 Features auswählen 
 features <- c("Age", "Month.Of.Service")
@@ -106,7 +105,7 @@ cols <- c(features, "EmployeeChurned")
 ```
 
 
-##SVM
+## SVM
 ```{r}
 # fit an SVM with linear kernel
 svmfit <- svm(EmployeeChurned ~ ., data = train[,cols], kernel = "linear", 
@@ -128,9 +127,7 @@ confusionMatrix(prediction, test[,"EmployeeChurned"])
 Wir erkennen sowohl an der Confusions Matrix, als auch am Plot, dass die svm Methode hier nicht zum Erfolg führt, da alle Predictions 0 sind. Dies wird an der Art unserer Daten liegen und wie das Data Frame nach dem One-Hot-Encoding aufgebaut ist. Daher haben wir uns entschieden auf das H2O-Paket umzusteigen, welches selbst die Daten richtig aufbereitet und wir die Rohdaten nutzen konnten.
 
 
-### 2. Versuch mit H2O
-
-##Datenimport und Vorbereitung
+## Datenimport und Vorbereitung
 ```{r}
 df <- read_xlsx("20220110_dataPrepped_beforeOneHot.xlsx")
 
@@ -165,7 +162,7 @@ predictors <- c( "decrease_Category", "Month Of Service")
 
 ```
 
-##SVM mit H2O
+## SVM mit H2O
 ```{r}
 #https://docs.h2o.ai/h2o/latest-stable/h2o-docs/data-science/svm.html
 #SVM durchführen 
@@ -249,7 +246,7 @@ prediction_radial <- predict(radial_svm, testDF, type = "class")
 confusionMatrix(prediction_radial, testDF[, "EmployeeChurned"])
 ```
 
-##SVM mit besten Parametern
+## SVM mit besten Parametern
 Für H2O nutzen wir die ermittelten Gamma Werte von Linear, da diese ein höhere Accuracy haben.
 ```{r}
 #https://docs.h2o.ai/h2o/latest-stable/h2o-docs/data-science/svm.html
