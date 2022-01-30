@@ -181,7 +181,7 @@ svm_model_h20 <- h2o.getModel(svm_model@model_id)
 perf_svm <- h2o.performance(svm_model_h20, testH2O)
 perf_svm
 ```
-Die H20.psvm Methode führt eine svm aus und legt zusätzlich alle Informationen in das Model wie zum Beispiel die Confusions Matrix. Darüber hinaus wurde das Model auf den Testdatensatz angewendet. Das Ergebnis ist eine durchschnittlicher Error von ca. 39%. Dies ist wesentlich weniger als 50% und damit besser als raten (50%). Jedoch ist es noch weit entfernt von einer Vorhersage, die wir uns wünschen. 
+Die H20.psvm Methode führt eine svm aus und legt zusätzlich alle Informationen in das Model wie zum Beispiel die Confusions Matrix. Darüber hinaus wurde das Model auf den Testdatensatz angewendet. Das Ergebnis ist eine durchschnittlicher Error von ca. 40%. Dies ist wesentlich weniger als 50% und damit besser als raten (50%). Jedoch ist es noch weit entfernt von einer Vorhersage, die wir uns wünschen. 
 Wir hätten gern wie beim DRF eine Optimierung der Parameter "Gamma" und "Cost" vorgenommen, nur leider ist dies in der H2O Bibliothek nicht möglich. Dies haben wir daher mit der e1071 Bibliothek realisiert, da wir rausgefunden haben, dass diese wieder anwendbar ist, nachdem umwandeln der der Daten von H20 und wieder zurück in ein "normales" DataFrame.
 
 
@@ -228,6 +228,9 @@ tuneSVM <- function(svm_type) {
 ```{r}
 linear_svm <- tuneSVM("linear")
 
+#plot(linear_svm, trainDF[,cols])
+#Leider ist die Plotfunktion nicht mehr möglich nach dem umwandeln der Daten in H20 und wieder zurück
+
 #predict
 prediction_linear <- predict(linear_svm, testDF, type = "class")
     
@@ -247,7 +250,7 @@ confusionMatrix(prediction_radial, testDF[, "EmployeeChurned"])
 ```
 
 ##SVM mit besten Parametern
-Für H2O nutzen wir die ermittelten Gamma Werte von Linear, da dies der Typ ist, der von H2O genutzt wird. 
+Für H2O nutzen wir die ermittelten Gamma Werte von Linear, da diese ein höhere Accuracy haben.
 ```{r}
 #https://docs.h2o.ai/h2o/latest-stable/h2o-docs/data-science/svm.html
 #SVM durchführen 
@@ -279,7 +282,6 @@ prediciton_df <- as.data.frame(pred)
 
 asdf_svm <- testDF
 asdf_svm$prob <- prediciton_df$p1
-asdf_svm$prob
 
 asdf_svm$EmployeeChurned <- as.numeric(as.character(asdf_svm$EmployeeChurned))
 
@@ -292,8 +294,19 @@ plot(perf_rocr, col="blue")
 abline(0,1)
 
 ```
-Die Fläche unterhalb der ROC-Kurve ist mit 0.59 größer als 0,5 und damit liefert 
+Die Fläche unterhalb der ROC-Kurve ist mit 0.6 größer als 0,5 und damit liefert 
 das erstellte Modell eine genauere Vorhersage als bloßes Raten.
-Die 
 
-# Auswahl Threshold
+
+## Auswahl Threshold
+Die Auswahl eines Thresholds ist bei einer SVM nicht sinnvoll, da das Ergebnis immer 1 oder 0 ist, d.h. entweder es ist auf der einen Seite der Linie oder der anderen. Daher ist der Threshold immer 1. Dies führt ebenfalls dazu, dass die Kostenfunktion nicht anwendbar ist, da der Threshold immer 1 ist, verändert sich das Ergebnis bei der Kostenfunktion ebenfalls nicht.
+
+## Zusammenfassung SVM
+Es wurden diverse Möglickeiten genutzt die beste Vorhersage durch das SVM-Modell zu bestimmen. Zu erst wurde das klassische Verfahren durch die e1071-Bibliothek angewendet. Auf Grund der Datenstruktur die vorliegt konnten keine Statistisch sinnvollen Vorhersagen gemacht werde, da diese alle auf "0" gesetzt wurden. Somit wurden keine unterschiedlicen Bereiche entdeckt. 
+Aus diesem Grund wurde mit der H2O-Bibliothek ein neuer Ansatz gestartet, da hier die DataFrames in eigene h20-DataFrames umgewandelt werden. Dies war jedoch nur auf den Rohdaten anwendbar und nicht mehr auf den One-Hot-Encodeten Daten. Hierbei wurden nicht alle Daten eingelesen, sondern nur diese, die durch das RandomForest-Modell den stärksten Einfluss haben, da sonst die Rechenleistung beim Tuning nicht ausreicht. 
+Die Ergebnisse der H2O Vorhersage lagen bei einem Error von ca. 40%.
+Darauf hin wurde getestet, ob die SVM-Methode von e1071 mit dem H2O-DataFram funktioniert, da dort die Daten wieder abgewandelt wurden. Dies hat funktioniert und dadurch konnte ein Tuning des "Gamma" und "Cost" Wertes vorgenommen werden. Dies führte zu einer Genauigkeit von: 60% für die Radial-Methode und 67% bei der Linearen-Methode. 
+Zur Vergelichbarkeit wurde eine ROC-Kurve konstuiert. Dabei war es leider nicht möglich die Modelle der e1071-Bibliothek zu nutzen, weshalb noch einmal die H2O-SVM methode mit den optimierten Parametern der e1071-tune-Funktion durchgeführt wurde. Dies führte zu einer Fehleranfälligkeit von 37% jedoch bei der uns wichtigen False-Negative Rate einen Error von 28%. Dies ist nochmals eine deutliche Verbessung zum Anfang und somit das beste Ergbnis des SVM-Modells.
+
+
+
