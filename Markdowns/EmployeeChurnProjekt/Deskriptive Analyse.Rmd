@@ -325,7 +325,9 @@ unique(df$`Stelle (SAP)`)
 summary(df$`Stelle (SAP)`)
 sum(is.na(df$`Stelle (SAP)`))
 # qplot(df$`Stelle (SAP)`)
+```
 
+```{r}
 df$`Stelle (SAP)` <- NULL
 ```
 
@@ -405,20 +407,6 @@ qplot(df$Classification)
 df$Classification <- NULL
 ```
 
-
-
-
-### Last_Development_Calendar Year/Month
-Dieses Merkmal beschreibt, wann sich die Person das zum letzten Mal horizontal oder vertikal oder von tariflich beschäftigt zu außertariflich 
-beschäftigt entwickelt hat. 
-Leere Werte deuten darauf hin, dass sich die Person noch nicht entwickelt hat. In solchen Fällen ist das Startdatum der Person als 
-Berechnungsgrundlage zu wählen.
-```{r}
-# todo: in Date umwandeln, falls leer mit Start-Datum ersetzen - in Monaten
-summary(df$'Last_Development_Calendar Year/Month')
-sum(is.na(df$'Last_Development_Calendar Year/Month'))
-```
-
 ### development to exempt
 Dieses Merkmal beschreibt die Entwicklung einer Person von tariflich beschäftigt zu außer-tariflich beschäftigt (1)
 oder nicht (0).
@@ -465,8 +453,6 @@ summary(df$'start_Calendar Year/Month')
 sum(is.na(df$'start_Calendar Year/Month'))
 #hier nach Jahren und eventuell Monaten splitten, dann könnte man ne Abhängigkeit zeigen, dass z.B. Menschen die Monat Januar anfangen schneller aussteigen als #im März :D
 
-
-#Monat
 ```
 
 
@@ -532,8 +518,9 @@ summary(df$'start_Cost Center2')
 sum(is.na(df$'start_Cost Center2'))
 
 ```
-##### Da es sehr viele unterschiedliche Ausprägungen bei diesem Merkmal gibt und die interne Rechnungstelle für uns in keinem sichtbaren Zusammenhang mit dem Mitarbeiter sthet, da dies keinen Einfluss auf den Mitarbeiter an sich hat, haben wir uns entschieden dieses Merkmal nicht weiter zu berücksichtiegen.
+Da es sehr viele unterschiedliche Ausprägungen bei diesem Merkmal gibt und die interne Rechnungstelle für uns in keinem sichtbaren Zusammenhang mit dem Mitarbeiter sthet, da dies keinen Einfluss auf den Mitarbeiter an sich hat, haben wir uns entschieden dieses Merkmal nicht weiter zu berücksichtiegen.
 Dieses Merkmal beschreibt die Kostenstelle inclusive der Zuordnung der Region und dem Unternehmen.
+
 ```{r}
 df$`start_Cost Center2` <- NULL
 ```
@@ -558,9 +545,8 @@ Dieses Merkmal beschreibt die Kostenstelle der Person zum letzten aktiven Zeitpu
 summary(df$'Cost Center')
 sum(is.na(df$'Cost Center'))
 # qplot(df$'Cost Center')
-
 ```
-\
+
 Wie oben bereits erläutert hat die Kostenstelle keinen Einfluss auf die Mitarbeiter, da dies intern geschieht und mögliche Zusammenhänge kausal ausgeschlossen sind, werden wir dieses Merkmal nicht weiter berücksichtigen
 ```{r}
 df$`Cost Center` <- NULL
@@ -625,7 +611,7 @@ unique(df$'decrease_SDU')
 summary(df$'decrease_SDU')
 sum(is.na(df$'decrease_SDU'))
 ```
-\
+
 Da wir bereits den offiziellen namen der SDU betrachtet werden wir die gleichen Daten auf Grund von redundanz aus dem Datensatz entfernen
 ```{r}
 df$decrease_SDU <- NULL
@@ -687,7 +673,7 @@ unique(df$'start_SDU')
 summary(df$'start_SDU')
 sum(is.na(df$'start_SDU'))
 ```
-\
+
 Da wir bereits den offiziellen namen der SDU werden wir die gleichen Daten auf Grund von redundanz aus dem Datensatz entfernen
 ```{r}
 df$start_SDU <- NULL
@@ -730,7 +716,6 @@ Es lässt sich erkennen, dass jüngere Mitarbeiter eher dazu tendieren das Unter
 ### Month Of Service
 Dieses Merkmal haben wir erstellt, um die Anstellungszeit genauer darstellen zu können. Die Aufteilung in Jahre ist zu unspezidfisch 
 für unsere Analyse, da dieses merkmal auf Grund der Problemstellung eine wichtige Rolle in unserem Projetk spielen wird. 
-
 ```{r}
 summary(df$`Month Of Service`)
 df$`Month Of Service` <- pmax(df$`Month Of Service`, 0)
@@ -742,7 +727,7 @@ qplot(df$`Month Of Service`)
 ggplot(df, aes(EmployeeChurned, `Month Of Service`)) + 
   geom_boxplot(aes(colour = EmployeeChurned), alpha=0.2)
 ```
-\
+
 Es lässt sich erkennen, dass Mitarbeitende mit längerer Anstellungszeit eher im Unternehmen bleiben, als weniger lang angestellte Mitarbeitende.
 
 ### Month Since Last Development

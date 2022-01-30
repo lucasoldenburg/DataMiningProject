@@ -3,8 +3,8 @@ title: "Deskriptive Analyse"
 output: html_document
 ---
 
-## Employee Churn
-# Prediction Martin
+# Employee Churn
+## Predictions
 
 ```{r}
 library(readxl)
@@ -26,7 +26,6 @@ library(ROCR)
 library(h2o)
 h2o.init()
 ```
-
 
 ## Datenimport und -vorbereitung 
 ```{r}
@@ -86,7 +85,6 @@ hot_df %<>% mutate_at(factorColsOneHot, factor)
 #hot_df$index <- 1:nrow(hot_df)
 
 
-
 # Rohdatenset ohne One-Hot-Encoding
 raw_df <- read_xlsx("20220110_dataPrepped_beforeOneHot.xlsx")
 
@@ -141,7 +139,7 @@ raw_testH2O <- splits[[2]]
 ```
 
 
-# Einfacher Entscheidungsbaum mit rpart-Bibliothek
+## Einfacher Entscheidungsbaum mit rpart-Bibliothek
 ```{r}
 raw_rpart_control <- trainControl(
     method = "repeatedcv",
@@ -149,8 +147,7 @@ raw_rpart_control <- trainControl(
     repeats = 10
 )
 
-#cp -> Complexity Parameter definiert die minimal zu erreichende Verbesserung
-#je Ast
+#cp -> Complexity Parameter definiert die minimal zu erreichende Verbesserung je Ast
 rpart_grid <- expand.grid(cp = c(0.015, 0.01, 0.005, 0.001, 
                                  0.0005, 0.0001, 0.00001))
 
@@ -164,7 +161,8 @@ raw_rpart_fit <- train(EmployeeChurned ~ .,
 best_cp <- raw_rpart_fit$bestTune[1,1]
 best_cp 
 ```
-# Modell mit optimalen Parametern trainieren
+
+## Modell mit optimalen Parametern trainieren
 ```{r}
 raw_rpart <- rpart(EmployeeChurned ~., y = TRUE, x = TRUE,
                   data=raw_train,
@@ -172,21 +170,22 @@ raw_rpart <- rpart(EmployeeChurned ~., y = TRUE, x = TRUE,
 
 raw_rpart_prediction <- rpart.predict(raw_rpart, raw_test)
 raw_rpart_prediction <- data.frame(raw_rpart_prediction)
-raw_test$prob <- raw_rpart_prediction$`X1`
-raw_test$EmployeeChurned <- as.numeric(as.character(raw_test$EmployeeChurned))
-raw_test
+raw_test_rpart <- raw_test
+raw_test_rpart$prob <- raw_rpart_prediction$`X1`
+raw_test_rpart$EmployeeChurned <- as.numeric(as.character(raw_test$EmployeeChurned))
+raw_test_rpart
 ```
 
 
-# Allgemeine Modellgüte anhand der ROC-Kurve bestimmen
+## Allgemeine Modellgüte anhand der ROC-Kurve bestimmen
 ```{r}
 # fpr_rocr <- perf_rocr@x.values[[1]]
-pred_rocr <- prediction(raw_test$prob, raw_test$EmployeeChurned)
-perf_rocr <- performance(pred_rocr, "tpr", "fpr" )
+pred_rocr_rpart <- prediction(raw_test_rpart$prob, raw_test_rpart$EmployeeChurned)
+perf_rocr_rpart <- performance(pred_rocr_rpart, "tpr", "fpr" )
 
-fpr_rocr <- perf_rocr@x.values[[1]]
-tpr_rocr <- perf_rocr@y.values[[1]]
-threshold_rocr <- perf_rocr@alpha.values[[1]] 
+fpr_rocr_rpart <- perf_rocr_rpart@x.values[[1]]
+tpr_rocr_rpart <- perf_rocr_rpart@y.values[[1]]
+threshold_rocr_rpart <- perf_rocr_rpart@alpha.values[[1]] 
 
 #AUC - Fläche unter der ROC-Kurve als Gütemerkmal
 performance(pred_rocr, "auc")@y.values
@@ -199,7 +198,7 @@ abline(v=0.2, col="red")
 Die Fläche unterhalb der ROC-Kurve ist größer als 0,5 und damit liefert 
 das erstellte Modell eine genauere Vorhersage als bloßes Raten.
 
-# Auswahl Threshold
+## Auswahl Threshold
 ```{r}
 #Funktion zur Klassifizierung der Vorhersage
 classify <- function(x, threshold){
@@ -214,13 +213,13 @@ threshold_predict <- 0.2
 #führt. Auch FN-Werte sorgen für Kosten im Unternehmen (siehe Kosten für Fehlklassifikation)
 
 #Anwendung auf Testdatensatz
-raw_test$predict <-classify(raw_test$prob, threshold_predict)
-head(raw_test_showPredict <- subset(raw_test, select = c(prob,predict)),10)
+raw_test_rpart$predict <-classify(raw_test_rpart$prob, threshold_predict)
+head(raw_test_showPredict <- subset(raw_test_rpart, select = c(prob,predict)),10)
 ```
 
-# Modellgüte anhand der Konfusionsmatrix bestimmen
+## Modellgüte anhand der Konfusionsmatrix bestimmen
 ```{r}
-confusionMatrix(factor(raw_test$predict), factor(raw_test$EmployeeChurned),
+confusionMatrix(factor(raw_test_rpart$predict), factor(raw_test$EmployeeChurned),
                 positive = "1")
 ```
 Aufgrund des niedrigen Schwellenwertes, ist die Genauigkeit (Accuracy) gering. 
@@ -234,11 +233,11 @@ vermieden werden sollten. Um dies aktiv in die Modellierung zu integrieren
 sollen die mit den Fehlklassifikationen verbundenen Kosten in die Betrachtung
 mit einbezogen werden.
 
-# Kosten für Fehlklassifikationen
+## Kosten für Fehlklassifikationen
 ```{r}
-#Kosten für neues Recruiting (Suchauftrag, Recruitingaufwand wie Planung, Gespräche, Onboarding)
-cost_FP <- 500  
 #Kosten aufgrund von Zeit für Manager:in und Mitarbeiter:in sowie zusätzliche Trainings- oder Gehaltskosten
+cost_FP <- 500  
+#Kosten für neues Recruiting (Suchauftrag, Recruitingaufwand wie Planung, Gespräche, Onboarding)
 cost_FN <- 3000
 
 matrix_overview_cost <- matrix(c(0,3000,500,0), nrow=2)
@@ -286,9 +285,9 @@ zu erreichen.
 ```{r}
 threshold_rpart_opti <- 0.17
 
-raw_test$predict_rpart_opti <-classify(raw_test$prob, threshold_rpart_opti)
+raw_test_rpart$predict_rpart_opti <-classify(raw_test_rpart$prob, threshold_rpart_opti)
 
-confusionMatrix(factor(raw_test$predict_rpart_opti), factor(raw_test$EmployeeChurned),
+confusionMatrix(factor(raw_test_rpart$predict_rpart_opti), factor(raw_test_rpart$EmployeeChurned),
                 positive = "1")
 ```
 Es werden fast alle Mitarbeiter:innen erkannt, die das Unternehmen verlassen.
@@ -298,7 +297,7 @@ deren Zuspruch sorgen.
 Doch aufgrund der hohen Sensitivität kann eine noch gute balanzierte Genauigkeit
 von dem Modell bei Anwendung auf die Testdaten erreicht werden.
 
-# Visualisierung des Entscheidungsbaumes (Wichtigkeit der Features)
+## Visualisierung des Entscheidungsbaumes (Wichtigkeit der Features)
 ```{r}
 printcp(raw_rpart)
 prp(raw_rpart)
@@ -320,7 +319,7 @@ Nicht zum Einsatz kommen: "Part Time Mark", "NonExempt", "start_NonExempt",
                 "Nationality_Classification", "Paybands"
 
 
-# h2o Distributed Random Forest (DRF)
+## H2O Distributed Random Forest (DRF)
 Im DRF werden eine Reihe an Bäumen erzeugt. Jeder dieser lernt basierend auf einen Teil
 des Datensets (Spalten und Reihen). Für die finale Vorhersage wird dann der Durchschnitt 
 aus den Vorhersagen der einzelnen Bäume berechnet. Das verringert die Varianz.
@@ -328,10 +327,10 @@ Um robuste Bäume zu erhalten werden darüber hinaus auf jedem Level je Baum
 zufällig die betrachteten Spalten (Features) gewählt. Die Anzahl der verwendeten
 Spalten wird dabei durch die Wurzel aus der Gesamtanzahl der Spalten definiert.
 
-##H2O Distributed Random Forest und Grid-Search (Tuning Hyperparameter)
+## H2O Distributed Random Forest und Grid-Search (Tuning Hyperparameter)
 ```{r}
-predictors <- c(factorCols, "Month Of Service", "Age", "Months Since Last Development")
-target <- "EmployeeChurned"
+predictors_drf <- c(factorCols, "Month Of Service", "Age", "Months Since Last Development")
+target_drf <- "EmployeeChurned"
 
 #Hyperparameter
 drf_params <- list( balance_classes = c(TRUE, FALSE),
@@ -340,29 +339,29 @@ drf_params <- list( balance_classes = c(TRUE, FALSE),
                     min_split_improvement = c(0.001, 0.0001, 0.00001, 0.000001))
 #0.0000001
 ```
-##Hyperparameter
+## Hyperparameter
 balance classes - default False
 ntrees - default 50
 max_depth - default 20
 Min_split_improvement - default 0,00001
 
-##Hyperparameterwahl
+## Hyperparameterwahl
 ```{r}
 #search_criteria strategy “Cartesian”
-h2oGrid_drf <- h2o.grid("drf", x = predictors, y = target,
-            grid_id = "h2oGrid",
+h2oGrid_drf <- h2o.grid("drf", x = predictors_drf, y = target_drf,
+            grid_id = "h2oGrid_drf",
             training_frame = raw_trainH2O,
             hyper_params = drf_params,
             seed = 1234)
 
 #Auswahl der optimalen Parameter anhand der AUC der einzelnen Modelle
-h2oGridPerf_drf <- h2o.getGrid(grid_id = "h2oGrid",
+h2oGridPerf_drf <- h2o.getGrid(grid_id = "h2oGrid_drf",
                            sort_by = "auc",
                            decreasing = TRUE)
 
 # Güte im Trainingsset
-summary(h2oGridPerf)
-best_drf <- h2o.getModel(h2oGridPerf@model_ids[[1]])
+summary(h2oGridPerf_drf)
+best_drf <- h2o.getModel(h2oGridPerf_drf@model_ids[[1]])
 h2o.performance(best_drf, raw_trainH2O)
 ```
 
@@ -386,21 +385,21 @@ sowie eine hohe FP-Klassifizierungsrate.
 ## Auswahl Threshold anhand der ROC-Kurve
 ```{r}
 # Anwendung auf Testset
-predictBestGrid <- h2o.predict(best_drf, newdata = raw_testH2O)
+predictBestGrid_drf <- h2o.predict(best_drf, newdata = raw_testH2O)
 
 # Umwandlung in generic dataframe 
-raw_drfPrediciton_df <- as.data.frame(predictBestGrid)
-raw_testH2O_asdf <- as.data.frame(raw_testH2O)
-raw_testH2O_asdf$prob <- raw_drfPrediciton_df$p1
-raw_testH2O_asdf
+raw_drfPrediciton_df <- as.data.frame(predictBestGrid_drf)
+raw_testH2O_asdf_drf <- as.data.frame(raw_testH2O)
+raw_testH2O_asdf_drf$prob <- raw_drfPrediciton_df$p1
+raw_testH2O_asdf_drf
 
-raw_testH2O_asdf$EmployeeChurned <- as.numeric(as.character(raw_testH2O_asdf$EmployeeChurned))
+raw_testH2O_asdf_drf$EmployeeChurned <- as.numeric(as.character(raw_testH2O_asdf_drf$EmployeeChurned))
 raw_test
 
-pred_rocr_drf <- prediction(raw_testH2O_asdf$prob, raw_testH2O_asdf$EmployeeChurned)
+pred_rocr_drf <- prediction(raw_testH2O_asdf_drf$prob, raw_testH2O_asdf_drf$EmployeeChurned)
 perf_rocr_drf <- performance(pred_rocr_drf, "tpr", "fpr" )
 
-performance(pred_rocr, "auc")@y.values
+performance(pred_rocr_drf, "auc")@y.values
 # Darstellung der ROC-Kurve
 plot(perf_rocr_drf, col="blue")
 abline(0,1)
@@ -419,9 +418,9 @@ threshold_drf <- 0.22
 
 ## Modellgüte anhand der Konfusionsmatrix bestimmen
 ```{r}
-raw_testH2O_asdf$predict <-classify(raw_testH2O_asdf$prob, threshold_drf)
+raw_testH2O_asdf_drf$predict <-classify(raw_testH2O_asdf_drf$prob, threshold_drf)
 
-confusionMatrix(factor(raw_testH2O_asdf$predict), factor(raw_testH2O_asdf$EmployeeChurned),
+confusionMatrix(factor(raw_testH2O_asdf_drf$predict), factor(raw_testH2O_asdf_drf$EmployeeChurned),
                 positive = "1")
 ```
 Im Vergleich zur Threshold-Wahl basierend auf der Maximierung des F1-Scores ist 
@@ -452,8 +451,8 @@ i <- 1
 costs_rdf <- c()
 
 while (i < length(threshold_input_rdf)+1) {
-    costs_rdf[[(length(costs_rdf) +1)]] <- cost(raw_testH2O_asdf$prob, 
-                                        raw_testH2O_asdf$EmployeeChurned, 
+    costs_rdf[[(length(costs_rdf) +1)]] <- cost(raw_testH2O_asdf_rdf$prob, 
+                                        raw_testH2O_asdf_rdf$EmployeeChurned, 
                                         threshold_input_rdf[i], cost_FN, cost_FP)
     i <- i+1
 }
@@ -470,9 +469,9 @@ sollte für Vorhersagen eingesetzt werden.
 ```{r}
 threshold_drf_opti <- 0.17
 
-raw_testH2O_asdf$predict_opti <-classify(raw_testH2O_asdf$prob, threshold_drf_opti)
+raw_testH2O_asdf_rdf$predict_opti <-classify(raw_testH2O_asdf_rdf$prob, threshold_drf_opti)
 
-confusionMatrix(factor(raw_testH2O_asdf$predict_opti), factor(raw_testH2O_asdf$EmployeeChurned),
+confusionMatrix(factor(raw_testH2O_asdf_rdf$predict_opti), factor(raw_testH2O_asdf_rdf$EmployeeChurned),
                 positive = "1")
 
 ```
@@ -499,19 +498,18 @@ Auffällig ist, dass die Zuordnung in Befristung (TemporaryPersonel) eine wenige
 wichtige Rolle als im Modell basierend auf dem  rpart-Algorithmus einnimmt.
 
 
-## Vergleich rpart und H2O D
+## Vergleich rpart und H2O Distributed Random Forest
 ```{r}
-confusionMatrix(factor(raw_test$predict_rpart), factor(raw_test$EmployeeChurned),
+confusionMatrix(factor(raw_test_rpart$predict_rpart), factor(raw_test_rpart$EmployeeChurned),
                 positive = "1")
 
-confusionMatrix(factor(raw_testH2O_asdf$predict_opti), factor(raw_testH2O_asdf$EmployeeChurned),
+confusionMatrix(factor(raw_testH2O_asdf_rdf$predict_opti), factor(raw_testH2O_asdf_rdf$EmployeeChurned),
                 positive = "1")
 ```
 Der Distributed Random Forest erzielt nicht nur allgemein eine größere AUC, auch
 die Genauigkeit (inklusive balanzierter Genauigkeit) sind in den optimierten 
 Modellen deutlich höher.
 Gleicher Threshold nach Kostenfunktion(kann zufällig sein)
-
 
 
 ## Vergleich der Algorithmen anhand der einzelnen ROC-Kurven
@@ -537,6 +535,3 @@ title(main = "Vergleich der Algorithmen anhand der einzelnen ROC-Kurven")
 ```{r}
 
 ```
-
-
-## Ergebnis, nächste Schritte
