@@ -1,8 +1,10 @@
 ---
 title: "Abgabe Gruppe C"
-author: "Eric Beier, Lucas Oldenburg, Martin König, "
+author: 'Eric Beier, Lucas Oldenburg, Martin König, '
 date: "30/01/2022"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ## Bibliotheksimporte
@@ -185,7 +187,6 @@ rpart_prediction <- data.frame(rpart_prediction)
 test_rpart <- test
 test_rpart$prob <- rpart_prediction$`X1`
 test_rpart$EmployeeChurned <- as.numeric(as.character(test$EmployeeChurned))
-test_rpart
 ```
 
 
@@ -372,7 +373,7 @@ h2oGridPerf_drf <- h2o.getGrid(grid_id = "h2oGrid_drf",
                            decreasing = TRUE)
 
 # Güte im Trainingsset
-summary(h2oGridPerf_drf)
+#summary(h2oGridPerf_drf)
 best_drf <- h2o.getModel(h2oGridPerf_drf@model_ids[[1]])
 h2o.performance(best_drf, trainH2O)
 ```
@@ -403,10 +404,9 @@ predictBestGrid_drf <- h2o.predict(best_drf, newdata = testH2O)
 drfPrediciton_df <- as.data.frame(predictBestGrid_drf)
 testH2O_asdf_drf <- as.data.frame(testH2O)
 testH2O_asdf_drf$prob <- drfPrediciton_df$p1
-testH2O_asdf_drf
+
 
 testH2O_asdf_drf$EmployeeChurned <- as.numeric(as.character(testH2O_asdf_drf$EmployeeChurned))
-test
 
 pred_rocr_drf <- prediction(testH2O_asdf_drf$prob, testH2O_asdf_drf$EmployeeChurned)
 perf_rocr_drf <- performance(pred_rocr_drf, "tpr", "fpr" )
@@ -635,7 +635,7 @@ h2oGrid <- h2o.grid("glm", x = predictors, y = response,
             hyper_params = glm_params,
             seed = 1234)
 
-summary(h2oGrid, show_stack_traces = TRUE)
+#summary(h2oGrid, show_stack_traces = TRUE)
 
 #Auswahl der optimalen Parameter anhand der AUC der einzelnen Modelle
 h2oGridPerf <- h2o.getGrid(grid_id = "h2oGrid",
@@ -643,7 +643,7 @@ h2oGridPerf <- h2o.getGrid(grid_id = "h2oGrid",
                            decreasing = TRUE)
 
 # Güte im Trainingsset
-summary(h2oGridPerf)
+#summary(h2oGridPerf)
 best_glm <- h2o.getModel(h2oGridPerf@model_ids[[1]])
 h2o.performance(best_glm, trainH2O)
 h2o.performance(best_glm, testH2O)
