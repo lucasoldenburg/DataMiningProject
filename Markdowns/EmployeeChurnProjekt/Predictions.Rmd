@@ -1,5 +1,5 @@
 ---
-title: "Deskriptive Analyse"
+title: "Abgabe Gruppe C"
 output: html_document
 ---
 
@@ -514,9 +514,9 @@ Gleicher Threshold nach Kostenfunktion(kann zufällig sein)
 
 ## Vergleich der Algorithmen anhand der einzelnen ROC-Kurven
 ```{r}
-pred_rocr_drf <- prediction(raw_testH2O_asdf$prob, raw_testH2O_asdf$EmployeeChurned)
+pred_rocr_drf <- prediction(raw_testH2O_asdf_drf$prob, raw_testH2O_asdf_drf$EmployeeChurned)
 perf_rocr_drf <- performance(pred_rocr_drf, "tpr", "fpr" )
-pred_rocr <- prediction(raw_test$prob, raw_test$EmployeeChurned)
+pred_rocr <- prediction(raw_test_rpart$prob, raw_test_rpart$EmployeeChurned)
 perf_rocr <- performance(pred_rocr, "tpr", "fpr" )
 
 
