@@ -451,8 +451,8 @@ i <- 1
 costs_rdf <- c()
 
 while (i < length(threshold_input_rdf)+1) {
-    costs_rdf[[(length(costs_rdf) +1)]] <- cost(raw_testH2O_asdf_rdf$prob, 
-                                        raw_testH2O_asdf_rdf$EmployeeChurned, 
+    costs_rdf[[(length(costs_rdf) +1)]] <- cost(raw_testH2O_asdf_drf$prob, 
+                                        raw_testH2O_asdf_drf$EmployeeChurned, 
                                         threshold_input_rdf[i], cost_FN, cost_FP)
     i <- i+1
 }
@@ -469,9 +469,9 @@ sollte für Vorhersagen eingesetzt werden.
 ```{r}
 threshold_drf_opti <- 0.17
 
-raw_testH2O_asdf_rdf$predict_opti <-classify(raw_testH2O_asdf_rdf$prob, threshold_drf_opti)
+raw_testH2O_asdf_drf$predict_opti <-classify(raw_testH2O_asdf_drf$prob, threshold_drf_opti)
 
-confusionMatrix(factor(raw_testH2O_asdf_rdf$predict_opti), factor(raw_testH2O_asdf_rdf$EmployeeChurned),
+confusionMatrix(factor(raw_testH2O_asdf_drf$predict_opti), factor(raw_testH2O_asdf_drf$EmployeeChurned),
                 positive = "1")
 
 ```
@@ -503,7 +503,7 @@ wichtige Rolle als im Modell basierend auf dem  rpart-Algorithmus einnimmt.
 confusionMatrix(factor(raw_test_rpart$predict_rpart), factor(raw_test_rpart$EmployeeChurned),
                 positive = "1")
 
-confusionMatrix(factor(raw_testH2O_asdf_rdf$predict_opti), factor(raw_testH2O_asdf_rdf$EmployeeChurned),
+confusionMatrix(factor(raw_testH2O_asdf_drf$predict_opti), factor(raw_testH2O_asdf_drf$EmployeeChurned),
                 positive = "1")
 ```
 Der Distributed Random Forest erzielt nicht nur allgemein eine größere AUC, auch

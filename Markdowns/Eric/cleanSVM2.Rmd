@@ -1,11 +1,5 @@
----
-title: "cleanSVM"
-author: "Eric Beier"
-date: "29/01/2022"
-output: html_document
----
 
-## Biblioheksimporte
+## Bibliotheksimporte
 ```{r}
 library(readxl)
 library(ggplot2)
@@ -87,6 +81,23 @@ factorColsOneHot <- c("Gender",
 hot_df %<>% mutate_at(factorColsOneHot, factor)
 ```
 
+## Datenimport und Vorbereitung
+```{r}
+df <- read_xlsx("20220110_dataPrepped_beforeOneHot.xlsx")
+
+# Kategorische Variablen umwandeln
+factorCols <- c("EmployeeChurned",
+                "decrease_Category",
+                "Nationality_Classification",
+                "Paybands")
+
+df %<>% mutate_at(factorCols, factor)
+# Auswählen der zu nutzenden Spalten auf Grund der Ergebnisse von Random Forrest, die Nutzung aller Features ist mit einem sehr hohen Rechenaufwand verbunden, der nicht geleistet werden konnte.
+df <- subset(df, select = c(EmployeeChurned, decrease_Category, `Month Of Service`, `Months Since Last Development`, Age, Paybands, Nationality_Classification))
+
+# Ansehen der Daten
+plot(df, col=df$EmployeeChurned)
+```
 
 ## Erstellen der Train und Test Datensets
 ```{r}
@@ -127,23 +138,7 @@ confusionMatrix(prediction, test[,"EmployeeChurned"])
 Wir erkennen sowohl an der Confusions Matrix, als auch am Plot, dass die svm Methode hier nicht zum Erfolg führt, da alle Predictions 0 sind. Dies wird an der Art unserer Daten liegen und wie das Data Frame nach dem One-Hot-Encoding aufgebaut ist. Daher haben wir uns entschieden auf das H2O-Paket umzusteigen, welches selbst die Daten richtig aufbereitet und wir die Rohdaten nutzen konnten.
 
 
-## Datenimport und Vorbereitung
-```{r}
-df <- read_xlsx("20220110_dataPrepped_beforeOneHot.xlsx")
 
-# Kategorische Variablen umwandeln
-factorCols <- c("EmployeeChurned",
-                "decrease_Category",
-                "Nationality_Classification",
-                "Paybands")
-
-df %<>% mutate_at(factorCols, factor)
-# Auswählen der zu nutzenden Spalten auf Grund der Ergebnisse von Random Forrest, die Nutzung aller Features ist mit einem sehr hohen Rechenaufwand verbunden, der nicht geleistet werden konnte.
-df <- subset(df, select = c(EmployeeChurned, decrease_Category, `Month Of Service`, `Months Since Last Development`, Age, Paybands, Nationality_Classification))
-
-# Ansehen der Daten
-plot(df, col=df$EmployeeChurned)
-```
 Wir haben bewusst nicht alle Features betrachtet, da nicht alle Merkmale einen signifikanten Einfluss haben. Mehr wollten wir auf den Ergebnissen der anderen Methoden aufbauen und ermitteln, ob wir eine noch bessere Vorhersage mit der Support-Vector-Machine erreichen können. Des Weiteren stand uns nicht genügend Rechenkraft zur Seite beim Tuning um alle Features zu berücksichtigen. 
 
 
