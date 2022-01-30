@@ -76,48 +76,109 @@ target <- "EmployeeChurned"
 # erstmal 2 Features auswählen die die stärkste Abhängikeit nach den Trees haben
 predictors <- c( "decrease_Category", "Month Of Service")
 
+
+```
+
+## SVM Tune mit e1071
+```{r}
 tuneDF <- as.data.frame(dfH2O)
 trainDF <- as.data.frame(trainH2O)
 testDF <- as.data.frame(testH2O)
 
-```
-## SVM Tune mit e1071
-```{r}
-tuneSVM <- function(trainData, testData, svm_type) {
+tuneSVM <- function(svm_type) {
 
      tuned_svm <- tune(svm, EmployeeChurned ~ ., 
-              data = trainData, 
+              data = trainDF, 
               kernel = svm_type, 
               scale = TRUE, 
-              ranges = list(cost = c(0.01, 0.05, 0.075),  gamma = c(0.01, 0.02,0.25)), 
+              ranges = list(cost = c(0.05, 0.075),  gamma = c(0.01, 0.02,0.25)), 
               tunecontrol = tune.control(cross=5)
               )
     tuned_svm
     
     # train on the entire data set using best value for cost
-    best_cost <- tuned_svm$best.parameters[1]
-    best_gamma <- tuned_svm$best.parameters[2] 
+    best_cost <- as.numeric(tuned_svm$best.parameters[1])
+    best_gamma <- as.numeric(tuned_svm$best.parameters[2])
 
         
     svmfit_best <- svm(EmployeeChurned ~ ., 
-                  data = trainData, 
+                  data = trainDF, 
                   kernel = svm_type, 
+                  cost = best_cost, 
+                  gamma = best_gamma, 
+                  scale = TRUE)
+  return(svmfit_best)
+}
+
+
+
+```
+
+```{r}
+ tuned_svm <- tune(
+              svm, 
+              EmployeeChurned ~ ., 
+              data = trainDF, 
+              kernel = "linear", 
+              scale = TRUE, 
+              ranges = list(cost = c(0.05, 0.075),  gamma = c(0.01, 0.02,0.25)), 
+              tunecontrol = tune.control(cross=5)
+              )
+    tuned_svm
+    
+    # train on the entire data set using best value for cost
+    best_cost <- as.numeric(tuned_svm$best.parameters[1])
+    best_gamma <- as.numeric(tuned_svm$best.parameters[2])
+```
+
+
+## Linear SVM
+```{r}
+linear_svm <- tuneSVM("linear")
+
+#predict
+prediction_linear <- predict(linear_svm, testDF, type = "class")
+    
+# confusion matrix with quality measures
+confusionMatrix(prediction_linear, testDF[, "EmployeeChurned"])
+```
+
+## Radial SVM
+```{r}
+radial_svm <- tuneSVM("radial")
+
+#predict
+prediction_radial <- predict(radial_svm, testDF, type = "class")
+    
+# confusion matrix with quality measures
+confusionMatrix(prediction_radial, testDF[, "EmployeeChurned"])
+```
+
+```{r}
+
+tuned_svm <- tune(svm, EmployeeChurned ~ ., 
+              data = trainDF, 
+              kernel = "linear", 
+              scale = TRUE, 
+              ranges = list(cost = c(0.05, 0.075),  gamma = c(0.01, 0.02,0.25)), 
+              tunecontrol = tune.control(cross=5)
+              )
+tuned_svm
+best_cost <- as.numeric(tuned_svm$best.parameters[1])
+best_gamma <- as.numeric(tuned_svm$best.parameters[2])
+ svmfit_best <- svm(EmployeeChurned ~ ., 
+                  data = trainDF, 
+                  kernel = "linear", 
                   cost = best_cost, 
                   gamma = best_gamma, 
                   scale = TRUE)
     
     #predict
-    prediction <- predict(svmfit_best, testData, type = "class")
+    prediction <- predict(svmfit_best, testDF, type = "class")
     
     # confusion matrix with quality measures
-    confusionMatrix(prediction, testData[, "EmployeeChurned"])
-  return(svmfit_best)
-}
-
-linear_svm <- tuneSVM(trainDF, testDF, "linear")
-radial_svm <- tuneSVM(trainDF, testDF, "radial")
+    confusionMatrix(prediction, testDF[, "EmployeeChurned"])
 ```
-
 
 
 ##SVM mit H2O

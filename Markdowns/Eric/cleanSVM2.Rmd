@@ -1,0 +1,299 @@
+---
+title: "cleanSVM"
+author: "Eric Beier"
+date: "29/01/2022"
+output: html_document
+---
+
+## Biblioheksimporte
+```{r}
+library(readxl)
+library(ggplot2)
+library(tidyr)
+library(stringr)
+library(lubridate)
+library(mltools)
+library(data.table)
+library(mlbench)
+library(tidyverse)
+library(magrittr)
+
+#svm
+library(caret)
+library(e1071) 
+
+#tree
+library(rpart)
+library(rpart.plot)
+library(ROCR)
+library(h2o)
+h2o.init()
+
+```
+
+## Datenimport onehot
+```{r}
+
+# Datenset nach One-Hot-Encoding
+hot_df <- read_xlsx("20220110_dataPrepped_afterOneHot.xlsx")
+hot_df <- subset(hot_df, 
+                  select = -c(EmployeeChurned_0, `start_Cost center`,
+                              `start_Calendar Year/Month`,
+                              `LastActive_Calendar Year/Month`))
+
+colnames(hot_df)[colnames(hot_df) == "EmployeeChurned_1"] <- "EmployeeChurned"
+
+# Kategorische Variablen
+factorColsOneHot <- c("Gender",
+                "TemporaryPersonel",
+                "Part Time Mark",
+                "NonExempt",
+                "start_NonExempt",
+                "development to exempt",
+                "Vertical_Horizontal_Developments_>= 3",
+                "Vertical_Horizontal_Developments_0",
+                "Vertical_Horizontal_Developments_1-2",
+                "start_contract type_apprentice",
+                "start_contract type_permanent staff",
+                "start_contract type_temporary personnel",
+                "start_Part time mark",
+                "EmployeeChurned",
+                "decrease_Category_Customer",
+                "decrease_Category_GB Management",
+                "decrease_Category_GBR/N",
+                "decrease_Category_GTU GD",
+                "decrease_Category_Human Resources GBS",
+                "decrease_Category_Intellectual Property",
+                "decrease_Category_IT Service CC",
+                "decrease_Category_People",
+                "decrease_Category_Planning & Development",
+                "decrease_Category_Procurement Services - GP",
+                "decrease_Category_RAA/A Competence",
+                "decrease_Category_Safety",
+                "decrease_Category_Supplier & Reporting",
+                "Nationality_Classification_EU",
+                "Nationality_Classification_German",
+                "Nationality_Classification_Other",
+                "Paybands_A",
+                "Paybands_B",
+                "Paybands_C",
+                "Paybands_D",
+                "Paybands_E",
+                "Paybands_F",
+                "Paybands_G",
+                "Paybands_H")
+
+# Umwandlung in kategorische Variablen
+hot_df %<>% mutate_at(factorColsOneHot, factor)
+```
+
+### 1. Versuch svm durchzuführen mit caret und e1071
+
+## Erstellen der Train und Test Datensets
+```{r}
+df_test <- subset(hot_df, select = c("EmployeeChurned", "Age", "Month Of Service"))
+df <- data.frame(df_test)
+n <- nrow(df)
+
+train_indices <- sample(1:n, round(2/3 * n))
+train <- df[train_indices,]
+test <- df[-train_indices,]
+
+# erstmal 2 Features auswählen 
+features <- c("Age", "Month.Of.Service")
+cols <- c(features, "EmployeeChurned")
+
+```
+
+
+##SVM
+```{r}
+# fit an SVM with linear kernel
+svmfit <- svm(EmployeeChurned ~ ., data = train[,cols], kernel = "linear", 
+              cost = 1, scale = TRUE)
+
+# information about the model including the support vectors
+summary(svmfit)
+
+# plot it including the separation lines (hyperplanes)
+plot(svmfit, train[,cols])
+
+# predict on the test data set
+prediction <- predict(svmfit, test, type = "class")
+
+# confusion matrix with quality measures
+confusionMatrix(prediction, test[,"EmployeeChurned"])
+
+```
+Wir erkennen sowohl an der Confusions Matrix, als auch am Plot, dass die svm Methode hier nicht zum Erfolg führt, da alle Predictions 0 sind. Dies wird an der Art unserer Daten liegen und wie das Data Frame nach dem One-Hot-Encoding aufgebaut ist. Daher haben wir uns entschieden auf das H2O-Paket umzusteigen, welches selbst die Daten richtig aufbereitet und wir die Rohdaten nutzen konnten.
+
+
+### 2. Versuch mit H2O
+
+##Datenimport und Vorbereitung
+```{r}
+df <- read_xlsx("20220110_dataPrepped_beforeOneHot.xlsx")
+
+# Kategorische Variablen umwandeln
+factorCols <- c("EmployeeChurned",
+                "decrease_Category",
+                "Nationality_Classification",
+                "Paybands")
+
+df %<>% mutate_at(factorCols, factor)
+# Auswählen der zu nutzenden Spalten auf Grund der Ergebnisse von Random Forrest, die Nutzung aller Features ist mit einem sehr hohen Rechenaufwand verbunden, der nicht geleistet werden konnte.
+df <- subset(df, select = c(EmployeeChurned, decrease_Category, `Month Of Service`, `Months Since Last Development`, Age, Paybands, Nationality_Classification))
+
+# Ansehen der Daten
+plot(df, col=df$EmployeeChurned)
+```
+Wir haben bewusst nicht alle Features betrachtet, da nicht alle Merkmale einen signifikanten Einfluss haben. Mehr wollten wir auf den Ergebnissen der anderen Methoden aufbauen und ermitteln, ob wir eine noch bessere Vorhersage mit der Support-Vector-Machine erreichen können. Des Weiteren stand uns nicht genügend Rechenkraft zur Seite beim Tuning um alle Features zu berücksichtigen. 
+
+
+## H2O Vorbereitung und Umwandlung der Daten
+```{r}
+dfH2O <- as.h2o(df)
+
+#in H2o Test und Train erzeugen, da sonst keine validen Ergebnisse
+splits <- h2o.splitFrame(data =  dfH2O, ratios = 0.75, seed = 1234)
+trainH2O <- splits[[1]]
+testH2O <- splits[[2]]
+
+target <- "EmployeeChurned"
+# erstmal 2 Features auswählen die die stärkste Abhängikeit nach den Trees haben
+predictors <- c( "decrease_Category", "Month Of Service")
+
+```
+
+##SVM mit H2O
+```{r}
+#https://docs.h2o.ai/h2o/latest-stable/h2o-docs/data-science/svm.html
+#SVM durchführen 
+svm_model <- h2o.psvm(
+  rank_ratio = 0.1,
+  y ="EmployeeChurned",
+  training_frame = trainH2O, 
+  disable_training_metrics = FALSE
+  )
+
+#svm auf Testdatensatz testen
+svm_model_h20 <- h2o.getModel(svm_model@model_id)
+perf_svm <- h2o.performance(svm_model_h20, testH2O)
+perf_svm
+```
+Die H20.psvm Methode führt eine svm aus und legt zusätzlich alle Informationen in das Model wie zum Beispiel die Confusions Matrix. Darüber hinaus wurde das Model auf den Testdatensatz angewendet. Das Ergebnis ist eine durchschnittlicher Error von ca. 39%. Dies ist wesentlich weniger als 50% und damit besser als raten (50%). Jedoch ist es noch weit entfernt von einer Vorhersage, die wir uns wünschen. 
+Wir hätten gern wie beim DRF eine Optimierung der Parameter "Gamma" und "Cost" vorgenommen, nur leider ist dies in der H2O Bibliothek nicht möglich. Dies haben wir daher mit der e1071 Bibliothek realisiert, da wir rausgefunden haben, dass diese wieder anwendbar ist, nachdem umwandeln der der Daten von H20 und wieder zurück in ein "normales" DataFrame.
+
+
+## SVM Tune Funktion mit e1071
+Folgend verwenden wir die Tune Funktion um das beste "Gamma" und "Cost" zu ermitteln für eine optimale Vorhersage. 
+```{r}
+# Umwandeln der H20 DataFrames in "normale" DataFrames, um das Tuning der e1071 Methode ausführen können.
+tuneDF <- as.data.frame(dfH2O)
+trainDF <- as.data.frame(trainH2O)
+testDF <- as.data.frame(testH2O)
+
+#Tuning der Parameter -> hier hätten wir gern eine größere Bandbreite an gamma und cost Variablen durchlaufen lassen, wurde aber von unserer Rechenleistung nicht gewährleistet. Daher haben wir in einzelnen Schritten uns den jetztigen WErten angenähert um so einen möglichst optimalen Wert zu finden. Auch ist zu ebachten, dass wir keinen Gamma-Wert unter 0.01 nutzen konnten, da diese nicht mehr von den folgenden Methoden unterstützt werden.
+
+tuneSVM <- function(svm_type) {
+
+     tuned_svm <- tune(svm, EmployeeChurned ~ ., 
+              data = trainDF, 
+              kernel = svm_type, 
+              scale = TRUE, 
+              ranges = list(cost = c(0.05, 0.075),  gamma = c(0.01, 0.02,0.25)), 
+              tunecontrol = tune.control(cross=5)
+              )
+    tuned_svm
+    
+    # train on the entire data set using best value for cost
+    best_cost <- as.numeric(tuned_svm$best.parameters[1])
+    print(paste0("Cost: ", best_cost))
+    
+    best_gamma <- as.numeric(tuned_svm$best.parameters[2])
+    print(paste0("Gamma: ", best_gamma))
+        
+    svmfit_best <- svm(EmployeeChurned ~ ., 
+                  data = trainDF, 
+                  kernel = svm_type, 
+                  cost = best_cost, 
+                  gamma = best_gamma, 
+                  scale = TRUE)
+  return(svmfit_best)
+}
+
+```
+
+## Linear SVM
+```{r}
+linear_svm <- tuneSVM("linear")
+
+#predict
+prediction_linear <- predict(linear_svm, testDF, type = "class")
+    
+# confusion matrix with quality measures
+confusionMatrix(prediction_linear, testDF[, "EmployeeChurned"])
+```
+
+## Radial SVM
+```{r}
+radial_svm <- tuneSVM("radial")
+
+#predict
+prediction_radial <- predict(radial_svm, testDF, type = "class")
+    
+# confusion matrix with quality measures
+confusionMatrix(prediction_radial, testDF[, "EmployeeChurned"])
+```
+
+##SVM mit besten Parametern
+Für H2O nutzen wir die ermittelten Gamma Werte von Linear, da dies der Typ ist, der von H2O genutzt wird. 
+```{r}
+#https://docs.h2o.ai/h2o/latest-stable/h2o-docs/data-science/svm.html
+#SVM durchführen 
+svm_model <- h2o.psvm(
+  hyper_param = 0.075,
+  gamma = 0.01,
+  rank_ratio = 0.1,
+  y ="EmployeeChurned",
+  training_frame = trainH2O, 
+  disable_training_metrics = FALSE
+  )
+
+# mehr Infos über Model und support Vektoren
+summary(svm_model)            
+
+#svm auf Testdatensatz testen
+best_svm_model_h20 <- h2o.getModel(svm_model@model_id)
+best_perf_svm <- h2o.performance(best_svm_model_h20, testH2O)
+best_perf_svm
+```
+
+## Auswahl Threshold anhand ROC Kurve
+```{r}
+# Anwendung auf Testset
+#predict
+pred <- h2o.predict(best_svm_model_h20, newdata = testH2O)
+
+prediciton_df <- as.data.frame(pred)
+
+asdf_svm <- testDF
+asdf_svm$prob <- prediciton_df$p1
+asdf_svm$prob
+
+asdf_svm$EmployeeChurned <- as.numeric(as.character(asdf_svm$EmployeeChurned))
+
+pred_rocr <- prediction(asdf_svm$prob, asdf_svm$EmployeeChurned)
+perf_rocr <- performance(pred_rocr, "tpr", "fpr" )
+
+performance(pred_rocr, "auc")@y.values
+# Darstellung der ROC-Kurve
+plot(perf_rocr, col="blue")
+abline(0,1)
+
+```
+Die Fläche unterhalb der ROC-Kurve ist mit 0.59 größer als 0,5 und damit liefert 
+das erstellte Modell eine genauere Vorhersage als bloßes Raten.
+Die 
+
+# Auswahl Threshold

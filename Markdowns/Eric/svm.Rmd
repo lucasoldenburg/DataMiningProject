@@ -130,13 +130,14 @@ n <- nrow(df)
 train_indices <- sample(1:n, round(2/3 * n))
 test_train <- df[train_indices,]
 test_test <- df[-train_indices,]
+features <- c("Age", "Month.Of.Service")
+cols <- c(features, "EmployeeChurned")
 ```
 
 
 ## Knn
 ```{r}
-features <- c("Age", "Month.Of.Service")
-cols <- c(features, "EmployeeChurned")
+
 
 set.seed(50)
 ctrl <- trainControl(method="cv", number = 3) # 3-fold cross validation 
@@ -157,7 +158,7 @@ rpart <- rpart(EmployeeChurned ~., y = TRUE, x = TRUE,
 test_test$prob <- rpart.predict(rpart, test_test)
 
 #knnPrediction <- prediction(test_test$prob, test_test$EmployeeChurned)
-knnPerf <- performance(knnPredict, "tpr", "fpr")
+#knnPerf <- performance(knnPredict, "tpr", "fpr")
 # Get the confusion matrix to see accuracy value and other quality measures
 confusionMatrix(knnPredict, df$EmployeeChurned)
 
@@ -170,7 +171,7 @@ plot(df[,features], col=df$EmployeeChurned, pch=as.numeric(unclass(knnPredict)))
 ##SVM
 ```{r}
 # fit an SVM with linear kernel
-svmfit <- svm(EmployeeChurned ~ ., data = test_train[,cols], kernel = "radial", 
+svmfit <- svm(EmployeeChurned ~ ., data = test_train[,cols], kernel = "linear", 
               cost = 0.01, gamma = 0.5, scale = TRUE)
 
 # print the results
