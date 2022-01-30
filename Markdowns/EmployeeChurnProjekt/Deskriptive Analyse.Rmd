@@ -176,19 +176,6 @@ qplot(sort(df$Nationality_Classification))
 df$Nationality_Classification <- as.factor(df$Nationality_Classification)
 ```
 
-### YearsOfService_BASFBerlin
-Dieses Merkmal beschreibt, wie lange die Person im Unternehmen bisher tätig war in Jahren (nur Berliner Standort).
-Dabei wird aufgerundet. Das Symbol "#" gilt für eine Unternehmenszugehörigkeit unter einem Jahr.
-Aus diesem Grund wird die Unternehmenszugehörigkeit manuell berechnet aus dem Startdatum und dem letzten Aktivitätsdatum.
-Zusätzlich wird neben den Jahren auch die Monate angegeben.
-```{r}
-unique(df$YearsOfService_BASFBerlin)
-summary(df$YearsOfService_BASFBerlin)
-sum(is.na(df$YearsOfService_BASFBerlin))
-#qplot(df$YearsOfService_BASFBerlin)
-
-```
-
 ### Position text
 Dieses Merkmal beschreibt in welcher Position die Person tätig ist bzw. zuletzt war. 
 Es kann auch als Planstelle bezeichnet werden. Aufgrund der Menge an Merkmalsausprägungen
