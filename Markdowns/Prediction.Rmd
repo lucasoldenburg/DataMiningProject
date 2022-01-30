@@ -140,16 +140,6 @@ raw_trainH2O <- splits[[1]]
 raw_testH2O <- splits[[2]]
 ```
 
-# Find Features
-```{r}
-#Grid Search
-#Hyperparameter
-
-#feature importance
-#one hot or not?
-```
-
-
 
 # Einfacher Entscheidungsbaum mit rpart-Bibliothek
 ```{r}
@@ -190,20 +180,14 @@ raw_test
 
 # Allgemeine Modellgüte anhand der ROC-Kurve bestimmen
 ```{r}
-<<<<<<< HEAD
 # fpr_rocr <- perf_rocr@x.values[[1]]
-=======
 pred_rocr <- prediction(raw_test$prob, raw_test$EmployeeChurned)
 perf_rocr <- performance(pred_rocr, "tpr", "fpr" )
 
-<<<<<<< HEAD
-=======
 fpr_rocr <- perf_rocr@x.values[[1]]
->>>>>>> e1f6da4c58f4f2ab0af69fc42247fdde4e0889fd
 tpr_rocr <- perf_rocr@y.values[[1]]
 threshold_rocr <- perf_rocr@alpha.values[[1]] 
 
->>>>>>> cc0dc6c10b6697416bd9074cf0328479778129bc
 #AUC - Fläche unter der ROC-Kurve als Gütemerkmal
 performance(pred_rocr, "auc")@y.values
 
