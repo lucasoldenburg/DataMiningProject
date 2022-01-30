@@ -1,0 +1,129 @@
+---
+title: "svmNewTry"
+author: "Eric Beier"
+date: "29/01/2022"
+output: html_document
+---
+
+```{r}
+library(readxl)
+
+library(mltools)
+library(caret)
+library(e1071) # for SVMs
+```
+
+##Datenimport und Vorbereitung
+```{r}
+df <- read_xlsx("20220110_dataPrepped_beforeOneHot.xlsx")
+
+# Kategorische Variablen umwandeln
+factorCols <- c("EmployeeChurned",
+                "decrease_Category",
+                "Nationality_Classification",
+                "Paybands")
+
+df %<>% mutate_at(factorCols, factor)
+# Auswählen der zu nutzenden Spalten auf Grund der ERgebnisse von Random Forrest
+df <- subset(df, select = c(EmployeeChurned, decrease_Category, `Month Of Service`, `Months Since Last Development`, Age, Paybands, Nationality_Classification))
+
+# Ansehen der Daten
+#plot(df, col=df$EmployeeChurned)
+```
+
+
+## Erstellen der Train und Test Datensets
+```{r}
+n <- nrow(df)
+train_indices <- sample(1:n, round(2/3 * n))
+train <- df[train_indices,]
+test <- df[-train_indices,]
+
+# erstmal 2 Features auswählen die die stärkste Abhängikeit nach den Trees haben
+features <- c("decrease_Category", "Month Of Service")
+cols <- c(features, "EmployeeChurned")
+
+```
+
+##Change Test and Train Faktors
+```{r}
+# test$EmployeeChurned <- as.numeric(as.character(test$EmployeeChurned))
+# test$decrease_Category <- as.numeric(as.character(test$decrease_Category))
+# test$`Month Of Service`<- as.numeric(as.character(test$`Month Of Service`))
+# 
+# train$EmployeeChurned <- as.numeric(as.character(train$EmployeeChurned))
+# train$decrease_Category <- as.numeric(as.character(train$decrease_Category))
+# train$`Month Of Service`<- as.numeric(as.character(train$`Month Of Service`))
+```
+
+
+##SVM
+```{r}
+# fit an SVM with linear kernel
+svmfit <- svm(EmployeeChurned ~ ., data = train[,cols], kernel = "linear", 
+              cost = 1, scale = TRUE)
+
+# print the results
+print(svmfit)
+
+# more information about the model including the support vectors
+summary(svmfit)
+
+# indices of the support vectors
+#svmfit$index
+
+
+# plot it including the separation lines (hyperplanes)
+plot(svmfit, train[,cols])
+
+# predict on the test data set
+prediction <- predict(svmfit, test, type = "class")
+
+# confusion matrix with quality measures
+confusionMatrix(prediction, test[,"EmployeeChurned"])
+
+
+
+```
+
+
+```{r}
+# function to find the best value for the cost parameter
+# assume a column called Species in my_data representing the class to be predicted
+run_svm <- function(my_data, svm_type) {
+
+    # automatically run five-fold cross validation to find the best value for cost
+    # all the code related to the parameter gamma should be ignored by the functions 
+    # if svm_type = "linear", since a linear kernel only requires cost
+    tuned_svm <- tune(svm, EmployeeChurned ~ ., data = my_data, kernel = svm_type, 
+              scale = TRUE, ranges = list(cost = c(0.01, 0.1, 1, 10, 100), 
+                                          gamma = c(0.25, 0.5, 1, 2)), 
+              tunecontrol = tune.control(cross=5))
+    print(tuned_svm)
+    
+    # train on the entire data set using best value for cost
+    best_cost <- tuned_svm$best.parameters[1]
+    best_gamma <- tuned_svm$best.parameters[2] 
+
+        
+    svmfit_best <- svm(EmployeeChurned ~ ., data = my_data, kernel = svm_type, 
+                  cost = best_cost, gamma = best_gamma, scale = TRUE)
+    
+    # plot the result
+   # plot(svmfit_best, my_data)    
+    
+    # confusion matrix with quality measures
+    print(confusionMatrix(svmfit_best$fitted, my_data[,"EmployeeChurned"]))
+    
+}
+
+# learn a linear SVM
+run_svm(df[,cols], "linear")
+
+# learn an SVM with a radial basis function kernel
+# radial requires a value for the parameter gamma
+# which should be optimised as well; we just go for the default here
+run_svm(df[,cols], "radial")
+
+```
+

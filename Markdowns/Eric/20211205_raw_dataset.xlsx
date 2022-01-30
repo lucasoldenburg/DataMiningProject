@@ -1,0 +1,158 @@
+```{r}
+library(readxl)
+library(ggplot2)
+library(tidyr)
+library(stringr)
+library(lubridate)
+library(mltools)
+library(data.table)
+library(mlbench)
+library(tidyverse)
+library(magrittr)
+
+library(caret)
+library(e1071) # for SVMs
+library(rpart)
+library(rpart.plot)
+library(ROCR)
+library(h2o)
+h2o.init()
+
+
+
+```
+## Datenimport und -vorbereitung
+```{r}
+# Datenset nach One-Hot-Encoding
+hot_df <- read_xlsx("20220110_dataPrepped_afterOneHot.xlsx")
+hot_df <- subset(hot_df, 
+                  select = -c(EmployeeChurned_0, `start_Cost center`,
+                              `start_Calendar Year/Month`,
+                              `LastActive_Calendar Year/Month`))
+
+colnames(hot_df)[colnames(hot_df) == "EmployeeChurned_1"] <- "EmployeeChurned"
+
+# Kategorische Variablen
+factorColsOneHot <- c("Gender",
+                "TemporaryPersonel",
+                "Part Time Mark",
+                "NonExempt",
+                "start_NonExempt",
+                "development to exempt",
+                "Vertical_Horizontal_Developments_>= 3",
+                "Vertical_Horizontal_Developments_0",
+                "Vertical_Horizontal_Developments_1-2",
+                "start_contract type_apprentice",
+                "start_contract type_permanent staff",
+                "start_contract type_temporary personnel",
+                "start_Part time mark",
+                "EmployeeChurned",
+                "decrease_Category_Customer",
+                "decrease_Category_GB Management",
+                "decrease_Category_GBR/N",
+                "decrease_Category_GTU GD",
+                "decrease_Category_Human Resources GBS",
+                "decrease_Category_Intellectual Property",
+                "decrease_Category_IT Service CC",
+                "decrease_Category_People",
+                "decrease_Category_Planning & Development",
+                "decrease_Category_Procurement Services - GP",
+                "decrease_Category_RAA/A Competence",
+                "decrease_Category_Safety",
+                "decrease_Category_Supplier & Reporting",
+                "Nationality_Classification_EU",
+                "Nationality_Classification_German",
+                "Nationality_Classification_Other",
+                "Paybands_A",
+                "Paybands_B",
+                "Paybands_C",
+                "Paybands_D",
+                "Paybands_E",
+                "Paybands_F",
+                "Paybands_G",
+                "Paybands_H")
+
+# Umwandlung in kategorische Variablen
+hot_df %<>% mutate_at(factorColsOneHot, factor)
+
+#Indexspalte
+#hot_df$index <- 1:nrow(hot_df)
+
+
+
+# Rohdatenset ohne One-Hot-Encoding
+raw_df <- read_xlsx("20220110_dataPrepped_beforeOneHot.xlsx")
+
+raw_df <- subset(raw_df, 
+                  select = -c(`start_Cost center`,
+                              `start_Calendar Year/Month`,
+                              `LastActive_Calendar Year/Month`))
+
+# Kategorische Variablen
+factorCols <- c("Gender",
+                "TemporaryPersonel",
+                "Part Time Mark",
+                "NonExempt",
+                "start_NonExempt",
+                "development to exempt",
+                "Vertical_Horizontal_Developments",
+                "start_contract type",
+                "start_Part time mark",
+                "EmployeeChurned",
+                "decrease_Category",
+                "Nationality_Classification",
+                "Paybands")
+
+raw_df %<>% mutate_at(factorCols, factor)
+
+```
+##Train Test nach H2O
+```{r}
+h20_data <- hot_df |> mutate(across(c(EmployeeChurned, "Month Of Service"), as.factor)) |> select(-Gender)
+hot_dfH2O <- as.h2o(h20_data)
+
+splits <- h2o.splitFrame(data =  hot_dfH2O, ratios = 0.75, seed = 1234)
+trainH2O <- splits[[1]]
+testH2O <- splits[[2]]
+
+target <- "EmployeeChurned"
+features <- setdiff(colnames(hot_dfH2O), target)
+
+#Cartesian Grid Search
+hyper_grid.h2o <- list( balance_classes = c(TRUE, FALSE),
+                    ntrees = c(30, 50, 70),
+                    max_depth = c(10, 15, 20, 25),
+                    min_split_improvement = c(0.001, 0.0001, 0.00001, 0.000001))
+hyper_grid.h2o
+#number of Models:
+sapply(hyper_grid.h2o, length) %>% prod()
+
+
+
+
+
+```
+
+
+##SVM mit H2O
+```{r}
+#https://docs.h2o.ai/h2o/latest-stable/h2o-docs/data-science/svm.html
+
+svm_model <- h2o.psvm(gamma = 0.01,
+                      rank_ratio = 0.1,
+                      y ="EmployeeChurned",
+                      training_frame = trainH2O, 
+                      disable_training_metrics = FALSE
+                      )
+perf <- h2o.performance(svm_model)
+perf
+```
+
+```{r}
+plot(perf, col="blue")
+```
+
+
+
+
+

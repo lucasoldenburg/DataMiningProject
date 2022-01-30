@@ -17,29 +17,69 @@ library(mlbench)
 library(tidyverse)
 library(magrittr)
 
-#tree
-
-library(caret)
-library(caretEnsemble)
+library(rpart)
+library(rpart.plot)
+library(ROCR)
 library(h2o)
 h2o.init()
 
 ```
 
+##Datenimport und Vorbereitung ohne One-Hot
+```{r}
+# df <- read_xlsx("20220110_dataPrepped_beforeOneHot.xlsx")
+# 
+# # Kategorische Variablen umwandeln
+# factorCols <- c("EmployeeChurned",
+#                 "decrease_Category",
+#                 "Nationality_Classification",
+#                 "Paybands")
+# 
+# df %<>% mutate_at(factorCols, factor)
+# # Auswählen der zu nutzenden Spalten auf Grund der ERgebnisse von Random Forrest
+# df <- subset(df, select = c(EmployeeChurned, decrease_Category, `Month Of Service`, `Months Since Last Development`, Age, Paybands, Nationality_Classification))
+# 
+# # Ansehen der Daten
+# plot(df, col=df$EmployeeChurned)
+```
+
 ## Datenimport und -vorbereitung
 ```{r}
-hot_df <- read_xlsx("20220110_dataPrepped_afterOneHot.xlsx")
-hot_df <- subset(hot_df, 
-                  select = -c(EmployeeChurned_1, `start_Cost center`,
+# Rohdatenset ohne One-Hot-Encoding
+raw_df <- read_xlsx("20220110_dataPrepped_beforeOneHot.xlsx")
+
+raw_df <- subset(raw_df, 
+                  select = -c(`start_Cost center`,
                               `start_Calendar Year/Month`,
                               `LastActive_Calendar Year/Month`))
-
-
-colnames(hot_df)[colnames(hot_df) == "EmployeeChurned_0"] <- "EmployeeChurned"
-colnames(hot_df)[colnames(hot_df) == "Temporary_0"] <- "Temporary"
-
 # Kategorische Variablen
 factorCols <- c("Gender",
+                "TemporaryPersonel",
+                "Part Time Mark",
+                "NonExempt",
+                "start_NonExempt",
+                "development to exempt",
+                "Vertical_Horizontal_Developments",
+                "start_contract type",
+                "start_Part time mark",
+                "EmployeeChurned",
+                "decrease_Category",
+                "Nationality_Classification",
+                "Paybands")
+raw_df %<>% mutate_at(factorCols, factor)
+
+# Datenset nach One-Hot-Encoding
+hot_df <- read_xlsx("20220110_dataPrepped_afterOneHot.xlsx")
+hot_df <- subset(hot_df, 
+                 select = -c(EmployeeChurned_0,
+                                     `start_Cost center`,
+                                     `start_Calendar Year/Month`,
+                                     `LastActive_Calendar Year/Month`))
+
+colnames(hot_df)[colnames(hot_df) == "EmployeeChurned_1"] <- "EmployeeChurned"
+
+# Kategorische Variablen
+factorColsOneHot <- c("Gender",
                 "TemporaryPersonel",
                 "Part Time Mark",
                 "NonExempt",
@@ -60,6 +100,7 @@ factorCols <- c("Gender",
                 "decrease_Category_Human Resources GBS",
                 "decrease_Category_Intellectual Property",
                 "decrease_Category_IT Service CC",
+                "decrease_Category_Other", #fehlt bei den anderen
                 "decrease_Category_People",
                 "decrease_Category_Planning & Development",
                 "decrease_Category_Procurement Services - GP",
@@ -79,39 +120,389 @@ factorCols <- c("Gender",
                 "Paybands_H")
 
 # Umwandlung in kategorische Variablen
-hot_df %<>% mutate_at(factorCols, factor)
+hot_df %<>% mutate_at(factorColsOneHot, factor)
 
 #Indexspalte
 #hot_df$index <- 1:nrow(hot_df)
-str(hot_df)
+```
+
+## H2O Vorbereitung und Umwandlung der Daten, Erstellen der Train und Test Datensets
+```{r}
+raw_df <- as.h2o(raw_df)
+splits <- h2o.splitFrame(data =  raw_df, ratios = 0.75, seed = 1234)
+raw_train <- splits[[1]]
+raw_test <- splits[[2]]
+
+hot_df <- as.h2o(hot_df)
+splits1 <- h2o.splitFrame(data =  hot_df, ratios = 0.75, seed = 1234)
+hot_train <- splits1[[1]]
+hot_test <- splits1[[2]]
+```
+
+## Predictors und response
+```{r}
+# zuerst die 6 Features auswählen, die die stärkste Abhängikeit nach den Trees haben
+predictors_drf <- c("decrease_Category",
+                "Month Of Service",
+                "Months Since Last Development",
+                "Age",
+                "Paybands",
+                "Nationality_Classification")
+# alle raw-Features, da H2O durch das setzen von alpha = 1 automatisch die besten Features auswählt
+predictors <- c("Gender",
+                "Part Time Mark",
+                "TemporaryPersonel",
+                "development to exempt",
+                "Vertical_Horizontal_Developments",
+                "start_contract type",
+                "start_Part time mark",
+                "decrease_Category",
+                "Nationality_Classification",
+                "Month Of Service",
+                "Age",
+                "Months Since Last Development",
+                "NonExempt",
+                "Paybands",
+                "start_NonExempt")
+# one-Hot
+predictors_hot <- c("Gender",
+                "TemporaryPersonel",
+                "Part Time Mark",
+                "NonExempt",
+                "start_NonExempt",
+                "development to exempt",
+                "Vertical_Horizontal_Developments_>= 3",
+                "Vertical_Horizontal_Developments_0",
+                "Vertical_Horizontal_Developments_1-2",
+                "start_contract type_apprentice",
+                "start_contract type_permanent staff",
+                "start_contract type_temporary personnel",
+                "start_Part time mark",
+                "decrease_Category_Customer",
+                "decrease_Category_GB Management",
+                "decrease_Category_GBR/N",
+                "decrease_Category_GTU GD",
+                "decrease_Category_Human Resources GBS",
+                "decrease_Category_Intellectual Property",
+                "decrease_Category_IT Service CC",
+                "decrease_Category_Other",
+                "decrease_Category_People",
+                "decrease_Category_Planning & Development",
+                "decrease_Category_Procurement Services - GP",
+                "decrease_Category_RAA/A Competence",
+                "decrease_Category_Safety",
+                "decrease_Category_Supplier & Reporting",
+                "Nationality_Classification_EU",
+                "Nationality_Classification_German",
+                "Nationality_Classification_Other",
+                "Paybands_A",
+                "Paybands_B",
+                "Paybands_C",
+                "Paybands_D",
+                "Paybands_E",
+                "Paybands_F",
+                "Paybands_G",
+                "Paybands_H",
+                "Month Of Service",
+                "Age",
+                "Months Since Last Development")
+response <- "EmployeeChurned"
+```
+
+## Model bauen
+```{r}
+glm_model <- h2o.glm(family = "binomial",
+                     # x = predictors_drf,
+                     # # x = predictors_hot,
+                     x = predictors,
+                     y = response,
+                     training_frame = raw_train,
+                     # training_frame = hot_train,
+                     alpha = 1,
+                     lambda = 0,
+                     compute_p_values = FALSE)
+summary(glm_model)
+h2o.std_coef_plot(glm_model)
+```
+Es hat sich gezeigt, dass das Model ohne One-Hot Featueres mit allen Features am besten performt.
+
+## Anwendung auf Testdaten und Auswahl Threshold
+```{r}
+# Anwendung auf Testset
+pred <- h2o.predict(best_glm, newdata = raw_test)
+Prediciton_df <- as.data.frame(pred)
+
+hilf <- as.data.frame(raw_test)
+hilf$prob <- Prediciton_df$p1
+
+hilf$EmployeeChurned <- as.numeric(as.character(hilf$EmployeeChurned))
+
+pred_rocr <- prediction(hilf$prob, hilf$EmployeeChurned)
+perf_rocr <- performance(pred_rocr, "tpr", "fpr" )
+
+performance(pred_rocr, "auc")@y.values
+# Darstellung der ROC-Kurve mit Threshhold
+plot(perf_rocr, col="blue")
+abline(0,1)
+abline(v=0.29, col="red")
+```
+
+```{r}
+# # Anwendung auf Testset
+# predictBestGrid <- h2o.predict(best_drf, newdata = raw_testH2O)
+# 
+# # Umwandlung in generic dataframe 
+# raw_drfPrediciton_df <- as.data.frame(predictBestGrid)
+# raw_testH2O_asdf <- as.data.frame(raw_testH2O)
+# raw_testH2O_asdf$prob <- raw_drfPrediciton_df$p1
+# raw_testH2O_asdf
+# 
+# raw_testH2O_asdf$EmployeeChurned <- as.numeric(as.character(raw_testH2O_asdf$EmployeeChurned))
+# raw_test
+# 
+# pred_rocr_drf <- prediction(raw_testH2O_asdf$prob, raw_testH2O_asdf$EmployeeChurned)
+# perf_rocr_drf <- performance(pred_rocr_drf, "tpr", "fpr" )
+# 
+# fpr_rocr <- perf_rocr_drf@x.values[[1]]
+# tpr_rocr <- perf_rocr_drf@y.values[[1]]
+# threshold_rocr_drf <- perf_rocr_drf@alpha.values[[1]]
+```
+
+
+## Auswahl Threshold aus ROC-Kurve ("Ellenbogenpunkt")
+```{r}
+threshold_glm <- 0.29
+#Ein Ellenbogenpunkt ist ablesbar und wird tendenziell eher niedriger gewählt,
+#um die Anzahl an FP-Klassifikationen zu minimieren.
+```
+
+## Modellgüte anhand der Konfusionsmatrix bestimmen
+```{r}
+classify <- function(x, threshold){
+  ifelse(x < threshold,0,1)
+}
+hilf$predict <- classify(hilf$prob, threshold_glm)
+
+confusionMatrix(factor(hilf$predict), factor(hilf$EmployeeChurned),
+                positive = "1")
+```
+Im Vergleich zur Threshold-Wahl basierend auf der Maximierung des F1-Scores ist 
+die Genauigkeit um fast 4 Prozentpunkte geringer, dafür ist die balanzierte
+Genauigkeit nur geringfügig gesunken. Dafür ist die Spezifizität von 0,63 auf
+0,88 stark angestiegen, was im Sinne des Use Cases wünschenswert ist, auch wenn
+dafür die Sensitivität von ca. 0,83 auf 0,56 gesunken ist.?????????????????????????????????????????
+
+
+
+
+## ---H2O Distributed Random Forest und Grid-Search (Tuning Hyperparameter)
+```{r}
+predictors <- c(factorCols, "Month Of Service", "Age", "Months Since Last Development")
+target <- "EmployeeChurned"
+
+#Hyperparameter
+drf_params <- list( balance_classes = c(TRUE, FALSE),
+                    ntrees = c(30, 50, 70),
+                    max_depth = c(10, 15, 20, 25),
+                    min_split_improvement = c(0.001, 0.0001, 0.00001, 0.000001))
+#0.0000001
+```
+##Hyperparameter
+balance classes - default False
+ntrees - default 50
+max_depth - default 20
+Min_split_improvement - default 0,00001
+
+## ---Hyperparameterwahl
+GLM Hyperparameters
+alpha
+
+lambda
+
+missing_values_handling
+
+seed
+
+standardize
+
+theta
+
+tweedie_link_power
+
+tweedie_variance_power
+https://docs.h2o.ai/h2o/latest-stable/h2o-docs/grid-search.html#supported-grid-search-hyperparameters
+https://docs.h2o.ai/h2o/latest-stable/h2o-docs/grid-search.html
+
+```{r}
+#search_criteria strategy “Cartesian”
+h2oGrid <- h2o.grid("drf", x = predictors, y = target,
+            grid_id = "h2oGrid",
+            training_frame = raw_trainH2O,
+            hyper_params = drf_params,
+            seed = 1234)
+
+#Auswahl der optimalen Parameter anhand der AUC der einzelnen Modelle
+h2oGridPerf <- h2o.getGrid(grid_id = "h2oGrid",
+                           sort_by = "auc",
+                           decreasing = TRUE)
+
+# Güte im Trainingsset
+summary(h2oGridPerf)
+best_drf <- h2o.getModel(h2oGridPerf@model_ids[[1]])
+h2o.performance(best_drf, raw_trainH2O)
+```
+
+## ---Optimierung mit Kostenfunktion
+```{r}
+pred_class <- function(x, threshold){
+  ifelse(x < threshold,0,1)
+}
+
+cost <- function(prob, actual,threshold2, cost_FN_func, cost_FP_func){
+    predicted_automate2 <- pred_class(prob,threshold2)
+    count_FN <- sum(predicted_automate2 == 1 & actual == "0")
+    count_FP <- sum(predicted_automate2 == 0 & actual == "1")
+    cost <- count_FN * cost_FN_func + count_FP * cost_FP_func
+    return (cost)
+}
+
+threshold_input_rdf <- c(0.05, 0.1, 0.14, 0.15, 0.16, 0.17, 0.18,
+                         0.2, 0.23, 0.24, 0.25,
+                         0.3, 0.35, 0.45, 0.7) 
+
+i <- 1
+costs_rdf <- c()
+
+while (i < length(threshold_input_rdf)+1) {
+    costs_rdf[[(length(costs_rdf) +1)]] <- cost(raw_testH2O_asdf$prob, 
+                                        raw_testH2O_asdf$EmployeeChurned, 
+                                        threshold_input_rdf[i], cost_FN, cost_FP)
+    i <- i+1
+}
+
+cost_rdf_matrix <- matrix(c(threshold_input_rdf,costs_rdf),nrow=length(threshold_input_rdf))
+colnames(cost_rdf_matrix) <- c("Threshold", "Kosten in Euro")
+cost_rdf_matrix
+```
+Mit Betrachtung der Kosten liegt der optimale Threshold für das Model bei 0,15.
+Aufgrund der geringen Unterschiede wäre auch 0,17 als Threshold sinnvoll und
+sollte für Vorhersagen eingesetzt werden.
+
+## ---Modellgüte mit optimiertem Threshold anhand der Konfusionsmatrix bestimmen
+```{r}
+threshold_drf_opti <- 0.17
+
+raw_testH2O_asdf$predict_opti <-classify(raw_testH2O_asdf$prob, threshold_drf_opti)
+
+confusionMatrix(factor(raw_testH2O_asdf$predict_opti), factor(raw_testH2O_asdf$EmployeeChurned),
+                positive = "1")
 
 ```
+Verglichen mit vorher eingesetten Thresholds ist dies der niedrigste, da eine 
+FP-Klassifikation stärker bestraft wird, als eine FN-Klassifikation. Das bestätigt
+auch die hohe Sensitivität.
+Dadurch sinkt die Genauigkeit sowie die balanzierte Genauigkeit, wobei letztere
+größer ist und verglichen zum Ausgangswert (F1-Score-optimierter Threshold) nur 
+um 0,04 niedriger ist. 
+Die 311 FP-Klassifizierten Werte sollten im Rahmen des Use-Cases kritisch betrachtet
+werden, da diese Daten zur Unterstützung von Managern gelten soll und mti diesem
+Ergebnis viel Arbeit für diese Nutzergruppe entstehen würde. 
+
+## Wichtigkeit der Features
+```{r}
+varimp_drf <- h2o.varimp(best_drf) 
+varimp_drf
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## Train Test Split (Caret)
 ```{r}
-head(hot_df)
-#stratified random split (caret)
-inTrain <- createDataPartition(y=hot_df$EmployeeChurned, p = .75, list=FALSE)
-
-training <- hot_df[ inTrain,]
-testing  <- hot_df[-inTrain,]
-
-str(training)
-str(testing)
+# head(hot_df)
+# #stratified random split (caret)
+# inTrain <- createDataPartition(y=hot_df$EmployeeChurned, p = .75, list=FALSE)
+# 
+# training <- hot_df[ inTrain,]
+# testing  <- hot_df[-inTrain,]
+# 
+# str(training)
+# str(testing)
 ```
 
-## Regression h2o Beispiele (Block später löschen)
+## Regression ohne h2o Beispiele (Block später löschen)
 ```{r}
-glm1 <- glm(formula = training$Gender ~ training$EmployeeChurned, family = binomial, data = training)
-glm1
-glm2 <- glm(formula = training$`Part Time Mark` ~ training$EmployeeChurned, family = binomial, data = training)
-glm2
-
-predict(glm1)
+# glm1 <- glm(formula = training$EmployeeChurned ~ training$Age, family = binomial, data = training)
+# glm1
+# 
+# pre1 <- predict(glm1, type = 'response')
+# 
+# summary(glm1)
+# summary(pre1)
+# 
+# head(training)
+# 
+# plot(pre1)
+# 
+# 
+# training$predAge0.3 <- pre1
+# classify <- function(x, threshold){
+#   ifelse(x>threshold, 1, 0)
+# }
+# 
+# training$predAge0.3 <- classify(training$predAge0.3, 0.35)
+# c_matrix <- table(training$predAge0.5, training$EmployeeChurned)
+# c_matrix
 
 ```
 
-## Links / Quellen
-https://www.geo.fu-berlin.de/en/v/soga/Basics-of-statistics/Logistic-Regression/Logistic-Regression-in-R---An-Example/index.html
+```{r}
+# # Umwandlung in h2o-Dataframe
+# trainingH2O <- as.h2o(training)
+# testingH2O <- as.h2o(testing)
+# 
+# predictors <- c(factorCols, "Month Of Service", "Age", "Months Since Last Development")
+# response <- "EmployeeChurned"
+# 
+# h2oFit <- h2o.glm(x = predictors,
+#                   y = response,
+#                   training_frame = trainingH2O)
+```
+
+```{r}
+# df_test <- subset(hot_df, select = c("EmployeeChurned", "development to exempt", "Month Of Service"))
+# df <- data.frame(df_test)
+# 
+# LRModel <- glm()
+
+```
+
 
 

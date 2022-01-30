@@ -11,7 +11,6 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## R Markdown
 
-
 ```{r}
 library(readxl)
 library(ggplot2)
@@ -26,6 +25,9 @@ library(magrittr)
 
 library(caret)
 library(e1071) # for SVMs
+library(rpart)
+library(rpart.plot)
+library(ROCR)
 library(h2o)
 h2o.init()
 
@@ -90,46 +92,52 @@ hot_df %<>% mutate_at(factorColsOneHot, factor)
 #hot_df$index <- 1:nrow(hot_df)
 
 
-
-# Rohdatenset ohne One-Hot-Encoding
-raw_df <- read_xlsx("20220110_dataPrepped_beforeOneHot.xlsx")
-
-raw_df <- subset(raw_df, 
-                  select = -c(`start_Cost center`,
-                              `start_Calendar Year/Month`,
-                              `LastActive_Calendar Year/Month`))
-
-# Kategorische Variablen
-factorCols <- c("Gender",
-                "TemporaryPersonel",
-                "Part Time Mark",
-                "NonExempt",
-                "start_NonExempt",
-                "development to exempt",
-                "Vertical_Horizontal_Developments",
-                "start_contract type",
-                "start_Part time mark",
-                "EmployeeChurned",
-                "decrease_Category",
-                "Nationality_Classification",
-                "Paybands")
-
-raw_df %<>% mutate_at(factorCols, factor)
+# 
+# # Rohdatenset ohne One-Hot-Encoding
+# raw_df <- read_xlsx("20220110_dataPrepped_beforeOneHot.xlsx")
+# View(hot_df)
+# str(hot_df)
+# raw_df <- subset(raw_df, 
+#                   select = -c(`start_Cost center`,
+#                               `start_Calendar Year/Month`,
+#                               `LastActive_Calendar Year/Month`))
+# 
+# # Kategorische Variablen
+# factorCols <- c("Gender",
+#                 "TemporaryPersonel",
+#                 "Part Time Mark",
+#                 "NonExempt",
+#                 "start_NonExempt",
+#                 "development to exempt",
+#                 "Vertical_Horizontal_Developments",
+#                 "start_contract type",
+#                 "start_Part time mark",
+#                 "EmployeeChurned",
+#                 "decrease_Category",
+#                 "Nationality_Classification",
+#                 "Paybands")
+# 
+# raw_df %<>% mutate_at(factorCols, factor)
 
 ```
 
 ## Train Test Split (Caret)
 ```{r}
-df_test <- subset(hot_df, select = c("EmployeeChurned", "development to exempt", "Month Of Service"))
+df_test <- subset(hot_df, select = c("EmployeeChurned", "Age", "Month Of Service"))
 df <- data.frame(df_test)
 n <- nrow(df)
 
 train_indices <- sample(1:n, round(2/3 * n))
 test_train <- df[train_indices,]
 test_test <- df[-train_indices,]
-
-features <- c("development.to.exempt", "Month.Of.Service")
+features <- c("Age", "Month.Of.Service")
 cols <- c(features, "EmployeeChurned")
+```
+
+
+## Knn
+```{r}
+
 
 set.seed(50)
 ctrl <- trainControl(method="cv", number = 3) # 3-fold cross validation 
@@ -145,6 +153,12 @@ knnfit <- train(EmployeeChurned ~ ., data = df[, cols], method = "knn", trContro
 # predict the classes in the entire data set using the best model
 knnPredict <- predict(knnfit, newdata = df[, cols] )
 
+rpart <- rpart(EmployeeChurned ~., y = TRUE, x = TRUE,
+                  data=test_train)
+test_test$prob <- rpart.predict(rpart, test_test)
+
+#knnPrediction <- prediction(test_test$prob, test_test$EmployeeChurned)
+#knnPerf <- performance(knnPredict, "tpr", "fpr")
 # Get the confusion matrix to see accuracy value and other quality measures
 confusionMatrix(knnPredict, df$EmployeeChurned)
 
@@ -153,56 +167,12 @@ plot(df[,features], col=df$EmployeeChurned, pch=as.numeric(unclass(knnPredict)))
 
 
 ```
-##Tran Test nach H2O
-```{r}
-h20_data <- hot_df |> mutate(across(c(EmployeeChurned, "Month Of Service"), as.factor)) |> select(-Gender)
-
-hot_dfH2O <- as.h2o(h20_data)
-
-splits <- h2o.splitFrame(data =  hot_dfH2O, ratios = 0.75, seed = 1234)
-trainH2O <- splits[[1]]
-testH2O <- splits[[2]]
-
-target <- "EmployeeChurned"
-features <- setdiff(colnames(hot_dfH2O), target)
-
-hyper_grid.h2o <- list(ntrees = seq(100, 300, by = 50),
-                       mtries = 2:6)
-hyper_grid.h2o
-#number of Models:
-sapply(hyper_grid.h2o, length) %>% prod()
-
-
-
-
-
-
-#raw_dfH2O <- as.h2o(raw_df)
-#splits <- h2o.splitFrame(data =  raw_dfH2O, ratios = 0.75, seed = 1234)
-#raw_trainH2O <- splits[[1]]
-#raw_testH2O <- splits[[2]]
-```
-##SVM mit H2O
-```{r}
-#https://docs.h2o.ai/h2o/latest-stable/h2o-docs/data-science/svm.html
-
-svm_model <- h2o.psvm(gamma = 0.01,
-                      rank_ratio = 0.1,
-                      y ="EmployeeChurned",
-                      training_frame = trainH2O, 
-                      disable_training_metrics = FALSE
-                      )
-perf <- h2o.performance(svm_model)
-perf
-```
-
-
 
 ##SVM
 ```{r}
 # fit an SVM with linear kernel
 svmfit <- svm(EmployeeChurned ~ ., data = test_train[,cols], kernel = "linear", 
-              cost = 1, scale = TRUE)
+              cost = 0.01, gamma = 0.5, scale = TRUE)
 
 # print the results
 print(svmfit)
@@ -212,6 +182,9 @@ summary(svmfit)
 
 # indices of the support vectors
 svmfit$index
+
+#test_train$EmployeeChurned <- as.numeric(as.character(test_train$EmployeeChurned))
+#test_train$ <- as.numeric(as.character(test_train$EmployeeChurned))
 
 # plot it including the separation lines (hyperplanes)
 plot(svmfit, test_train[,cols])
@@ -266,4 +239,7 @@ run_iris_svm(df[,cols], "linear")
 run_iris_svm(df[,cols], "radial")
 
 ```
+
+
+
 
