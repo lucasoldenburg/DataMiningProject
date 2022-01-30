@@ -35,22 +35,21 @@ Im Rahmen der Arbeit betrachtete Abgänge sind dabei: Kündigung (von Mitarbeite
 Für die Datengrundlage sind eine Reihe an Tabellen aus dem SAP Data Warehouse System im Einsatz. Orientiert wird sich dabei an Phasen, die eine Arbeitskraft im Zuge der Tätigkeit für ein Unternehmen durchläuft. Besonderer Fokus liegt dabei auf den Informationen über die Arbeitskraft zu Beginn der Arbeitstätigkeit und dem Zeitpunkt der letzten Aktivität sowie der Entwicklung. Im Detail werden im Weiteren die Merkmale einzeln beschrieben und analysiert, bei Bedarf klassiert (bei vielen Merkmalsausprägungen qualitativer Merkmale).
 Die Abgänge seit Januar 2016 bis Oktober 2021 sowie die derzeit aktiven Mitarbeitenden werden in dieser Arbeit betrachtet. 
 
-Zur Vorhersage, ob eine Arbeitskraft wahrscheinlich das Unternehmen verlässt, kommen Algorithmen des überwachten maschinellen Lernens zum Einsatz. Es handelt sich um eine Klassifizierung zwischen zwei Klassen. Neben einem Entscheidungsbaum und Tree-Ensambles (Boosting, Bagging, Einsatz von XGBoost) wird die logistische Regression eingesetzt. Im dritten Modell soll die Vorhersage mittels einer Support Vector Maschine oder einem Naive-Bayes-Ansatz durchgeführt werden.
+Zur Vorhersage, ob eine Arbeitskraft wahrscheinlich das Unternehmen verlässt, kommen Algorithmen des überwachten maschinellen Lernens zum Einsatz. Es handelt sich um eine Klassifizierung zwischen zwei Klassen. Neben einem Entscheidungsbaum und Tree-Ensambles (Boosting, Bagging, möglicherweise Einsatz von XGBoost) wird die logistische Regression eingesetzt. Im dritten Modell soll die Vorhersage mittels einer Support Vector Maschine durchgeführt werden.
 
-Die Ergebnisse der unterschiedlichen Modelle werden mittels einer Confusion-Matrix miteinander verglichen. Zusätzlich zur Accuracy soll die Balanced Accuracy untersucht werden.
+Die Ergebnisse der unterschiedlichen Modelle werden mittels der AUC (Area under the curve) und einer Confusion-Matrix miteinander verglichen. Zusätzlich zur Accuracy soll die Balanced Accuracy untersucht werden.
 
-Um die einzelne Modelle der Realität anzupassen soll mit einer Kostenfunktion optimiert werden, welche Falsch-Positive-Werte und Falsch-Negative-Werte unterschiedlich bestraft.
+Um die einzelne Modelle der Realität anzupassen soll mit einer Kostenfunktion optimiert werden, welche Falsch-Positive-Werte (FP) und Falsch-Negative-Werte (FN) unterschiedlich bestraft.
 Falsch-Negative-Werte (Arbeitskraft verlässt das Unternehmen, aber Modell hat als nicht-riskant klassifiziert) sorgen für Kosten in der Rekrutierung von neuem Personal und verursachen eine erhöhte Belastung für die Teams.
 Falsch-Positive-Werte (Arbeitskraft plant Unternehmen nicht zu verlassen, aber Modell hat als riskant klassifiziert) führen zu Kosten durch Aufwand für den Manager und die besagte Arbeitskraft, da diese in den Austausch gehen. Zusätzlich kann es zu möglicherweise vermeidbaren Kosten kommen, die im Zuge des Versuchs die Arbeitskraft zu halten, entstehen (Weiterbildung, Gehaltserhöhung). 
-Diese Kosten jedoch zu verallgemeinern, führt zu ungenauen und potenziell falschen Ergebnissen. Zudem ist für eine genaue Schätzung ein hoher Grad an Verständnis in dem Spezialbereich nötig. Dafür ist der Austausch mit den Experten der lokalen Personalabteilung des BASF Service Hubs Berlin geplant.
+Diese Kosten jedoch zu verallgemeinern, führt zu ungenauen und potenziell falschen Ergebnissen. Zudem ist für eine genaue Schätzung ein hoher Grad an Verständnis in dem Spezialbereich nötig. Dafür ist der Austausch mit den Experten der lokalen Personalabteilung des BASF Service Hubs Berlin geplant. Allgemein sollten jedoch die Falsch-Negativ-Klassifikationen minimiert werden.
 
 ### Aufgabenstellung
 
 Deskriptive Analyse der Daten: Was beschreiben die Daten, was sind die Datentypen und Wertebereiche, fehlen Daten, gibt es falsche Werte, gibt es Korrelationen zwischen Merkmalen (Features, Spalten)? Benutzen Sie Visualisierungen, wenn es sinnvoll erscheint. Was können wir aus dieser deskriptiven Analyse über das Problem lernen?
 
 ### Set-Up 
-Zu erst laden wir die benötigten Bibliotheken. Die Daten werden anschließend aus einer .xlsx-Datei geladen. Anschließend wandeln wir die Zahlenwerte in das Format Numeric um und die Datumwerte in das Format Datum. 
-
+Zu erst werden die benötigten Bibliotheken geladen. Die Daten werden anschließend aus einer .xlsx-Datei eingelesen.
 ```{r}
 library(readxl)
 library(writexl)
@@ -61,9 +60,23 @@ library(lubridate)
 library(mltools)
 library(data.table)
 
-
 df <- read_xlsx("20211209_raw_dataset.xlsx")
+```
+Wie der Präsentation zur Projektdefiniton zu entnehmen ist, wurden die Daten mittels
+des Tools Alteryx aus dem SAP Data Warehouse extrahiert. Dabei kamen fünf untschiedliche
+Cubes als Datenbasis zum Einsatz. Darüber hinaus wurden mit Hilfe von zwei Mapping-
+Tabellen die Positionen in Gehaltsbänder sowie die den Mitarbeitenden zugeordneten
+Kostenstellen den Funktionsbereichen zugeordnet.
+Basierend auf der Central Person ID (Unique Identifier) wurden die Tabellen miteinander
+gejoined.
+Aus den Zeitstemplen wurden Zeiträumbe berechnet und im Themengebiet Entwicklung kam
+es zur Erstellung neuer Features aus den gegebenen Datenpunkten (Entwicklung von
+tariflicher Beschäftigung in außertarifliche Beschäftigung, Anzahl an horizontalen
+oder vertikalen Entwicklungen). 
 
+
+Danach erfolgt die Umwandlung von Zahlenwerten in das Format Numeric und die Datumswerte in das Format Datum. 
+```{r}
 #Years in Numerisch umwandeln
 #all Chars in numeric 
   #Years of Service Berlin
@@ -760,7 +773,7 @@ ggplot(df, aes(EmployeeChurned, `Months Since Last Development`)) +
 ```
 Auf den ersten Blick gibt es keinen erkennbaren Zusammenhang zwischen der Zielvariable EmployeeChurned und Month Since Last Development.
 
-### Korrelation der Numerischen Merkmale
+### Visualisierungen 
 Die roten Punkte bedeuten, dass der Mitarbeiter nicht mehr im Unternehmen ist.
 ```{r}
 str(df)
