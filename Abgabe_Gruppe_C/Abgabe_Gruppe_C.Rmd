@@ -37,9 +37,10 @@ h2o.init()
 # Datenset nach One-Hot-Encoding
 hot_df <- read_xlsx("20220110_dataPrepped_afterOneHot.xlsx")
 hot_df <- subset(hot_df, 
-                  select = -c(EmployeeChurned_0, `start_Cost center`,
-                              `start_Calendar Year/Month`,
-                              `LastActive_Calendar Year/Month`))
+                 select = -c(EmployeeChurned_0,
+                                     `start_Cost center`,
+                                     `start_Calendar Year/Month`,
+                                     `LastActive_Calendar Year/Month`))
 
 colnames(hot_df)[colnames(hot_df) == "EmployeeChurned_1"] <- "EmployeeChurned"
 
@@ -65,6 +66,7 @@ factorColsOneHot <- c("Gender",
                 "decrease_Category_Human Resources GBS",
                 "decrease_Category_Intellectual Property",
                 "decrease_Category_IT Service CC",
+                "decrease_Category_Other", #fehlt bei den anderen
                 "decrease_Category_People",
                 "decrease_Category_Planning & Development",
                 "decrease_Category_Procurement Services - GP",
@@ -89,34 +91,442 @@ hot_df %<>% mutate_at(factorColsOneHot, factor)
 
 ## Datenimport und Vorbereitung
 ```{r}
+# Rohdatenset ohne One-Hot-Encoding
 df <- read_xlsx("20220110_dataPrepped_beforeOneHot.xlsx")
 
-# Kategorische Variablen umwandeln
-factorCols <- c("EmployeeChurned",
+df <- subset(df, 
+                  select = -c(`start_Cost center`,
+                              `start_Calendar Year/Month`,
+                              `LastActive_Calendar Year/Month`))
+# Kategorische Variablen
+factorCols <- c("Gender",
+                "TemporaryPersonel",
+                "Part Time Mark",
+                "NonExempt",
+                "start_NonExempt",
+                "development to exempt",
+                "Vertical_Horizontal_Developments",
+                "start_contract type",
+                "start_Part time mark",
+                "EmployeeChurned",
                 "decrease_Category",
                 "Nationality_Classification",
                 "Paybands")
-
 df %<>% mutate_at(factorCols, factor)
-# Auswählen der zu nutzenden Spalten auf Grund der Ergebnisse von Random Forrest, die Nutzung aller Features ist mit einem sehr hohen Rechenaufwand verbunden, der nicht geleistet werden konnte.
-df <- subset(df, select = c(EmployeeChurned, decrease_Category, `Month Of Service`, `Months Since Last Development`, Age, Paybands, Nationality_Classification))
 
-# Ansehen der Daten
-plot(df, col=df$EmployeeChurned)
+```
+
+## H2O Vorbereitung und Umwandlung der Daten
+```{r}
+dfH2O <- as.h2o(df)
+
+#in H2o Test und Train erzeugen, da sonst keine validen Ergebnisse
+splits <- h2o.splitFrame(data =  dfH2O, ratios = 0.75, seed = 1234)
+trainH2O <- splits[[1]]
+testH2O <- splits[[2]]
+
+#h2o hot
+hot_df <- as.h2o(hot_df)
+splits1 <- h2o.splitFrame(data =  hot_df, ratios = 0.75, seed = 1234)
+hot_train <- splits1[[1]]
+hot_test <- splits1[[2]]
+
+
 ```
 
 ## Erstellen der Train und Test Datensets
 ```{r}
-data_test <- subset(hot_df, select = c("EmployeeChurned", "Age", "Month Of Service"))
-df_test <- data.frame(data_test)
-n <- nrow(df_test)
+data_hot_test <- subset(hot_df, select = c("EmployeeChurned", "Age", "Month Of Service"))
+df_hot <- data.frame(data_hot_test)
+n <- nrow(df_hot)
 
 train_indices <- sample(1:n, round(2/3 * n))
-train <- df_test[train_indices,]
-test <- df_test[-train_indices,]
+train <- df_hot[train_indices,]
+test <- df_hot[-train_indices,]
 
 # erstmal 2 Features auswählen 
 features <- c("Age", "Month.Of.Service")
 cols <- c(features, "EmployeeChurned")
 
 ```
+
+
+
+## Einfacher Entscheidungsbaum mit rpart-Bibliothek
+```{r}
+rpart_control <- trainControl(
+    method = "repeatedcv",
+    number = 5,
+    repeats = 10
+)
+
+#cp -> Complexity Parameter definiert die minimal zu erreichende Verbesserung je Ast
+rpart_grid <- expand.grid(cp = c(0.015, 0.01, 0.005, 0.001, 
+                                 0.0005, 0.0001, 0.00001))
+
+rpart_fit <- train(EmployeeChurned ~ ., 
+                       method = "rpart",
+                       na.action = na.omit,
+                       trControl = rpart_control,
+                       tuneGrid = rpart_grid,
+                       data = train)
+
+best_cp <- rpart_fit$bestTune[1,1]
+best_cp 
+```
+
+## Modell mit optimalen Parametern trainieren
+```{r}
+rpart <- rpart(EmployeeChurned ~., y = TRUE, x = TRUE,
+                  data=train,
+                      control= rpart.control(cp=best_cp))
+
+rpart_prediction <- rpart.predict(rpart, test)
+rpart_prediction <- data.frame(rpart_prediction)
+test_rpart <- test
+test_rpart$prob <- rpart_prediction$`X1`
+test_rpart$EmployeeChurned <- as.numeric(as.character(test$EmployeeChurned))
+test_rpart
+```
+
+
+## Allgemeine Modellgüte anhand der ROC-Kurve bestimmen
+```{r}
+# fpr_rocr <- perf_rocr@x.values[[1]]
+pred_rocr_rpart <- prediction(test_rpart$prob, test_rpart$EmployeeChurned)
+perf_rocr_rpart <- performance(pred_rocr_rpart, "tpr", "fpr" )
+
+fpr_rocr_rpart <- perf_rocr_rpart@x.values[[1]]
+tpr_rocr_rpart <- perf_rocr_rpart@y.values[[1]]
+threshold_rocr_rpart <- perf_rocr_rpart@alpha.values[[1]] 
+
+#AUC - Fläche unter der ROC-Kurve als Gütemerkmal
+performance(pred_rocr_rpart, "auc")@y.values
+
+# Darstellung der ROC-Kurve
+plot(perf_rocr_rpart, col="blue")
+abline(0,1)
+abline(v=0.2, col="red")
+```
+Die Fläche unterhalb der ROC-Kurve ist größer als 0,5 und damit liefert 
+das erstellte Modell eine genauere Vorhersage als bloßes Raten.
+
+## Auswahl Threshold
+```{r}
+#Funktion zur Klassifizierung der Vorhersage
+classify <- function(x, threshold){
+  ifelse(x < threshold,0,1)
+}
+
+#Auswahl Threshold aus ROC-Kurve ("Ellenbogenpunkt")
+threshold_predict <- 0.2
+#Ein genauer "Ellenbogenpunkt" kann aus der Grafik nicht entnommen werden.
+#Ziel sollte es sein FP-Klassifikationen zu vermeiden (kleinerer Threshold), aber dennoch 
+#eine Balance zu finden, welche für eine Überklassifikation von Positiv-Klassifikation
+#führt. Auch FN-Werte sorgen für Kosten im Unternehmen (siehe Kosten für Fehlklassifikation)
+
+#Anwendung auf Testdatensatz
+test_rpart$predict <-classify(test_rpart$prob, threshold_predict)
+head(test_showPredict <- subset(test_rpart, select = c(prob,predict)),10)
+```
+
+## Modellgüte anhand der Konfusionsmatrix bestimmen
+```{r}
+confusionMatrix(factor(test_rpart$predict), factor(test$EmployeeChurned),
+                positive = "1")
+```
+Aufgrund des niedrigen Schwellenwertes, ist die Genauigkeit (Accuracy) gering. 
+Dafür weißt die balanzierte Genauigkeit (Balanced Accuracy) einen höheren Wert
+als die klassische Genauigkeit auf. 
+Es wird tendenziell erhöht auf eine Abwanderung der Mitarbeiter:innen klassifiziert.
+Dabei ist die geringe Spezifizität auf die hohe Zahl an FN-klassifizierten Werten 
+zurückzuführen. 
+Im Anwendungsfall ist dies nicht von Nachteil, da besonders FP-Klassifikationen
+vermieden werden sollten. Um dies aktiv in die Modellierung zu integrieren 
+sollen die mit den Fehlklassifikationen verbundenen Kosten in die Betrachtung
+mit einbezogen werden.
+
+## Kosten für Fehlklassifikationen
+```{r}
+#Kosten aufgrund von Zeit für Manager:in und Mitarbeiter:in sowie zusätzliche Trainings- oder Gehaltskosten
+cost_FP <- 500  
+#Kosten für neues Recruiting (Suchauftrag, Recruitingaufwand wie Planung, Gespräche, Onboarding)
+cost_FN <- 3000
+
+matrix_overview_cost <- matrix(c(0,3000,500,0), nrow=2)
+colnames(matrix_overview_cost) <- c("Mitarbeiter:in geht", "Mitarbeiter:in bleibt")
+rownames(matrix_overview_cost) <- c("Vorhersage Mitarbeiter:in geht", "Vorhersage Mitarbeiter:in bleibt")
+matrix_overview_cost
+```
+
+## Optimierung mit Kostenfunktion
+```{r}
+pred_class <- function(x, threshold){
+  ifelse(x < threshold,0,1)
+}
+
+cost <- function(prob, actual,threshold2, cost_FN_func, cost_FP_func){
+    predicted_automate2 <- pred_class(prob,threshold2)
+    count_FN <- sum(predicted_automate2 == 0 & actual == "1")
+    count_FP <- sum(predicted_automate2 == 1 & actual == "0")
+    cost <- count_FN * cost_FN_func + count_FP * cost_FP_func
+    return (cost)
+}
+
+threshold_input_rpart <- c(0.05, 0.1, 0.15, 0.16, 0.17, 0.2, 0.23, 0.24, 0.25,
+                     0.3, 0.35, 0.45, 0.7) 
+
+i <- 1
+costs_rpart <- c()
+
+while (i < length(threshold_input_rpart)+1) {
+    costs_rpart[[(length(costs_rpart) +1)]] <- cost(test$prob, test$EmployeeChurned, 
+                                         threshold_input_rpart[i], cost_FN, cost_FP)
+    i <- i+1
+}
+
+cost_matrix_rpart <- matrix(c(threshold_input_rpart,costs_rpart),nrow=length(threshold_input_rpart))
+colnames(cost_matrix_rpart) <- c("Threshold", "Kosten in Euro")
+cost_matrix_rpart
+```
+Mit Betrachtung der Kosten liegt der optimale Threshold für das Model bei 0,17
+und sollte für Vorhersagen eingesetzt werden. Es wurde der höchst mögliche 
+Threshold bei den geringsten Kosten gewhählt, um ein balanzierteres Ergebnis
+zu erreichen.
+
+## Modellgüte mit optimiertem Threshold anhand der Konfusionsmatrix bestimmen
+```{r}
+threshold_rpart_opti <- 0.17
+
+test_rpart$predict_rpart_opti <-classify(test_rpart$prob, threshold_rpart_opti)
+
+confusionMatrix(factor(test_rpart$predict_rpart_opti), factor(test_rpart$EmployeeChurned),
+                positive = "1")
+```
+Es werden fast alle Mitarbeiter:innen erkannt, die das Unternehmen verlassen.
+Allerdings ist die FN-Klassifikation sehr hoch. Eine Spezifizität von circa
+1/3 würde für einen hohen Aufwand bei Managern führen und nicht unbedingt für
+deren Zuspruch sorgen.
+Doch aufgrund der hohen Sensitivität kann eine noch gute balanzierte Genauigkeit
+von dem Modell bei Anwendung auf die Testdaten erreicht werden.
+
+## Visualisierung des Entscheidungsbaumes (Wichtigkeit der Features)
+```{r}
+printcp(rpart)
+prp(rpart)
+```
+Den stärksten Einflussfaktor bildet der Funktionsbereich in dem die Mitarbeiter:in
+zum letzten aktiven Zeitpunkt tätig war. GB Management, Human Resources GBS und
+Safety sind dabei die genannten Faktoren. Dabei handelt es sich um erst kürzlich
+aufgebaute Einheiten, was die kurze Zugehörigkeit der Mitarbeiter:innen und
+geringe Abwanderung beschreibt. In zukünftigen Anpassungen des Modells auf neue
+Daten sollte dies schrittweise an die übrigen Funktionsbereiche angeglichen
+werden.
+Die nächste Spaltung erfolgt durch das Merkmal Befristung. 
+Auch die Dauer der Unternehmenszugehörigkeit sowie der Zeitpunkt seit der
+letzten Entwicklung kommen zum Einsatz, während das Alter und die Gehaltsstufe
+in den darauffolgenden Splits relevant werden.
+
+Nicht zum Einsatz kommen: "Part Time Mark", "NonExempt", "start_NonExempt",
+                "development to exempt", "decrease_Category",
+                "Nationality_Classification", "Paybands"
+
+
+## H2O Distributed Random Forest (DRF)
+Im DRF werden eine Reihe an Bäumen erzeugt. Jeder dieser lernt basierend auf einen Teil
+des Datensets (Spalten und Reihen). Für die finale Vorhersage wird dann der Durchschnitt 
+aus den Vorhersagen der einzelnen Bäume berechnet. Das verringert die Varianz.
+Um robuste Bäume zu erhalten werden darüber hinaus auf jedem Level je Baum 
+zufällig die betrachteten Spalten (Features) gewählt. Die Anzahl der verwendeten
+Spalten wird dabei durch die Wurzel aus der Gesamtanzahl der Spalten definiert.
+
+## H2O Distributed Random Forest und Grid-Search (Tuning Hyperparameter)
+```{r}
+predictors_drf <- c(factorCols, "Month Of Service", "Age", "Months Since Last Development")
+target_drf <- "EmployeeChurned"
+
+#Hyperparameter
+drf_params <- list( balance_classes = c(TRUE, FALSE),
+                    ntrees = c(30, 50, 70),
+                    max_depth = c(10, 15, 20, 25),
+                    min_split_improvement = c(0.001, 0.0001, 0.00001, 0.000001))
+#0.0000001
+```
+## Hyperparameter
+balance classes - default False
+ntrees - default 50
+max_depth - default 20
+Min_split_improvement - default 0,00001
+
+## Hyperparameterwahl
+```{r}
+#search_criteria strategy “Cartesian”
+h2oGrid_drf <- h2o.grid("drf", x = predictors_drf, y = target_drf,
+            grid_id = "h2oGrid_drf",
+            training_frame = trainH2O,
+            hyper_params = drf_params,
+            seed = 1234)
+
+#Auswahl der optimalen Parameter anhand der AUC der einzelnen Modelle
+h2oGridPerf_drf <- h2o.getGrid(grid_id = "h2oGrid_drf",
+                           sort_by = "auc",
+                           decreasing = TRUE)
+
+# Güte im Trainingsset
+summary(h2oGridPerf_drf)
+best_drf <- h2o.getModel(h2oGridPerf_drf@model_ids[[1]])
+h2o.performance(best_drf, trainH2O)
+```
+
+
+## Güte anhand Threshold basierend auf F1-Metrik
+```{r}
+#Anwendung auf Testdatenset
+best_drf_perf <- h2o.performance(model = best_drf,
+                                  newdata = testH2O)
+best_drf_perf
+```
+Der Threshold wird automatisch auf die Metrik F1 optimiert.
+Empfohlener Threshold bei Maximierung von F1 bei ca. 0,27.
+Accuracy: ca. 73%
+Balanced Accuracy: ca. 73%  (Spezifizität: ca. 0,63)
+
+Ein deutlich niedriger Threshold (F1) als auf dem Trainingsdatenset ist zu erkennen
+sowie eine hohe FP-Klassifizierungsrate.
+
+
+## Auswahl Threshold anhand der ROC-Kurve
+```{r}
+# Anwendung auf Testset
+predictBestGrid_drf <- h2o.predict(best_drf, newdata = testH2O)
+
+# Umwandlung in generic dataframe 
+drfPrediciton_df <- as.data.frame(predictBestGrid_drf)
+testH2O_asdf_drf <- as.data.frame(testH2O)
+testH2O_asdf_drf$prob <- drfPrediciton_df$p1
+testH2O_asdf_drf
+
+testH2O_asdf_drf$EmployeeChurned <- as.numeric(as.character(testH2O_asdf_drf$EmployeeChurned))
+test
+
+pred_rocr_drf <- prediction(testH2O_asdf_drf$prob, testH2O_asdf_drf$EmployeeChurned)
+perf_rocr_drf <- performance(pred_rocr_drf, "tpr", "fpr" )
+
+performance(pred_rocr_drf, "auc")@y.values
+# Darstellung der ROC-Kurve
+plot(perf_rocr_drf, col="blue")
+abline(0,1)
+abline(v=0.22, col="red")
+```
+Die ROC-Kurve verläuft deutlich oberhalb der Diagonalen. Bei Anwendung des 
+Modells wird somit eine höhere Vorhersagequalität erreicht, als mit reinem
+Raten.
+
+## Auswahl Threshold aus ROC-Kurve ("Ellenbogenpunkt")
+```{r}
+threshold_drf <- 0.22
+#Ein Ellenbogenpunkt ist ablesbar und wird tendenziell eher niedriger gewählt,
+#um die Anzahl an FP-Klassifikationen zu minimieren.
+```
+
+## Modellgüte anhand der Konfusionsmatrix bestimmen
+```{r}
+testH2O_asdf_drf$predict <-classify(testH2O_asdf_drf$prob, threshold_drf)
+
+confusionMatrix(factor(testH2O_asdf_drf$predict), factor(testH2O_asdf_drf$EmployeeChurned),
+                positive = "1")
+```
+Im Vergleich zur Threshold-Wahl basierend auf der Maximierung des F1-Scores ist 
+die Genauigkeit um fast 4 Prozentpunkte geringer, dafür ist die balanzierte
+Genauigkeit nur geringfügig gesunken. Dafür ist die Spezifizität von 0,63 auf
+0,88 stark angestiegen, was im Sinne des Use Cases wünschenswert ist, auch wenn
+dafür die Sensitivität von ca. 0,83 auf 0,56 gesunken ist.
+
+## Optimierung mit Kostenfunktion
+```{r}
+pred_class <- function(x, threshold){
+  ifelse(x < threshold,0,1)
+}
+
+cost <- function(prob, actual,threshold2, cost_FN_func, cost_FP_func){
+    predicted_automate2 <- pred_class(prob,threshold2)
+    count_FN <- sum(predicted_automate2 == 1 & actual == "0")
+    count_FP <- sum(predicted_automate2 == 0 & actual == "1")
+    cost <- count_FN * cost_FN_func + count_FP * cost_FP_func
+    return (cost)
+}
+
+threshold_input_rdf <- c(0.05, 0.1, 0.14, 0.15, 0.16, 0.17, 0.18,
+                         0.2, 0.23, 0.24, 0.25,
+                         0.3, 0.35, 0.45, 0.7) 
+
+i <- 1
+costs_rdf <- c()
+
+while (i < length(threshold_input_rdf)+1) {
+    costs_rdf[[(length(costs_rdf) +1)]] <- cost(testH2O_asdf_drf$prob, 
+                                        testH2O_asdf_drf$EmployeeChurned, 
+                                        threshold_input_rdf[i], cost_FN, cost_FP)
+    i <- i+1
+}
+
+cost_rdf_matrix <- matrix(c(threshold_input_rdf,costs_rdf),nrow=length(threshold_input_rdf))
+colnames(cost_rdf_matrix) <- c("Threshold", "Kosten in Euro")
+cost_rdf_matrix
+```
+Mit Betrachtung der Kosten liegt der optimale Threshold für das Model bei 0,15.
+Aufgrund der geringen Unterschiede wäre auch 0,17 als Threshold sinnvoll und
+sollte für Vorhersagen eingesetzt werden.
+
+## Modellgüte mit optimiertem Threshold anhand der Konfusionsmatrix bestimmen
+```{r}
+threshold_drf_opti <- 0.17
+
+testH2O_asdf_drf$predict_opti <-classify(testH2O_asdf_drf$prob, threshold_drf_opti)
+
+confusionMatrix(factor(testH2O_asdf_drf$predict_opti), factor(testH2O_asdf_drf$EmployeeChurned),
+                positive = "1")
+
+```
+Verglichen mit vorher eingesetten Thresholds ist dies der niedrigste, da eine 
+FP-Klassifikation stärker bestraft wird, als eine FN-Klassifikation. Das bestätigt
+auch die hohe Sensitivität.
+Dadurch sinkt die Genauigkeit sowie die balanzierte Genauigkeit, wobei letztere
+größer ist und verglichen zum Ausgangswert (F1-Score-optimierter Threshold) nur 
+um 0,04 niedriger ist. 
+Die 311 FP-Klassifizierten Werte sollten im Rahmen des Use-Cases kritisch betrachtet
+werden, da diese Daten zur Unterstützung von Managern gelten soll und mti diesem
+Ergebnis viel Arbeit für diese Nutzergruppe entstehen würde. 
+
+## Wichtigkeit der Features
+```{r}
+varimp_drf <- h2o.varimp(best_drf) 
+varimp_drf
+```
+Wie im vorher eingesetzten Algorithmus (rpart) sind der Funktionsbereich,
+die Dauer der Zugehörigkeit, die Dauer seit letzter Entwciklung, das Alter sowie
+die Zuordnung in die Gehaltsbänder ausschlaggebend für die Vorhersage einer
+Mitarbeiter:innen-Abwanderung. 
+Auffällig ist, dass die Zuordnung in Befristung (TemporaryPersonel) eine weniger 
+wichtige Rolle als im Modell basierend auf dem  rpart-Algorithmus einnimmt.
+
+
+## Vergleich rpart und H2O Distributed Random Forest
+```{r}
+confusionMatrix(factor(test_rpart$predict_rpart), factor(test_rpart$EmployeeChurned),
+                positive = "1")
+
+confusionMatrix(factor(testH2O_asdf_drf$predict_opti), factor(testH2O_asdf_drf$EmployeeChurned),
+                positive = "1")
+```
+Der Distributed Random Forest erzielt nicht nur allgemein eine größere AUC, auch
+die Genauigkeit (inklusive balanzierter Genauigkeit) sind in den optimierten 
+Modellen deutlich höher.
+Gleicher Threshold nach Kostenfunktion(kann zufällig sein)
+
+
+
+
+# Logistic Regression
+
+
