@@ -661,12 +661,12 @@ test_asdf$prob <- Prediciton_df$p1
 
 test_asdf$EmployeeChurned <- as.numeric(as.character(test_asdf$EmployeeChurned))
 
-pred_rocr <- prediction(test_asdf$prob, test_asdf$EmployeeChurned)
-perf_rocr <- performance(pred_rocr, "tpr", "fpr" )
+pred_rocr_glm <- prediction(test_asdf$prob, test_asdf$EmployeeChurned)
+perf_rocr_glm <- performance(pred_rocr_glm, "tpr", "fpr" )
 
-performance(pred_rocr, "auc")@y.values
+performance(pred_rocr_glm, "auc")@y.values
 # Darstellung der ROC-Kurve mit Threshhold
-plot(perf_rocr, col="blue")
+plot(perf_rocr_glm, col="blue")
 abline(0,1)
 abline(v=0.29, col="green")
 abline(v=0.292874, col="red")
@@ -959,12 +959,12 @@ asdf_svm$prob <- prediciton_DF_svm$p1
 
 asdf_svm$EmployeeChurned <- as.numeric(as.character(asdf_svm$EmployeeChurned))
 
-pred_rocr <- prediction(asdf_svm$prob, asdf_svm$EmployeeChurned)
-perf_rocr <- performance(pred_rocr, "tpr", "fpr" )
+pred_rocr_svm <- prediction(asdf_svm$prob, asdf_svm$EmployeeChurned)
+perf_rocr_svm <- performance(pred_rocr_svm, "tpr", "fpr" )
 
-performance(pred_rocr, "auc")@y.values
+performance(pred_rocr_svm, "auc")@y.values
 # Darstellung der ROC-Kurve
-plot(perf_rocr, col="blue")
+plot(perf_rocr_svm, col="blue")
 abline(0,1)
 
 ```
@@ -992,14 +992,15 @@ Zur Vergelichbarkeit wurde eine ROC-Kurve konstuiert. Dabei war es leider nicht 
 
 
 # Darstellung der ROC-Kurve
-plot(perf_rocr, col="red")
+plot(perf_rocr_rpart, col="red")
 plot(perf_rocr_drf, col="blue", add=TRUE)
-plot(perf)
+plot(perf_rocr_glm, col="purple", add=TRUE)
+plot(perf_rocr_svm, col="green", add=TRUE)
 abline(0,1)
 legend(x = "bottomright",
-       legend = c("Einfacher Baum (rpart)", "Distributed Random Forest (H2O"),
-       lty = c(1, 1),
-       col = c("red", "blue"))
+       legend = c("Einfacher Baum (rpart)", "Distributed Random Forest (H2O)","Logistic Regression", "Support-Vector-Machine"),
+       lty = c(1, 1, 1, 1),
+       col = c("red", "blue", "purple", "green"))
 title(main = "Vergleich der Algorithmen anhand der einzelnen ROC-Kurven")
 ```
 

@@ -346,7 +346,7 @@ Ergebnis viel Arbeit für diese Nutzergruppe entstehen würde.
 
 ## Wichtigkeit der Features
 ```{r}
-varimp_drf <- h2o.varimp(best_glm)
-varimp_drf
+varimp_glm <- h2o.varimp(best_glm)
+varimp_glm
 ```
 
