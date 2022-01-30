@@ -8,7 +8,24 @@ output: html_document
 ## Biblioheksimporte
 ```{r}
 library(readxl)
+library(ggplot2)
+library(tidyr)
+library(stringr)
+library(lubridate)
+library(mltools)
+library(data.table)
+library(mlbench)
+library(tidyverse)
+library(magrittr)
 
+#svm
+library(caret)
+library(e1071) 
+
+#tree
+library(rpart)
+library(rpart.plot)
+library(ROCR)
 library(h2o)
 h2o.init()
 
@@ -35,86 +52,111 @@ plot(df, col=df$EmployeeChurned)
 
 ## Erstellen der Train und Test Datensets
 ```{r}
-n <- nrow(df)
-train_indices <- sample(1:n, round(2/3 * n))
-train <- df[train_indices,]
-test <- df[-train_indices,]
-
-# erstmal 2 Features auswählen die die stärkste Abhängikeit nach den Trees haben
-features <- c("decrease_Category", "Month Of Service")
-cols <- c(features, "EmployeeChurned")
+# n <- nrow(df)
+# train_indices <- sample(1:n, round(2/3 * n))
+# train <- df[train_indices,]
+# test <- df[-train_indices,]
+# 
+# # erstmal 2 Features auswählen die die stärkste Abhängikeit nach den Trees haben
+ features <- c("decrease_Category", "Month Of Service")
+ cols <- c(features, "EmployeeChurned")
 
 ```
 
 ## H2O Vorbereitung und Umwandlung der Daten
 ```{r}
-
 dfH2O <- as.h2o(df)
 
+#in H2o Test und Train erzeugen, da sonst keine validen Ergebnisse
 splits <- h2o.splitFrame(data =  dfH2O, ratios = 0.75, seed = 1234)
 trainH2O <- splits[[1]]
 testH2O <- splits[[2]]
 
 target <- "EmployeeChurned"
-#predictors <- c(factorCols, "Month Of Service", "Age", "Months Since Last Development")
 # erstmal 2 Features auswählen die die stärkste Abhängikeit nach den Trees haben
-predictors <- c("decrease_Category", "Month Of Service")
+predictors <- c( "decrease_Category", "Month Of Service")
 
-
-#Cartesian Grid Search
-params <- list( balance_classes = c(TRUE, FALSE),
-                    ntrees = c(30, 50, 70),
-                    max_depth = c(10, 15, 20, 25),
-                    min_split_improvement = c(0.001, 0.0001, 0.00001, 0.000001))
-params
-
-#number of Models:
-sapply(hyper_grid.h2o, length) %>% prod()
-
+tuneDF <- as.data.frame(dfH2O)
+trainDF <- as.data.frame(trainH2O)
+testDF <- as.data.frame(testH2O)
 
 ```
+## SVM Tune mit e1071
+```{r}
+tuneSVM <- function(trainData, testData, svm_type) {
+
+     tuned_svm <- tune(svm, EmployeeChurned ~ ., 
+              data = trainData, 
+              kernel = svm_type, 
+              scale = TRUE, 
+              ranges = list(cost = c(0.01, 0.05, 0.075),  gamma = c(0.01, 0.02,0.25)), 
+              tunecontrol = tune.control(cross=5)
+              )
+    tuned_svm
+    
+    # train on the entire data set using best value for cost
+    best_cost <- tuned_svm$best.parameters[1]
+    best_gamma <- tuned_svm$best.parameters[2] 
+
+        
+    svmfit_best <- svm(EmployeeChurned ~ ., 
+                  data = trainData, 
+                  kernel = svm_type, 
+                  cost = best_cost, 
+                  gamma = best_gamma, 
+                  scale = TRUE)
+    
+    #predict
+    prediction <- predict(svmfit_best, testData, type = "class")
+    
+    # confusion matrix with quality measures
+    confusionMatrix(prediction, testData[, "EmployeeChurned"])
+  return(svmfit_best)
+}
+
+linear_svm <- tuneSVM(trainDF, testDF, "linear")
+radial_svm <- tuneSVM(trainDF, testDF, "radial")
+```
+
+
+
 ##SVM mit H2O
 ```{r}
 #https://docs.h2o.ai/h2o/latest-stable/h2o-docs/data-science/svm.html
 #SVM durchführen 
 svm_model <- h2o.psvm(
-  x= predictors,
-  gamma = 0.01,
   rank_ratio = 0.1,
   y ="EmployeeChurned",
   training_frame = trainH2O, 
   disable_training_metrics = FALSE
-                      )
+  )
 
 # mehr Infos über Model und support Vektoren
 summary(svm_model)            
 
-
-best_drf <- h2o.getModel(svm_model@model_id)
-best_drf
-perf <- h2o.performance(best_drf, testH2O)
-perf
+best_svm <- h2o.getModel(svm_model@model_id)
+best_svm
+perf_svm <- h2o.performance(best_svm, testH2O)
+perf_svm
 ```
 
 
 
-## Auswahl Threshold
+## Auswahl Threshold anhand ROC Kurve
 ```{r}
 # Anwendung auf Testset
-pred <- h2o.predict(best_drf, newdata = testH2O)
-
+#predict
+pred <- h2o.predict(best_svm, newdata = testH2O)
 Prediciton_df <- as.data.frame(pred)
-asdf <- as.data.frame(testH2O)
-asdf$prob <- Prediciton_df$p1
 
-asdf$EmployeeChurned <- as.numeric(as.character(asdf$EmployeeChurned))
+#
+asdf_svm <- testDF
+asdf_svm$prob <- Prediciton_df$p1
 
-pred_rocr <- prediction(asdf$prob, asdf$EmployeeChurned)
+asdf_svm$EmployeeChurned <- as.numeric(as.character(asdf_svm$EmployeeChurned))
+
+pred_rocr <- prediction(asdf_svm$prob, asdf_svm$EmployeeChurned)
 perf_rocr <- performance(pred_rocr, "tpr", "fpr" )
-
-fpr_rocr <- perf_rocr@x.values[[1]]
-tpr_rocr <- perf_rocr@y.values[[1]]
-threshold_rocr <- perf_rocr@alpha.values[[1]] 
 
 performance(pred_rocr, "auc")@y.values
 # Darstellung der ROC-Kurve
@@ -122,5 +164,101 @@ plot(perf_rocr, col="blue")
 abline(0,1)
 
 ```
+Die Fläche unterhalb der ROC-Kurve ist größer als 0,5 und damit liefert 
+das erstellte Modell eine genauere Vorhersage als bloßes Raten.
 
+# Auswahl Threshold
+```{r}
+#Auswahl Threshold aus ROC-Kurve ("Ellenbogenpunkt")
+threshold_predict <- 0.35
+#Ein genauer "Ellenbogenpunkt" kann aus der Grafik nicht entnommen werden.
+#Ziel sollte es sein FP-Klassifikationen zu vermeiden (kleinerer Threshold), aber dennoch 
+#eine Balance zu finden, welche für eine Überklassifikation von Positiv-Klassifikation
+#führt. Auch FN-Werte sorgen für Kosten im Unternehmen (siehe Kosten für Fehlklassifikation)
+
+```
+
+## Modellgüte anhand der Konfusionsmatrix bestimmen
+```{r}
+asdf_svm$predict <-classify(asdf_svm$prob, threshold_predict)
+
+confusionMatrix(factor(asdf_svm$predict), factor(asdf_svm$EmployeeChurned),
+                positive = "1")
+```
+
+## Optimierung mit Kostenfunktion
+```{r}
+pred_class <- function(x, threshold){
+  ifelse(x < threshold,0,1)
+}
+
+cost <- function(prob, actual,threshold2, cost_FN_func, cost_FP_func){
+    predicted_automate2 <- pred_class(prob,threshold2)
+    count_FN <- sum(predicted_automate2 == 1 & actual == "0")
+    count_FP <- sum(predicted_automate2 == 0 & actual == "1")
+    cost <- count_FN * cost_FN_func + count_FP * cost_FP_func
+    return (cost)
+}
+
+threshold_input <- c(0.05, 0.1, 0.14, 0.15, 0.16, 0.17, 0.18,
+                         0.2, 0.23, 0.24, 0.25,
+                         0.3, 0.35, 0.45, 0.7) 
+
+i <- 1
+costs_svm <- c()
+
+#Kosten für neues Recruiting (Suchauftrag, Recruitingaufwand wie Planung, Gespräche, Onboarding)
+cost_FP <- 3000  
+#Kosten aufgrund von Zeit für Manager:in und Mitarbeiter:in sowie zusätzliche Trainings- oder Gehaltskosten
+cost_FN <- 500 
+
+while (i < length(threshold_input)+1) {
+    costs_svm[[(length(costs_svm) +1)]] <- cost(asdf_svm$prob, 
+                                        asdf_svm$EmployeeChurned, 
+                                        threshold_input[i], cost_FN, cost_FP)
+    i <- i+1
+}
+
+cost_svm_matrix <- matrix(c(threshold_input,costs_svm),nrow=length(threshold_input))
+colnames(cost_svm_matrix) <- c("Threshold", "Kosten in Euro")
+cost_svm_matrix
+```
+
+Mit Betrachtung der Kosten liegt der optimale Threshold für das Model bei 0,15.
+Aufgrund der geringen Unterschiede wäre auch 0,17 als Threshold sinnvoll und
+sollte für Vorhersagen eingesetzt werden.
+
+## Modellgüte mit optimiertem Threshold anhand der Konfusionsmatrix bestimmen
+```{r}
+threshold_svm_opti <- 0.17
+
+asdf_svm$predict_opti <-classify(asdf_svm$prob, threshold_svm_opti)
+
+confusionMatrix(factor(asdf_svm$predict_opti), factor(asdf_svm$EmployeeChurned),
+                positive = "1")
+
+```
+
+## Wichtigkeit der Features
+```{r}
+varimp_drf <- h2o.varimp(best_svm) 
+varimp_drf
+```
+## Vergleich der Algorithmen anhand der einzelnen ROC-Kurven
+```{r}
+pred_rocr_drf <- prediction(raw_testH2O_asdf$prob, raw_testH2O_asdf$EmployeeChurned)
+perf_rocr_drf <- performance(pred_rocr_drf, "tpr", "fpr" )
+pred_rocr <- prediction(raw_test$prob, raw_test$EmployeeChurned)
+perf_rocr <- performance(pred_rocr, "tpr", "fpr" )
+
+
+# Darstellung der ROC-Kurve
+plot(perf_rocr, col="red")
+plot(perf_rocr_drf, col="blue", add=TRUE)
+abline(0,1)
+legend(x = "bottomright",
+       legend = c("Einfacher Baum (rpart)", "Distributed Random Forest (H2O"),
+       lty = c(1, 1),
+       col = c("red", "blue"))
+title(main = "Vergleich der Algorithmen anhand der einzelnen ROC-Kurven")
 
