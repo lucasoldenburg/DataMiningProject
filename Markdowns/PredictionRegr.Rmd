@@ -25,24 +25,6 @@ h2o.init()
 
 ```
 
-##Datenimport und Vorbereitung ohne One-Hot
-```{r}
-# df <- read_xlsx("20220110_dataPrepped_beforeOneHot.xlsx")
-# 
-# # Kategorische Variablen umwandeln
-# factorCols <- c("EmployeeChurned",
-#                 "decrease_Category",
-#                 "Nationality_Classification",
-#                 "Paybands")
-# 
-# df %<>% mutate_at(factorCols, factor)
-# # Auswählen der zu nutzenden Spalten auf Grund der ERgebnisse von Random Forrest
-# df <- subset(df, select = c(EmployeeChurned, decrease_Category, `Month Of Service`, `Months Since Last Development`, Age, Paybands, Nationality_Classification))
-# 
-# # Ansehen der Daten
-# plot(df, col=df$EmployeeChurned)
-```
-
 ## Datenimport und -vorbereitung
 ```{r}
 # Rohdatenset ohne One-Hot-Encoding
@@ -228,7 +210,10 @@ h2o.std_coef_plot(glm_model)
 ```
 Es hat sich gezeigt, dass das Model ohne One-Hot Featueres mit allen Features am besten performt.
 
-## H2O Distributed Random Forest und Grid-Search (Tuning Hyperparameter)
+## Hyperparameterwahl und Tuning
+https://docs.h2o.ai/h2o/latest-stable/h2o-docs/grid-search.html#supported-grid-search-hyperparameters
+https://docs.h2o.ai/h2o/latest-stable/h2o-docs/grid-search.html#supported-grid-search-hyperparameters
+https://docs.h2o.ai/h2o/latest-stable/h2o-docs/grid-search.html
 ```{r}
 #Hyperparameter
 glm_params <- list( alpha = c(0.01, 0.25, 0.5, 0.75, 1),
@@ -236,19 +221,6 @@ glm_params <- list( alpha = c(0.01, 0.25, 0.5, 0.75, 1),
                     # missing_values_handling = c("Skip", "MeanImputation", "PlugValues")
                     # standardize = c(TRUE, FALSE) "highly recommended"
                     )
-#0.0000001
-```
-##Hyperparameter
-balance classes - default False
-ntrees - default 50
-max_depth - default 20
-Min_split_improvement - default 0,00001
-
-## Hyperparameterwahl
-https://docs.h2o.ai/h2o/latest-stable/h2o-docs/grid-search.html#supported-grid-search-hyperparameters
-https://docs.h2o.ai/h2o/latest-stable/h2o-docs/grid-search.html
-
-```{r}
 #search_criteria strategy “Cartesian”
 h2oGrid <- h2o.grid("glm", x = predictors, y = response,
             grid_id = "h2oGrid",
@@ -269,6 +241,7 @@ best_glm <- h2o.getModel(h2oGridPerf@model_ids[[1]])
 h2o.performance(best_glm, raw_train)
 h2o.performance(best_glm, raw_test)
 ```
+Es kann als Treshold abgelesen werden: max f1 =	0.292874
 
 ## Anwendung auf Testdaten und Auswahl Threshold
 ```{r}
@@ -291,6 +264,7 @@ abline(0,1)
 abline(v=0.29, col="green")
 abline(v=0.292874, col="red")
 ```
+Die grüne Linie zeigt den selbst geschätzten bzw. gesehenen Treshold am Ellenbogenpunkt. Die rote Line zeigt den berechneten Treshold.
 
 ## Auswahl Threshold aus ROC-Kurve ("Ellenbogenpunkt")
 ```{r}
@@ -310,7 +284,6 @@ confusionMatrix(factor(test_asdf$predict1), factor(test_asdf$EmployeeChurned),
                 positive = "1")
 confusionMatrix(factor(test_asdf$predict2), factor(test_asdf$EmployeeChurned),
                 positive = "1")
-
 ```
 Der gesehene Ellnbogenpunkt und der berechnete threshhold liefern identische Ergebnisse auf dem Testdatensatz.
 
@@ -357,21 +330,20 @@ threshold_glm_opti <- 0.18
 test_asdf$predict_opti <-classify(test_asdf$prob, threshold_glm_opti)
 confusionMatrix(factor(test_asdf$predict_opti), factor(test_asdf$EmployeeChurned),
                 positive = "1")
-
 ```
-Verglichen mit vorher eingesetten Thresholds ist dies der niedrigste, da eine 
+Verglichen mit vorher eingesetzten Thresholds ist dies der niedrigste, da eine 
 FP-Klassifikation stärker bestraft wird, als eine FN-Klassifikation. Das bestätigt
 auch die hohe Sensitivität.
 Dadurch sinkt die Genauigkeit sowie die balanzierte Genauigkeit, wobei letztere
 größer ist und verglichen zum Ausgangswert (F1-Score-optimierter Threshold) nur 
 um 0,04 niedriger ist. 
-Die 311 FP-Klassifizierten Werte sollten im Rahmen des Use-Cases kritisch betrachtet
+Die 383 FP-Klassifizierten Werte sollten im Rahmen des Use-Cases kritisch betrachtet
 werden, da diese Daten zur Unterstützung von Managern gelten soll und mti diesem
-Ergebnis viel Arbeit für diese Nutzergruppe entstehen würde. 
+Ergebnis viel Arbeit für diese Nutzergruppe entstehen würde.
 
 ## Wichtigkeit der Features
 ```{r}
-varimp_drf <- h2o.varimp(best_glm) 
+varimp_drf <- h2o.varimp(best_glm)
 varimp_drf
 ```
 
