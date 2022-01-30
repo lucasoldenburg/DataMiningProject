@@ -159,6 +159,8 @@ raw_rpart_control <- trainControl(
     repeats = 10
 )
 
+#cp -> Complexity Parameter definiert die minimal zu erreichende Verbesserung
+#je Ast
 rpart_grid <- expand.grid(cp = c(0.015, 0.01, 0.005, 0.001, 
                                  0.0005, 0.0001, 0.00001))
 
@@ -190,10 +192,6 @@ raw_test
 ```{r}
 pred_rocr <- prediction(raw_test$prob, raw_test$EmployeeChurned)
 perf_rocr <- performance(pred_rocr, "tpr", "fpr" )
-
-fpr_rocr <- perf_rocr@x.values[[1]]
-tpr_rocr <- perf_rocr@y.values[[1]]
-threshold_rocr <- perf_rocr@alpha.values[[1]] 
 
 #AUC - Fläche unter der ROC-Kurve als Gütemerkmal
 performance(pred_rocr, "auc")@y.values
@@ -244,9 +242,9 @@ mit einbezogen werden.
 # Kosten für Fehlklassifikationen
 ```{r}
 #Kosten für neues Recruiting (Suchauftrag, Recruitingaufwand wie Planung, Gespräche, Onboarding)
-cost_FP <- 3000  
+cost_FP <- 500  
 #Kosten aufgrund von Zeit für Manager:in und Mitarbeiter:in sowie zusätzliche Trainings- oder Gehaltskosten
-cost_FN <- 500 
+cost_FN <- 3000
 
 matrix_overview_cost <- matrix(c(0,3000,500,0), nrow=2)
 colnames(matrix_overview_cost) <- c("Mitarbeiter:in geht", "Mitarbeiter:in bleibt")
@@ -262,8 +260,8 @@ pred_class <- function(x, threshold){
 
 cost <- function(prob, actual,threshold2, cost_FN_func, cost_FP_func){
     predicted_automate2 <- pred_class(prob,threshold2)
-    count_FN <- sum(predicted_automate2 == 1 & actual == "0")
-    count_FP <- sum(predicted_automate2 == 0 & actual == "1")
+    count_FN <- sum(predicted_automate2 == 0 & actual == "1")
+    count_FP <- sum(predicted_automate2 == 1 & actual == "0")
     cost <- count_FN * cost_FN_func + count_FP * cost_FP_func
     return (cost)
 }
@@ -356,14 +354,14 @@ Min_split_improvement - default 0,00001
 ##Hyperparameterwahl
 ```{r}
 #search_criteria strategy “Cartesian”
-h2oGrid <- h2o.grid("drf", x = predictors, y = target,
+h2oGrid_drf <- h2o.grid("drf", x = predictors, y = target,
             grid_id = "h2oGrid",
             training_frame = raw_trainH2O,
             hyper_params = drf_params,
             seed = 1234)
 
 #Auswahl der optimalen Parameter anhand der AUC der einzelnen Modelle
-h2oGridPerf <- h2o.getGrid(grid_id = "h2oGrid",
+h2oGridPerf_drf <- h2o.getGrid(grid_id = "h2oGrid",
                            sort_by = "auc",
                            decreasing = TRUE)
 
@@ -406,10 +404,6 @@ raw_test
 
 pred_rocr_drf <- prediction(raw_testH2O_asdf$prob, raw_testH2O_asdf$EmployeeChurned)
 perf_rocr_drf <- performance(pred_rocr_drf, "tpr", "fpr" )
-
-fpr_rocr <- perf_rocr_drf@x.values[[1]]
-tpr_rocr <- perf_rocr_drf@y.values[[1]]
-threshold_rocr_drf <- perf_rocr_drf@alpha.values[[1]] 
 
 performance(pred_rocr, "auc")@y.values
 # Darstellung der ROC-Kurve
