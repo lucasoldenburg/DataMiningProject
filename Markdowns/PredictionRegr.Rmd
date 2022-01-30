@@ -213,98 +213,29 @@ response <- "EmployeeChurned"
 ```{r}
 glm_model <- h2o.glm(family = "binomial",
                      # x = predictors_drf,
-                     # # x = predictors_hot,
+                     # x = predictors_hot,
                      x = predictors,
                      y = response,
                      training_frame = raw_train,
                      # training_frame = hot_train,
                      alpha = 1,
-                     lambda = 0,
+                     lambda = 0.00001,
                      compute_p_values = FALSE)
 summary(glm_model)
 h2o.std_coef_plot(glm_model)
+# AUC = 0.7636248 one hot
+# AUC = 0.7636351 mit predictors
 ```
 Es hat sich gezeigt, dass das Model ohne One-Hot Featueres mit allen Features am besten performt.
 
-## Anwendung auf Testdaten und Auswahl Threshold
-```{r}
-# Anwendung auf Testset
-pred <- h2o.predict(best_glm, newdata = raw_test)
-Prediciton_df <- as.data.frame(pred)
-
-hilf <- as.data.frame(raw_test)
-hilf$prob <- Prediciton_df$p1
-
-hilf$EmployeeChurned <- as.numeric(as.character(hilf$EmployeeChurned))
-
-pred_rocr <- prediction(hilf$prob, hilf$EmployeeChurned)
-perf_rocr <- performance(pred_rocr, "tpr", "fpr" )
-
-performance(pred_rocr, "auc")@y.values
-# Darstellung der ROC-Kurve mit Threshhold
-plot(perf_rocr, col="blue")
-abline(0,1)
-abline(v=0.29, col="red")
-```
-
-```{r}
-# # Anwendung auf Testset
-# predictBestGrid <- h2o.predict(best_drf, newdata = raw_testH2O)
-# 
-# # Umwandlung in generic dataframe 
-# raw_drfPrediciton_df <- as.data.frame(predictBestGrid)
-# raw_testH2O_asdf <- as.data.frame(raw_testH2O)
-# raw_testH2O_asdf$prob <- raw_drfPrediciton_df$p1
-# raw_testH2O_asdf
-# 
-# raw_testH2O_asdf$EmployeeChurned <- as.numeric(as.character(raw_testH2O_asdf$EmployeeChurned))
-# raw_test
-# 
-# pred_rocr_drf <- prediction(raw_testH2O_asdf$prob, raw_testH2O_asdf$EmployeeChurned)
-# perf_rocr_drf <- performance(pred_rocr_drf, "tpr", "fpr" )
-# 
-# fpr_rocr <- perf_rocr_drf@x.values[[1]]
-# tpr_rocr <- perf_rocr_drf@y.values[[1]]
-# threshold_rocr_drf <- perf_rocr_drf@alpha.values[[1]]
-```
-
-
-## Auswahl Threshold aus ROC-Kurve ("Ellenbogenpunkt")
-```{r}
-threshold_glm <- 0.29
-#Ein Ellenbogenpunkt ist ablesbar und wird tendenziell eher niedriger gewählt,
-#um die Anzahl an FP-Klassifikationen zu minimieren.
-```
-
-## Modellgüte anhand der Konfusionsmatrix bestimmen
-```{r}
-classify <- function(x, threshold){
-  ifelse(x < threshold,0,1)
-}
-hilf$predict <- classify(hilf$prob, threshold_glm)
-
-confusionMatrix(factor(hilf$predict), factor(hilf$EmployeeChurned),
-                positive = "1")
-```
-Im Vergleich zur Threshold-Wahl basierend auf der Maximierung des F1-Scores ist 
-die Genauigkeit um fast 4 Prozentpunkte geringer, dafür ist die balanzierte
-Genauigkeit nur geringfügig gesunken. Dafür ist die Spezifizität von 0,63 auf
-0,88 stark angestiegen, was im Sinne des Use Cases wünschenswert ist, auch wenn
-dafür die Sensitivität von ca. 0,83 auf 0,56 gesunken ist.?????????????????????????????????????????
-
-
-
-
 ## ---H2O Distributed Random Forest und Grid-Search (Tuning Hyperparameter)
 ```{r}
-predictors <- c(factorCols, "Month Of Service", "Age", "Months Since Last Development")
-target <- "EmployeeChurned"
-
 #Hyperparameter
-drf_params <- list( balance_classes = c(TRUE, FALSE),
-                    ntrees = c(30, 50, 70),
-                    max_depth = c(10, 15, 20, 25),
-                    min_split_improvement = c(0.001, 0.0001, 0.00001, 0.000001))
+glm_params <- list( alpha = c(0.01, 0.25, 0.5, 0.75, 1),
+                    lambda = c(1, 0.5, 0.1, 0.01, 0.001, 0.0001, 0.00001, 0)
+                    # missing_values_handling = c("Skip", "MeanImputation", "PlugValues")
+                    # standardize = c(TRUE, FALSE) "highly recommended"
+                    )
 #0.0000001
 ```
 ##Hyperparameter
@@ -313,33 +244,19 @@ ntrees - default 50
 max_depth - default 20
 Min_split_improvement - default 0,00001
 
-## ---Hyperparameterwahl
-GLM Hyperparameters
-alpha
-
-lambda
-
-missing_values_handling
-
-seed
-
-standardize
-
-theta
-
-tweedie_link_power
-
-tweedie_variance_power
+## Hyperparameterwahl
 https://docs.h2o.ai/h2o/latest-stable/h2o-docs/grid-search.html#supported-grid-search-hyperparameters
 https://docs.h2o.ai/h2o/latest-stable/h2o-docs/grid-search.html
 
 ```{r}
 #search_criteria strategy “Cartesian”
-h2oGrid <- h2o.grid("drf", x = predictors, y = target,
+h2oGrid <- h2o.grid("glm", x = predictors, y = response,
             grid_id = "h2oGrid",
-            training_frame = raw_trainH2O,
-            hyper_params = drf_params,
+            training_frame = raw_train,
+            hyper_params = glm_params,
             seed = 1234)
+
+summary(h2oGrid, show_stack_traces = TRUE)
 
 #Auswahl der optimalen Parameter anhand der AUC der einzelnen Modelle
 h2oGridPerf <- h2o.getGrid(grid_id = "h2oGrid",
@@ -348,9 +265,54 @@ h2oGridPerf <- h2o.getGrid(grid_id = "h2oGrid",
 
 # Güte im Trainingsset
 summary(h2oGridPerf)
-best_drf <- h2o.getModel(h2oGridPerf@model_ids[[1]])
-h2o.performance(best_drf, raw_trainH2O)
+best_glm <- h2o.getModel(h2oGridPerf@model_ids[[1]])
+h2o.performance(best_glm, raw_train)
+h2o.performance(best_glm, raw_test)
 ```
+
+## Anwendung auf Testdaten und Auswahl Threshold
+```{r}
+# Anwendung auf Testset
+pred <- h2o.predict(best_glm, newdata = raw_test)
+Prediciton_df <- as.data.frame(pred)
+
+test_asdf <- as.data.frame(raw_test)
+test_asdf$prob <- Prediciton_df$p1
+
+test_asdf$EmployeeChurned <- as.numeric(as.character(test_asdf$EmployeeChurned))
+
+pred_rocr <- prediction(test_asdf$prob, test_asdf$EmployeeChurned)
+perf_rocr <- performance(pred_rocr, "tpr", "fpr" )
+
+performance(pred_rocr, "auc")@y.values
+# Darstellung der ROC-Kurve mit Threshhold
+plot(perf_rocr, col="blue")
+abline(0,1)
+abline(v=0.29, col="green")
+abline(v=0.292874, col="red")
+```
+
+## Auswahl Threshold aus ROC-Kurve ("Ellenbogenpunkt")
+```{r}
+threshold_glm_gesehen <- 0.29
+threshold_glm <- 0.292874
+```
+
+## Modellgüte anhand der Konfusionsmatrix bestimmen und Threshholds vergleichen
+```{r}
+classify <- function(x, threshold){
+  ifelse(x < threshold,0,1)
+}
+test_asdf$predict1 <- classify(test_asdf$prob, threshold = threshold_glm_gesehen)
+test_asdf$predict2 <- classify(test_asdf$prob, threshold = threshold_glm_gesehen)
+
+confusionMatrix(factor(test_asdf$predict1), factor(test_asdf$EmployeeChurned),
+                positive = "1")
+confusionMatrix(factor(test_asdf$predict2), factor(test_asdf$EmployeeChurned),
+                positive = "1")
+
+```
+Der gesehene Ellnbogenpunkt und der berechnete threshhold liefern identische Ergebnisse auf dem Testdatensatz.
 
 ## ---Optimierung mit Kostenfunktion
 ```{r}
@@ -360,41 +322,40 @@ pred_class <- function(x, threshold){
 
 cost <- function(prob, actual,threshold2, cost_FN_func, cost_FP_func){
     predicted_automate2 <- pred_class(prob,threshold2)
-    count_FN <- sum(predicted_automate2 == 1 & actual == "0")
-    count_FP <- sum(predicted_automate2 == 0 & actual == "1")
+    count_FN <- sum(predicted_automate2 == 0 & actual == "1")
+    count_FP <- sum(predicted_automate2 == 1 & actual == "0")
     cost <- count_FN * cost_FN_func + count_FP * cost_FP_func
     return (cost)
 }
 
-threshold_input_rdf <- c(0.05, 0.1, 0.14, 0.15, 0.16, 0.17, 0.18,
-                         0.2, 0.23, 0.24, 0.25,
+threshold_input_rdf <- c(0.05, 0.1, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19,
+                         0.2, 0.23, 0.24, 0.25, 0.29, 0.292874,
                          0.3, 0.35, 0.45, 0.7) 
 
 i <- 1
 costs_rdf <- c()
+cost_FN <- 3000
+cost_FP <- 500
 
 while (i < length(threshold_input_rdf)+1) {
-    costs_rdf[[(length(costs_rdf) +1)]] <- cost(raw_testH2O_asdf$prob, 
-                                        raw_testH2O_asdf$EmployeeChurned, 
-                                        threshold_input_rdf[i], cost_FN, cost_FP)
+    costs_rdf[[(length(costs_rdf) +1)]] <- cost(test_asdf$prob, 
+                                                test_asdf$EmployeeChurned, 
+                                                threshold_input_rdf[i], cost_FN, cost_FP)
     i <- i+1
 }
 
 cost_rdf_matrix <- matrix(c(threshold_input_rdf,costs_rdf),nrow=length(threshold_input_rdf))
 colnames(cost_rdf_matrix) <- c("Threshold", "Kosten in Euro")
 cost_rdf_matrix
+
 ```
-Mit Betrachtung der Kosten liegt der optimale Threshold für das Model bei 0,15.
-Aufgrund der geringen Unterschiede wäre auch 0,17 als Threshold sinnvoll und
-sollte für Vorhersagen eingesetzt werden.
+Mit Betrachtung der Kosten liegt der optimale Threshold für das Model bei 0,18.
 
-## ---Modellgüte mit optimiertem Threshold anhand der Konfusionsmatrix bestimmen
+## Modellgüte mit optimiertem Threshold anhand der Konfusionsmatrix bestimmen
 ```{r}
-threshold_drf_opti <- 0.17
-
-raw_testH2O_asdf$predict_opti <-classify(raw_testH2O_asdf$prob, threshold_drf_opti)
-
-confusionMatrix(factor(raw_testH2O_asdf$predict_opti), factor(raw_testH2O_asdf$EmployeeChurned),
+threshold_glm_opti <- 0.18
+test_asdf$predict_opti <-classify(test_asdf$prob, threshold_glm_opti)
+confusionMatrix(factor(test_asdf$predict_opti), factor(test_asdf$EmployeeChurned),
                 positive = "1")
 
 ```
@@ -410,7 +371,7 @@ Ergebnis viel Arbeit für diese Nutzergruppe entstehen würde.
 
 ## Wichtigkeit der Features
 ```{r}
-varimp_drf <- h2o.varimp(best_drf) 
+varimp_drf <- h2o.varimp(best_glm) 
 varimp_drf
 ```
 
