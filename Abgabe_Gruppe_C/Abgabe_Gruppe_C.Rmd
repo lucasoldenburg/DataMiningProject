@@ -982,3 +982,30 @@ Die Ergebnisse der H2O Vorhersage lagen bei einem Error von ca. 40%.
 Darauf hin wurde getestet, ob die SVM-Methode von e1071 mit dem H2O-DataFram funktioniert, da dort die Daten wieder abgewandelt wurden. Dies hat funktioniert und dadurch konnte ein Tuning des "Gamma" und "Cost" Wertes vorgenommen werden. Dies führte zu einer Genauigkeit von: 60% für die Radial-Methode und 67% bei der Linearen-Methode. 
 Zur Vergelichbarkeit wurde eine ROC-Kurve konstuiert. Dabei war es leider nicht möglich die Modelle der e1071-Bibliothek zu nutzen, weshalb noch einmal die H2O-SVM methode mit den optimierten Parametern der e1071-tune-Funktion durchgeführt wurde. Dies führte zu einer Fehleranfälligkeit von 37% jedoch bei der uns wichtigen False-Negative Rate einen Error von 28%. Dies ist nochmals eine deutliche Verbessung zum Anfang und somit das beste Ergbnis des SVM-Modells.
 
+
+## Vergleich der Algorithmen anhand der einzelnen ROC-Kurven
+```{r}
+# pred_rocr_drf <- prediction(raw_testH2O_asdf$prob, raw_testH2O_asdf$EmployeeChurned)
+# perf_rocr_drf <- performance(pred_rocr_drf, "tpr", "fpr" )
+# pred_rocr <- prediction(raw_test$prob, raw_test$EmployeeChurned)
+# perf_rocr <- performance(pred_rocr, "tpr", "fpr" )
+
+
+# Darstellung der ROC-Kurve
+plot(perf_rocr, col="red")
+plot(perf_rocr_drf, col="blue", add=TRUE)
+plot(perf)
+abline(0,1)
+legend(x = "bottomright",
+       legend = c("Einfacher Baum (rpart)", "Distributed Random Forest (H2O"),
+       lty = c(1, 1),
+       col = c("red", "blue"))
+title(main = "Vergleich der Algorithmen anhand der einzelnen ROC-Kurven")
+```
+
+
+
+
+
+
+
