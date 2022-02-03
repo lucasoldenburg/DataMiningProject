@@ -1,0 +1,2950 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={Abgabe Gruppe C},
+  pdfauthor={Eric Beier, Lucas Oldenburg, Martin König,},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifluatex
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+
+\title{Abgabe Gruppe C}
+\author{Eric Beier, Lucas Oldenburg, Martin König,}
+\date{30/01/2022}
+
+\begin{document}
+\maketitle
+
+\hypertarget{bibliotheksimporte}{%
+\subsection{Bibliotheksimporte}\label{bibliotheksimporte}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(readxl)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Paket 'readxl' wurde unter R Version 4.1.2 erstellt
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(ggplot2)}
+\FunctionTok{library}\NormalTok{(tidyr)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Paket 'tidyr' wurde unter R Version 4.1.2 erstellt
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(stringr)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Paket 'stringr' wurde unter R Version 4.1.2 erstellt
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(lubridate)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Paket 'lubridate' wurde unter R Version 4.1.2 erstellt
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Attache Paket: 'lubridate'
+\end{verbatim}
+
+\begin{verbatim}
+## Die folgenden Objekte sind maskiert von 'package:base':
+## 
+##     date, intersect, setdiff, union
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(mltools)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Paket 'mltools' wurde unter R Version 4.1.2 erstellt
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Attache Paket: 'mltools'
+\end{verbatim}
+
+\begin{verbatim}
+## Das folgende Objekt ist maskiert 'package:tidyr':
+## 
+##     replace_na
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(data.table)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Paket 'data.table' wurde unter R Version 4.1.2 erstellt
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Attache Paket: 'data.table'
+\end{verbatim}
+
+\begin{verbatim}
+## Die folgenden Objekte sind maskiert von 'package:lubridate':
+## 
+##     hour, isoweek, mday, minute, month, quarter, second, wday, week,
+##     yday, year
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(mlbench)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Paket 'mlbench' wurde unter R Version 4.1.2 erstellt
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(tidyverse)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Paket 'tidyverse' wurde unter R Version 4.1.2 erstellt
+\end{verbatim}
+
+\begin{verbatim}
+## -- Attaching packages --------------------------------------- tidyverse 1.3.1 --
+\end{verbatim}
+
+\begin{verbatim}
+## v tibble  3.1.5     v dplyr   1.0.7
+## v readr   2.1.0     v forcats 0.5.1
+## v purrr   0.3.4
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Paket 'readr' wurde unter R Version 4.1.2 erstellt
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Paket 'forcats' wurde unter R Version 4.1.2 erstellt
+\end{verbatim}
+
+\begin{verbatim}
+## -- Conflicts ------------------------------------------ tidyverse_conflicts() --
+## x lubridate::as.difftime() masks base::as.difftime()
+## x dplyr::between()         masks data.table::between()
+## x lubridate::date()        masks base::date()
+## x dplyr::filter()          masks stats::filter()
+## x dplyr::first()           masks data.table::first()
+## x data.table::hour()       masks lubridate::hour()
+## x lubridate::intersect()   masks base::intersect()
+## x data.table::isoweek()    masks lubridate::isoweek()
+## x dplyr::lag()             masks stats::lag()
+## x dplyr::last()            masks data.table::last()
+## x data.table::mday()       masks lubridate::mday()
+## x data.table::minute()     masks lubridate::minute()
+## x data.table::month()      masks lubridate::month()
+## x data.table::quarter()    masks lubridate::quarter()
+## x mltools::replace_na()    masks tidyr::replace_na()
+## x data.table::second()     masks lubridate::second()
+## x lubridate::setdiff()     masks base::setdiff()
+## x purrr::transpose()       masks data.table::transpose()
+## x lubridate::union()       masks base::union()
+## x data.table::wday()       masks lubridate::wday()
+## x data.table::week()       masks lubridate::week()
+## x data.table::yday()       masks lubridate::yday()
+## x data.table::year()       masks lubridate::year()
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(magrittr)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Attache Paket: 'magrittr'
+\end{verbatim}
+
+\begin{verbatim}
+## Das folgende Objekt ist maskiert 'package:purrr':
+## 
+##     set_names
+\end{verbatim}
+
+\begin{verbatim}
+## Das folgende Objekt ist maskiert 'package:tidyr':
+## 
+##     extract
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#svm}
+\FunctionTok{library}\NormalTok{(caret)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Lade nötiges Paket: lattice
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Attache Paket: 'caret'
+\end{verbatim}
+
+\begin{verbatim}
+## Das folgende Objekt ist maskiert 'package:purrr':
+## 
+##     lift
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(e1071) }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Paket 'e1071' wurde unter R Version 4.1.2 erstellt
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Attache Paket: 'e1071'
+\end{verbatim}
+
+\begin{verbatim}
+## Das folgende Objekt ist maskiert 'package:mltools':
+## 
+##     skewness
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#tree}
+\FunctionTok{library}\NormalTok{(rpart)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Paket 'rpart' wurde unter R Version 4.1.2 erstellt
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(rpart.plot)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Paket 'rpart.plot' wurde unter R Version 4.1.2 erstellt
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(ROCR)}
+\FunctionTok{library}\NormalTok{(h2o)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Paket 'h2o' wurde unter R Version 4.1.2 erstellt
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## ----------------------------------------------------------------------
+## 
+## Your next step is to start H2O:
+##     > h2o.init()
+## 
+## For H2O package documentation, ask for help:
+##     > ??h2o
+## 
+## After starting H2O, you can use the Web UI at http://localhost:54321
+## For more information visit https://docs.h2o.ai
+## 
+## ----------------------------------------------------------------------
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Attache Paket: 'h2o'
+\end{verbatim}
+
+\begin{verbatim}
+## Die folgenden Objekte sind maskiert von 'package:data.table':
+## 
+##     hour, month, week, year
+\end{verbatim}
+
+\begin{verbatim}
+## Die folgenden Objekte sind maskiert von 'package:lubridate':
+## 
+##     day, hour, month, week, year
+\end{verbatim}
+
+\begin{verbatim}
+## Die folgenden Objekte sind maskiert von 'package:stats':
+## 
+##     cor, sd, var
+\end{verbatim}
+
+\begin{verbatim}
+## Die folgenden Objekte sind maskiert von 'package:base':
+## 
+##     %*%, %in%, &&, ||, apply, as.factor, as.numeric, colnames,
+##     colnames<-, ifelse, is.character, is.factor, is.numeric, log,
+##     log10, log1p, log2, round, signif, trunc
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{h2o.init}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  Connection successful!
+## 
+## R is connected to the H2O cluster: 
+##     H2O cluster uptime:         32 minutes 44 seconds 
+##     H2O cluster timezone:       Europe/Berlin 
+##     H2O data parsing timezone:  UTC 
+##     H2O cluster version:        3.36.0.1 
+##     H2O cluster version age:    1 month and 5 days  
+##     H2O cluster name:           H2O_started_from_R_Martin_opj915 
+##     H2O cluster total nodes:    1 
+##     H2O cluster total memory:   1.73 GB 
+##     H2O cluster total cores:    8 
+##     H2O cluster allowed cores:  8 
+##     H2O cluster healthy:        TRUE 
+##     H2O Connection ip:          localhost 
+##     H2O Connection port:        54321 
+##     H2O Connection proxy:       NA 
+##     H2O Internal Security:      FALSE 
+##     H2O API Extensions:         Amazon S3, Algos, Infogram, AutoML, Core V3, TargetEncoder, Core V4 
+##     R Version:                  R version 4.1.1 (2021-08-10)
+\end{verbatim}
+
+\hypertarget{datenimport-onehot}{%
+\subsection{Datenimport onehot}\label{datenimport-onehot}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Datenset nach One{-}Hot{-}Encoding}
+\NormalTok{hot\_df }\OtherTok{\textless{}{-}} \FunctionTok{read\_xlsx}\NormalTok{(}\StringTok{"20220110\_dataPrepped\_afterOneHot.xlsx"}\NormalTok{)}
+\NormalTok{hot\_df }\OtherTok{\textless{}{-}} \FunctionTok{subset}\NormalTok{(hot\_df, }
+                 \AttributeTok{select =} \SpecialCharTok{{-}}\FunctionTok{c}\NormalTok{(EmployeeChurned\_0,}
+                                     \StringTok{\textasciigrave{}}\AttributeTok{start\_Cost center}\StringTok{\textasciigrave{}}\NormalTok{,}
+                                     \StringTok{\textasciigrave{}}\AttributeTok{start\_Calendar Year/Month}\StringTok{\textasciigrave{}}\NormalTok{,}
+                                     \StringTok{\textasciigrave{}}\AttributeTok{LastActive\_Calendar Year/Month}\StringTok{\textasciigrave{}}\NormalTok{))}
+
+\FunctionTok{colnames}\NormalTok{(hot\_df)[}\FunctionTok{colnames}\NormalTok{(hot\_df) }\SpecialCharTok{==} \StringTok{"EmployeeChurned\_1"}\NormalTok{] }\OtherTok{\textless{}{-}} \StringTok{"EmployeeChurned"}
+
+\CommentTok{\# Kategorische Variablen}
+\NormalTok{factorColsOneHot }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"Gender"}\NormalTok{,}
+                \StringTok{"TemporaryPersonel"}\NormalTok{,}
+                \StringTok{"Part Time Mark"}\NormalTok{,}
+                \StringTok{"NonExempt"}\NormalTok{,}
+                \StringTok{"start\_NonExempt"}\NormalTok{,}
+                \StringTok{"development to exempt"}\NormalTok{,}
+                \StringTok{"Vertical\_Horizontal\_Developments\_\textgreater{}= 3"}\NormalTok{,}
+                \StringTok{"Vertical\_Horizontal\_Developments\_0"}\NormalTok{,}
+                \StringTok{"Vertical\_Horizontal\_Developments\_1{-}2"}\NormalTok{,}
+                \StringTok{"start\_contract type\_apprentice"}\NormalTok{,}
+                \StringTok{"start\_contract type\_permanent staff"}\NormalTok{,}
+                \StringTok{"start\_contract type\_temporary personnel"}\NormalTok{,}
+                \StringTok{"start\_Part time mark"}\NormalTok{,}
+                \StringTok{"EmployeeChurned"}\NormalTok{,}
+                \StringTok{"decrease\_Category\_Customer"}\NormalTok{,}
+                \StringTok{"decrease\_Category\_GB Management"}\NormalTok{,}
+                \StringTok{"decrease\_Category\_GBR/N"}\NormalTok{,}
+                \StringTok{"decrease\_Category\_GTU GD"}\NormalTok{,}
+                \StringTok{"decrease\_Category\_Human Resources GBS"}\NormalTok{,}
+                \StringTok{"decrease\_Category\_Intellectual Property"}\NormalTok{,}
+                \StringTok{"decrease\_Category\_IT Service CC"}\NormalTok{,}
+                \StringTok{"decrease\_Category\_Other"}\NormalTok{, }\CommentTok{\#fehlt bei den anderen}
+                \StringTok{"decrease\_Category\_People"}\NormalTok{,}
+                \StringTok{"decrease\_Category\_Planning \& Development"}\NormalTok{,}
+                \StringTok{"decrease\_Category\_Procurement Services {-} GP"}\NormalTok{,}
+                \StringTok{"decrease\_Category\_RAA/A Competence"}\NormalTok{,}
+                \StringTok{"decrease\_Category\_Safety"}\NormalTok{,}
+                \StringTok{"decrease\_Category\_Supplier \& Reporting"}\NormalTok{,}
+                \StringTok{"Nationality\_Classification\_EU"}\NormalTok{,}
+                \StringTok{"Nationality\_Classification\_German"}\NormalTok{,}
+                \StringTok{"Nationality\_Classification\_Other"}\NormalTok{,}
+                \StringTok{"Paybands\_A"}\NormalTok{,}
+                \StringTok{"Paybands\_B"}\NormalTok{,}
+                \StringTok{"Paybands\_C"}\NormalTok{,}
+                \StringTok{"Paybands\_D"}\NormalTok{,}
+                \StringTok{"Paybands\_E"}\NormalTok{,}
+                \StringTok{"Paybands\_F"}\NormalTok{,}
+                \StringTok{"Paybands\_G"}\NormalTok{,}
+                \StringTok{"Paybands\_H"}\NormalTok{)}
+
+\CommentTok{\# Umwandlung in kategorische Variablen}
+\NormalTok{hot\_df }\SpecialCharTok{\%\textless{}\textgreater{}\%} \FunctionTok{mutate\_at}\NormalTok{(factorColsOneHot, factor)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{datenimport-und-vorbereitung}{%
+\subsection{Datenimport und
+Vorbereitung}\label{datenimport-und-vorbereitung}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Rohdatenset ohne One{-}Hot{-}Encoding}
+\NormalTok{df }\OtherTok{\textless{}{-}} \FunctionTok{read\_xlsx}\NormalTok{(}\StringTok{"20220110\_dataPrepped\_beforeOneHot.xlsx"}\NormalTok{)}
+
+\NormalTok{df }\OtherTok{\textless{}{-}} \FunctionTok{subset}\NormalTok{(df, }\AttributeTok{select =} \SpecialCharTok{{-}}\FunctionTok{c}\NormalTok{(}\StringTok{\textasciigrave{}}\AttributeTok{start\_Cost center}\StringTok{\textasciigrave{}}\NormalTok{,}
+                              \StringTok{\textasciigrave{}}\AttributeTok{start\_Calendar Year/Month}\StringTok{\textasciigrave{}}\NormalTok{,}
+                              \StringTok{\textasciigrave{}}\AttributeTok{LastActive\_Calendar Year/Month}\StringTok{\textasciigrave{}}\NormalTok{))}
+\CommentTok{\# Kategorische Variablen}
+\NormalTok{factorCols }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"Gender"}\NormalTok{,}
+                \StringTok{"TemporaryPersonel"}\NormalTok{,}
+                \StringTok{"Part Time Mark"}\NormalTok{,}
+                \StringTok{"NonExempt"}\NormalTok{,}
+                \StringTok{"start\_NonExempt"}\NormalTok{,}
+                \StringTok{"development to exempt"}\NormalTok{,}
+                \StringTok{"Vertical\_Horizontal\_Developments"}\NormalTok{,}
+                \StringTok{"start\_contract type"}\NormalTok{,}
+                \StringTok{"start\_Part time mark"}\NormalTok{,}
+                \StringTok{"EmployeeChurned"}\NormalTok{,}
+                \StringTok{"decrease\_Category"}\NormalTok{,}
+                \StringTok{"Nationality\_Classification"}\NormalTok{,}
+                \StringTok{"Paybands"}\NormalTok{)}
+\NormalTok{df }\SpecialCharTok{\%\textless{}\textgreater{}\%} \FunctionTok{mutate\_at}\NormalTok{(factorCols, factor)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{h2o-vorbereitung-und-umwandlung-der-daten}{%
+\subsection{H2O Vorbereitung und Umwandlung der
+Daten}\label{h2o-vorbereitung-und-umwandlung-der-daten}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dfH2O }\OtherTok{\textless{}{-}} \FunctionTok{as.h2o}\NormalTok{(df)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   |                                                                              |                                                                      |   0%  |                                                                              |======================================================================| 100%
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#in H2o Test und Train erzeugen, da sonst keine validen Ergebnisse}
+\NormalTok{splits }\OtherTok{\textless{}{-}} \FunctionTok{h2o.splitFrame}\NormalTok{(}\AttributeTok{data =}\NormalTok{  dfH2O, }\AttributeTok{ratios =} \FloatTok{0.75}\NormalTok{, }\AttributeTok{seed =} \DecValTok{1234}\NormalTok{)}
+\NormalTok{trainH2O }\OtherTok{\textless{}{-}}\NormalTok{ splits[[}\DecValTok{1}\NormalTok{]]}
+\NormalTok{testH2O }\OtherTok{\textless{}{-}}\NormalTok{ splits[[}\DecValTok{2}\NormalTok{]]}
+
+\CommentTok{\#h2o hot}
+\NormalTok{hot\_dfH2O }\OtherTok{\textless{}{-}} \FunctionTok{as.h2o}\NormalTok{(hot\_df)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   |                                                                              |                                                                      |   0%  |                                                                              |======================================================================| 100%
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{splits1 }\OtherTok{\textless{}{-}} \FunctionTok{h2o.splitFrame}\NormalTok{(}\AttributeTok{data =}\NormalTok{  hot\_dfH2O, }\AttributeTok{ratios =} \FloatTok{0.75}\NormalTok{, }\AttributeTok{seed =} \DecValTok{1234}\NormalTok{)}
+\NormalTok{hot\_train }\OtherTok{\textless{}{-}}\NormalTok{ splits1[[}\DecValTok{1}\NormalTok{]]}
+\NormalTok{hot\_test }\OtherTok{\textless{}{-}}\NormalTok{ splits1[[}\DecValTok{2}\NormalTok{]]}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{erstellen-der-train-und-test-datensets}{%
+\subsection{Erstellen der Train und Test
+Datensets}\label{erstellen-der-train-und-test-datensets}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#data\_hot\_test \textless{}{-} subset(hot\_df, select = c("EmployeeChurned", "Age", "Month Of Service")) \#was?}
+\CommentTok{\#df\_hot \textless{}{-} data.frame(data\_hot\_test)}
+\CommentTok{\#n \textless{}{-} nrow(df\_hot)}
+
+\NormalTok{data\_test }\OtherTok{\textless{}{-}} \FunctionTok{subset}\NormalTok{(df, }\AttributeTok{select =} \FunctionTok{c}\NormalTok{(}\StringTok{"EmployeeChurned"}\NormalTok{, }\StringTok{"Age"}\NormalTok{, }\StringTok{"Month Of Service"}\NormalTok{)) }\CommentTok{\#was?}
+\NormalTok{df\_hot }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(data\_test)}
+\NormalTok{n }\OtherTok{\textless{}{-}} \FunctionTok{nrow}\NormalTok{(df\_hot)}
+
+\NormalTok{train\_indices }\OtherTok{\textless{}{-}} \FunctionTok{sample}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\NormalTok{n, }\FunctionTok{round}\NormalTok{(}\FloatTok{0.75} \SpecialCharTok{*}\NormalTok{ n))}
+\NormalTok{train }\OtherTok{\textless{}{-}}\NormalTok{ df\_hot[train\_indices,]}
+\NormalTok{test }\OtherTok{\textless{}{-}}\NormalTok{ df\_hot[}\SpecialCharTok{{-}}\NormalTok{train\_indices,]}
+
+\CommentTok{\# erstmal 2 Features auswählen }
+\NormalTok{features }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"Age"}\NormalTok{, }\StringTok{"Month.Of.Service"}\NormalTok{)}
+\NormalTok{cols }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(features, }\StringTok{"EmployeeChurned"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{decision-tree}{%
+\section{Decision Tree}\label{decision-tree}}
+
+\hypertarget{einfacher-entscheidungsbaum-mit-rpart-bibliothek}{%
+\subsection{Einfacher Entscheidungsbaum mit
+rpart-Bibliothek}\label{einfacher-entscheidungsbaum-mit-rpart-bibliothek}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{rpart\_control }\OtherTok{\textless{}{-}} \FunctionTok{trainControl}\NormalTok{(}
+    \AttributeTok{method =} \StringTok{"repeatedcv"}\NormalTok{,}
+    \AttributeTok{number =} \DecValTok{5}\NormalTok{,}
+    \AttributeTok{repeats =} \DecValTok{10}
+\NormalTok{)}
+
+\CommentTok{\#cp {-}\textgreater{} Complexity Parameter definiert die minimal zu erreichende Verbesserung je Ast}
+\NormalTok{rpart\_grid }\OtherTok{\textless{}{-}} \FunctionTok{expand.grid}\NormalTok{(}\AttributeTok{cp =} \FunctionTok{c}\NormalTok{(}\FloatTok{0.015}\NormalTok{, }\FloatTok{0.01}\NormalTok{, }\FloatTok{0.005}\NormalTok{, }\FloatTok{0.001}\NormalTok{, }
+                                 \FloatTok{0.0005}\NormalTok{, }\FloatTok{0.0001}\NormalTok{, }\FloatTok{0.00001}\NormalTok{))}
+
+\NormalTok{rpart\_fit }\OtherTok{\textless{}{-}} \FunctionTok{train}\NormalTok{(EmployeeChurned }\SpecialCharTok{\textasciitilde{}}\NormalTok{ ., }
+                       \AttributeTok{method =} \StringTok{"rpart"}\NormalTok{,}
+                       \AttributeTok{na.action =}\NormalTok{ na.omit,}
+                       \AttributeTok{trControl =}\NormalTok{ rpart\_control,}
+                       \AttributeTok{tuneGrid =}\NormalTok{ rpart\_grid,}
+                       \AttributeTok{data =}\NormalTok{ train)}
+
+\NormalTok{best\_cp }\OtherTok{\textless{}{-}}\NormalTok{ rpart\_fit}\SpecialCharTok{$}\NormalTok{bestTune[}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{]}
+\NormalTok{best\_cp }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.005
+\end{verbatim}
+
+\hypertarget{modell-mit-optimalen-parametern-trainieren}{%
+\subsection{Modell mit optimalen Parametern
+trainieren}\label{modell-mit-optimalen-parametern-trainieren}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{rpart }\OtherTok{\textless{}{-}} \FunctionTok{rpart}\NormalTok{(EmployeeChurned }\SpecialCharTok{\textasciitilde{}}\NormalTok{., }\AttributeTok{y =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{x =} \ConstantTok{TRUE}\NormalTok{,}
+                  \AttributeTok{data=}\NormalTok{train,}
+                      \AttributeTok{control=} \FunctionTok{rpart.control}\NormalTok{(}\AttributeTok{cp=}\NormalTok{best\_cp))}
+
+\NormalTok{rpart\_prediction }\OtherTok{\textless{}{-}} \FunctionTok{rpart.predict}\NormalTok{(rpart, test)}
+\NormalTok{rpart\_prediction }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(rpart\_prediction)}
+\NormalTok{test\_rpart }\OtherTok{\textless{}{-}}\NormalTok{ test}
+\NormalTok{test\_rpart}\SpecialCharTok{$}\NormalTok{prob }\OtherTok{\textless{}{-}}\NormalTok{ rpart\_prediction}\SpecialCharTok{$}\StringTok{\textasciigrave{}}\AttributeTok{X1}\StringTok{\textasciigrave{}}
+\NormalTok{test\_rpart}\SpecialCharTok{$}\NormalTok{EmployeeChurned }\OtherTok{\textless{}{-}} \FunctionTok{as.numeric}\NormalTok{(}\FunctionTok{as.character}\NormalTok{(test}\SpecialCharTok{$}\NormalTok{EmployeeChurned))}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{allgemeine-modellguxfcte-anhand-der-roc-kurve-bestimmen}{%
+\subsection{Allgemeine Modellgüte anhand der ROC-Kurve
+bestimmen}\label{allgemeine-modellguxfcte-anhand-der-roc-kurve-bestimmen}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# fpr\_rocr \textless{}{-} perf\_rocr@x.values[[1]]}
+\NormalTok{pred\_rocr\_rpart }\OtherTok{\textless{}{-}} \FunctionTok{prediction}\NormalTok{(test\_rpart}\SpecialCharTok{$}\NormalTok{prob, test\_rpart}\SpecialCharTok{$}\NormalTok{EmployeeChurned)}
+\NormalTok{perf\_rocr\_rpart }\OtherTok{\textless{}{-}} \FunctionTok{performance}\NormalTok{(pred\_rocr\_rpart, }\StringTok{"tpr"}\NormalTok{, }\StringTok{"fpr"}\NormalTok{ )}
+
+\NormalTok{fpr\_rocr\_rpart }\OtherTok{\textless{}{-}}\NormalTok{ perf\_rocr\_rpart}\SpecialCharTok{@}\NormalTok{x.values[[}\DecValTok{1}\NormalTok{]]}
+\NormalTok{tpr\_rocr\_rpart }\OtherTok{\textless{}{-}}\NormalTok{ perf\_rocr\_rpart}\SpecialCharTok{@}\NormalTok{y.values[[}\DecValTok{1}\NormalTok{]]}
+\NormalTok{threshold\_rocr\_rpart }\OtherTok{\textless{}{-}}\NormalTok{ perf\_rocr\_rpart}\SpecialCharTok{@}\NormalTok{alpha.values[[}\DecValTok{1}\NormalTok{]] }
+
+\CommentTok{\#AUC {-} Fläche unter der ROC{-}Kurve als Gütemerkmal}
+\FunctionTok{performance}\NormalTok{(pred\_rocr\_rpart, }\StringTok{"auc"}\NormalTok{)}\SpecialCharTok{@}\NormalTok{y.values}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [[1]]
+## [1] 0.6412548
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Darstellung der ROC{-}Kurve}
+\FunctionTok{plot}\NormalTok{(perf\_rocr\_rpart, }\AttributeTok{col=}\StringTok{"blue"}\NormalTok{)}
+\FunctionTok{abline}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{)}
+\FunctionTok{abline}\NormalTok{(}\AttributeTok{v=}\FloatTok{0.2}\NormalTok{, }\AttributeTok{col=}\StringTok{"red"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Abgabe_Gruppe_C_files/figure-latex/unnamed-chunk-8-1.pdf}
+/ Die Fläche unterhalb der ROC-Kurve ist größer als 0,5 und damit
+liefert das erstellte Modell eine genauere Vorhersage als bloßes Raten.
+
+\hypertarget{auswahl-threshold}{%
+\subsection{Auswahl Threshold}\label{auswahl-threshold}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Funktion zur Klassifizierung der Vorhersage}
+\NormalTok{classify }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(x, threshold)\{}
+  \FunctionTok{ifelse}\NormalTok{(x }\SpecialCharTok{\textless{}}\NormalTok{ threshold,}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{)}
+\NormalTok{\}}
+
+\CommentTok{\#Auswahl Threshold aus ROC{-}Kurve ("Ellenbogenpunkt")}
+\NormalTok{threshold\_predict }\OtherTok{\textless{}{-}} \FloatTok{0.2}
+\CommentTok{\#Ein genauer "Ellenbogenpunkt" kann aus der Grafik nicht entnommen werden.}
+\CommentTok{\#Ziel sollte es sein FP{-}Klassifikationen zu vermeiden (kleinerer Threshold), aber dennoch }
+\CommentTok{\#eine Balance zu finden, welche für eine Überklassifikation von Positiv{-}Klassifikation}
+\CommentTok{\#führt. Auch FN{-}Werte sorgen für Kosten im Unternehmen (siehe Kosten für Fehlklassifikation)}
+
+\CommentTok{\#Anwendung auf Testdatensatz}
+\NormalTok{test\_rpart}\SpecialCharTok{$}\NormalTok{predict }\OtherTok{\textless{}{-}}\FunctionTok{classify}\NormalTok{(test\_rpart}\SpecialCharTok{$}\NormalTok{prob, threshold\_predict)}
+\FunctionTok{head}\NormalTok{(test\_showPredict }\OtherTok{\textless{}{-}} \FunctionTok{subset}\NormalTok{(test\_rpart, }\AttributeTok{select =} \FunctionTok{c}\NormalTok{(prob,predict)),}\DecValTok{10}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##          prob predict
+## 1  0.34201681       1
+## 3  0.34201681       1
+## 6  0.05755396       0
+## 7  0.34201681       1
+## 15 0.05755396       0
+## 16 0.30315501       1
+## 24 0.34201681       1
+## 27 0.05755396       0
+## 36 0.05755396       0
+## 44 0.05755396       0
+\end{verbatim}
+
+\hypertarget{modellguxfcte-anhand-der-konfusionsmatrix-bestimmen}{%
+\subsection{Modellgüte anhand der Konfusionsmatrix
+bestimmen}\label{modellguxfcte-anhand-der-konfusionsmatrix-bestimmen}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{confusionMatrix}\NormalTok{(}\FunctionTok{factor}\NormalTok{(test\_rpart}\SpecialCharTok{$}\NormalTok{predict), }\FunctionTok{factor}\NormalTok{(test\_rpart}\SpecialCharTok{$}\NormalTok{EmployeeChurned),}
+                \AttributeTok{positive =} \StringTok{"1"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction   0   1
+##          0  41   3
+##          1 566 357
+##                                           
+##                Accuracy : 0.4116          
+##                  95% CI : (0.3804, 0.4433)
+##     No Information Rate : 0.6277          
+##     P-Value [Acc > NIR] : 1               
+##                                           
+##                   Kappa : 0.0449          
+##                                           
+##  Mcnemar's Test P-Value : <2e-16          
+##                                           
+##             Sensitivity : 0.99167         
+##             Specificity : 0.06755         
+##          Pos Pred Value : 0.38678         
+##          Neg Pred Value : 0.93182         
+##              Prevalence : 0.37229         
+##          Detection Rate : 0.36918         
+##    Detection Prevalence : 0.95450         
+##       Balanced Accuracy : 0.52961         
+##                                           
+##        'Positive' Class : 1               
+## 
+\end{verbatim}
+
+Aufgrund des niedrigen Schwellenwertes, ist die Genauigkeit (Accuracy)
+gering. Dafür weist die balanzierte Genauigkeit (Balanced Accuracy)
+einen höheren Wert als die klassische Genauigkeit auf. Es wird
+tendenziell erhöht auf eine Abwanderung der Mitarbeiter:innen
+klassifiziert. Dabei ist die geringe Spezifizität auf die hohe Zahl an
+FP-klassifizierten Werten zurückzuführen. Im Anwendungsfall ist dies
+nicht von Nachteil, da besonders FN-Klassifikationen vermieden werden
+sollten. Um dies aktiv in die Modellierung zu integrieren sollen die mit
+den Fehlklassifikationen verbundenen Kosten in die Betrachtung mit
+einbezogen werden.
+
+\hypertarget{kosten-fuxfcr-fehlklassifikationen}{%
+\subsection{Kosten für
+Fehlklassifikationen}\label{kosten-fuxfcr-fehlklassifikationen}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Kosten aufgrund von Zeit für Manager:in und Mitarbeiter:in sowie zusätzliche Trainings{-} oder Gehaltskosten}
+\NormalTok{cost\_FP }\OtherTok{\textless{}{-}} \DecValTok{500}  
+\CommentTok{\#Kosten für neues Recruiting (Suchauftrag, Recruitingaufwand wie Planung, Gespräche, Onboarding)}
+\NormalTok{cost\_FN }\OtherTok{\textless{}{-}} \DecValTok{3000}
+
+\NormalTok{matrix\_overview\_cost }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{3000}\NormalTok{,}\DecValTok{500}\NormalTok{,}\DecValTok{0}\NormalTok{), }\AttributeTok{nrow=}\DecValTok{2}\NormalTok{)}
+\FunctionTok{colnames}\NormalTok{(matrix\_overview\_cost) }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"Mitarbeiter:in geht"}\NormalTok{, }\StringTok{"Mitarbeiter:in bleibt"}\NormalTok{)}
+\FunctionTok{rownames}\NormalTok{(matrix\_overview\_cost) }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"Vorhersage Mitarbeiter:in geht"}\NormalTok{, }\StringTok{"Vorhersage Mitarbeiter:in bleibt"}\NormalTok{)}
+\NormalTok{matrix\_overview\_cost}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                                  Mitarbeiter:in geht Mitarbeiter:in bleibt
+## Vorhersage Mitarbeiter:in geht                     0                   500
+## Vorhersage Mitarbeiter:in bleibt                3000                     0
+\end{verbatim}
+
+\hypertarget{optimierung-mit-kostenfunktion}{%
+\subsection{Optimierung mit
+Kostenfunktion}\label{optimierung-mit-kostenfunktion}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{pred\_class }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(x, threshold)\{}
+  \FunctionTok{ifelse}\NormalTok{(x }\SpecialCharTok{\textless{}}\NormalTok{ threshold,}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{)}
+\NormalTok{\}}
+
+\NormalTok{cost }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(prob, actual,threshold2, cost\_FN\_func, cost\_FP\_func)\{}
+\NormalTok{    predicted\_automate2 }\OtherTok{\textless{}{-}} \FunctionTok{pred\_class}\NormalTok{(prob,threshold2)}
+\NormalTok{    count\_FN }\OtherTok{\textless{}{-}} \FunctionTok{sum}\NormalTok{(predicted\_automate2 }\SpecialCharTok{==} \DecValTok{0} \SpecialCharTok{\&}\NormalTok{ actual }\SpecialCharTok{==} \StringTok{"1"}\NormalTok{)}
+\NormalTok{    count\_FP }\OtherTok{\textless{}{-}} \FunctionTok{sum}\NormalTok{(predicted\_automate2 }\SpecialCharTok{==} \DecValTok{1} \SpecialCharTok{\&}\NormalTok{ actual }\SpecialCharTok{==} \StringTok{"0"}\NormalTok{)}
+\NormalTok{    cost }\OtherTok{\textless{}{-}}\NormalTok{ count\_FN }\SpecialCharTok{*}\NormalTok{ cost\_FN\_func }\SpecialCharTok{+}\NormalTok{ count\_FP }\SpecialCharTok{*}\NormalTok{ cost\_FP\_func}
+    \FunctionTok{return}\NormalTok{ (cost)}
+\NormalTok{\}}
+
+\NormalTok{threshold\_input\_rpart }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\FloatTok{0.05}\NormalTok{, }\FloatTok{0.1}\NormalTok{, }\FloatTok{0.15}\NormalTok{, }\FloatTok{0.16}\NormalTok{, }\FloatTok{0.17}\NormalTok{, }\FloatTok{0.2}\NormalTok{, }\FloatTok{0.23}\NormalTok{, }\FloatTok{0.24}\NormalTok{, }\FloatTok{0.25}\NormalTok{,}
+                          \FloatTok{0.26}\NormalTok{, }\FloatTok{0.3}\NormalTok{, }\FloatTok{0.35}\NormalTok{, }\FloatTok{0.45}\NormalTok{, }\FloatTok{0.7}\NormalTok{) }
+
+\NormalTok{i }\OtherTok{\textless{}{-}} \DecValTok{1}
+\NormalTok{costs\_rpart }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{()}
+
+\ControlFlowTok{while}\NormalTok{ (i }\SpecialCharTok{\textless{}} \FunctionTok{length}\NormalTok{(threshold\_input\_rpart)}\SpecialCharTok{+}\DecValTok{1}\NormalTok{) \{}
+\NormalTok{    costs\_rpart[[(}\FunctionTok{length}\NormalTok{(costs\_rpart) }\SpecialCharTok{+}\DecValTok{1}\NormalTok{)]] }\OtherTok{\textless{}{-}} \FunctionTok{cost}\NormalTok{(test\_rpart}\SpecialCharTok{$}\NormalTok{prob, test\_rpart}\SpecialCharTok{$}\NormalTok{EmployeeChurned, }
+\NormalTok{                                         threshold\_input\_rpart[i], cost\_FN, cost\_FP)}
+\NormalTok{    i }\OtherTok{\textless{}{-}}\NormalTok{ i}\SpecialCharTok{+}\DecValTok{1}
+\NormalTok{\}}
+
+\NormalTok{cost\_matrix\_rpart }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(}\FunctionTok{c}\NormalTok{(threshold\_input\_rpart,costs\_rpart),}\AttributeTok{nrow=}\FunctionTok{length}\NormalTok{(threshold\_input\_rpart))}
+\FunctionTok{colnames}\NormalTok{(cost\_matrix\_rpart) }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"Threshold"}\NormalTok{, }\StringTok{"Kosten in Euro"}\NormalTok{)}
+\NormalTok{cost\_matrix\_rpart}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##       Threshold Kosten in Euro
+##  [1,] 0.05      303500        
+##  [2,] 0.1       288500        
+##  [3,] 0.15      292000        
+##  [4,] 0.16      292000        
+##  [5,] 0.17      292000        
+##  [6,] 0.2       292000        
+##  [7,] 0.23      292000        
+##  [8,] 0.24      292000        
+##  [9,] 0.25      292000        
+## [10,] 0.26      292000        
+## [11,] 0.3       292000        
+## [12,] 0.35      703500        
+## [13,] 0.45      809500        
+## [14,] 0.7       1002000
+\end{verbatim}
+
+Mit Betrachtung der Kosten kann der optimale Threshold für das Modell
+festgelegt werden, der für die Vorhersagen eingesetzt werden sollte. Es
+wurde der höchst mögliche Threshold bei den geringsten Kosten gewhählt,
+um ein balanzierteres Ergebnis zu erreichen.
+
+\hypertarget{modellguxfcte-mit-optimiertem-threshold-anhand-der-konfusionsmatrix-bestimmen}{%
+\subsection{Modellgüte mit optimiertem Threshold anhand der
+Konfusionsmatrix
+bestimmen}\label{modellguxfcte-mit-optimiertem-threshold-anhand-der-konfusionsmatrix-bestimmen}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{threshold\_rpart\_opti }\OtherTok{\textless{}{-}} \FloatTok{0.17}
+
+\NormalTok{test\_rpart}\SpecialCharTok{$}\NormalTok{predict\_rpart\_opti }\OtherTok{\textless{}{-}}\FunctionTok{classify}\NormalTok{(test\_rpart}\SpecialCharTok{$}\NormalTok{prob, threshold\_rpart\_opti)}
+
+\FunctionTok{confusionMatrix}\NormalTok{(}\FunctionTok{factor}\NormalTok{(test\_rpart}\SpecialCharTok{$}\NormalTok{predict\_rpart\_opti), }\FunctionTok{factor}\NormalTok{(test\_rpart}\SpecialCharTok{$}\NormalTok{EmployeeChurned),}
+                \AttributeTok{positive =} \StringTok{"1"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction   0   1
+##          0  41   3
+##          1 566 357
+##                                           
+##                Accuracy : 0.4116          
+##                  95% CI : (0.3804, 0.4433)
+##     No Information Rate : 0.6277          
+##     P-Value [Acc > NIR] : 1               
+##                                           
+##                   Kappa : 0.0449          
+##                                           
+##  Mcnemar's Test P-Value : <2e-16          
+##                                           
+##             Sensitivity : 0.99167         
+##             Specificity : 0.06755         
+##          Pos Pred Value : 0.38678         
+##          Neg Pred Value : 0.93182         
+##              Prevalence : 0.37229         
+##          Detection Rate : 0.36918         
+##    Detection Prevalence : 0.95450         
+##       Balanced Accuracy : 0.52961         
+##                                           
+##        'Positive' Class : 1               
+## 
+\end{verbatim}
+
+Es werden fast alle Mitarbeiter:innen erkannt, die das Unternehmen
+verlassen. Allerdings ist die FP-Klassifikation sehr hoch. Eine
+Spezifizität von unter 0,5 würde für einen hohen Aufwand bei Managern
+führen und nicht unbedingt für deren Zuspruch sorgen. Doch aufgrund der
+hohen Sensitivität kann eine noch gute balanzierte Genauigkeit von dem
+Modell bei Anwendung auf die Testdaten erreicht werden.
+
+\hypertarget{visualisierung-des-entscheidungsbaumes-wichtigkeit-der-features}{%
+\subsection{Visualisierung des Entscheidungsbaumes (Wichtigkeit der
+Features)}\label{visualisierung-des-entscheidungsbaumes-wichtigkeit-der-features}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{printcp}\NormalTok{(rpart)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Classification tree:
+## rpart(formula = EmployeeChurned ~ ., data = train, x = TRUE, 
+##     y = TRUE, control = rpart.control(cp = best_cp))
+## 
+## Variables actually used in tree construction:
+## [1] Age              Month.Of.Service
+## 
+## Root node error: 1093/2902 = 0.37664
+## 
+## n= 2902 
+## 
+##          CP nsplit rel error  xerror     xstd
+## 1 0.0167734      0   1.00000 1.00000 0.023881
+## 2 0.0137237      4   0.92864 0.98079 0.023788
+## 3 0.0118939      5   0.91491 0.97347 0.023751
+## 4 0.0100640      9   0.86368 0.96340 0.023698
+## 5 0.0073193     10   0.85361 0.88747 0.023250
+## 6 0.0050000     11   0.84629 0.88015 0.023202
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{prp}\NormalTok{(rpart)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Abgabe_Gruppe_C_files/figure-latex/unnamed-chunk-14-1.pdf}
+Den stärksten Einflussfaktor bildet der Funktionsbereich in dem die
+Mitarbeiter:in zum letzten aktiven Zeitpunkt tätig war. GB Management,
+Human Resources GBS und Safety sind dabei die genannten Faktoren. Dabei
+handelt es sich um erst kürzlich aufgebaute Einheiten, was die kurze
+Zugehörigkeit der Mitarbeiter:innen und geringe Abwanderung beschreibt.
+In zukünftigen Anpassungen des Modells auf neue Daten sollte dies
+schrittweise an die übrigen Funktionsbereiche angeglichen werden. Die
+nächste Spaltung erfolgt durch das Merkmal Befristung. Auch die Dauer
+der Unternehmenszugehörigkeit sowie der Zeitpunkt seit der letzten
+Entwicklung kommen zum Einsatz, während das Alter und die Gehaltsstufe
+in den darauffolgenden Splits relevant werden.
+
+Nicht zum Einsatz kommen: ``Part Time Mark'', ``NonExempt'',
+``start\_NonExempt'', ``development to exempt'', ``decrease\_Category'',
+``Nationality\_Classification'', ``Paybands''
+
+\hypertarget{h2o-distributed-random-forest-drf}{%
+\subsection{H2O Distributed Random Forest
+(DRF)}\label{h2o-distributed-random-forest-drf}}
+
+Im DRF werden eine Reihe an Bäumen erzeugt. Jeder dieser lernt basierend
+auf einen Teil des Datensets (Spalten und Reihen). Für die finale
+Vorhersage wird dann der Durchschnitt aus den Vorhersagen der einzelnen
+Bäume berechnet. Das verringert die Varianz. Um robuste Bäume zu
+erhalten werden darüber hinaus auf jedem Level je Baum zufällig die
+betrachteten Spalten (Features) gewählt. Die Anzahl der verwendeten
+Spalten wird dabei durch die Wurzel aus der Gesamtanzahl der Spalten
+definiert.
+
+\hypertarget{h2o-distributed-random-forest-und-grid-search-tuning-hyperparameter}{%
+\subsection{H2O Distributed Random Forest und Grid-Search (Tuning
+Hyperparameter)}\label{h2o-distributed-random-forest-und-grid-search-tuning-hyperparameter}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{predictors\_drf }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(factorCols, }\StringTok{"Month Of Service"}\NormalTok{, }\StringTok{"Age"}\NormalTok{, }\StringTok{"Months Since Last Development"}\NormalTok{)}
+\NormalTok{target\_drf }\OtherTok{\textless{}{-}} \StringTok{"EmployeeChurned"}
+
+\CommentTok{\#Hyperparameter}
+\NormalTok{drf\_params }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{( }\AttributeTok{balance\_classes =} \FunctionTok{c}\NormalTok{(}\ConstantTok{TRUE}\NormalTok{, }\ConstantTok{FALSE}\NormalTok{),}
+                    \AttributeTok{ntrees =} \FunctionTok{c}\NormalTok{(}\DecValTok{30}\NormalTok{, }\DecValTok{50}\NormalTok{, }\DecValTok{70}\NormalTok{),}
+                    \AttributeTok{max\_depth =} \FunctionTok{c}\NormalTok{(}\DecValTok{10}\NormalTok{, }\DecValTok{15}\NormalTok{, }\DecValTok{20}\NormalTok{, }\DecValTok{25}\NormalTok{),}
+                    \AttributeTok{min\_split\_improvement =} \FunctionTok{c}\NormalTok{(}\FloatTok{0.001}\NormalTok{, }\FloatTok{0.0001}\NormalTok{, }\FloatTok{0.00001}\NormalTok{, }\FloatTok{0.000001}\NormalTok{,}
+                                              \FloatTok{0.0000001}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{hyperparameter}{%
+\subsection{Hyperparameter}\label{hyperparameter}}
+
+balance classes - default False ntrees - default 50 max\_depth - default
+20 Min\_split\_improvement - default 0,00001
+
+\hypertarget{hyperparameterwahl}{%
+\subsection{Hyperparameterwahl}\label{hyperparameterwahl}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#search\_criteria strategy “Cartesian”}
+\NormalTok{h2oGrid\_drf }\OtherTok{\textless{}{-}} \FunctionTok{h2o.grid}\NormalTok{(}\StringTok{"drf"}\NormalTok{, }\AttributeTok{x =}\NormalTok{ predictors\_drf, }\AttributeTok{y =}\NormalTok{ target\_drf,}
+            \AttributeTok{grid\_id =} \StringTok{"h2oGrid\_drf"}\NormalTok{,}
+            \AttributeTok{training\_frame =}\NormalTok{ trainH2O,}
+            \AttributeTok{hyper\_params =}\NormalTok{ drf\_params,}
+            \AttributeTok{seed =} \DecValTok{1234}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning in .verify_dataxy(params$training_frame, x, y): removing response
+## variable from the explanatory variables
+\end{verbatim}
+
+\begin{verbatim}
+##   |                                                                              |                                                                      |   0%  |                                                                              |======================================================================| 100%
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Auswahl der optimalen Parameter anhand der AUC der einzelnen Modelle}
+\NormalTok{h2oGridPerf\_drf }\OtherTok{\textless{}{-}} \FunctionTok{h2o.getGrid}\NormalTok{(}\AttributeTok{grid\_id =} \StringTok{"h2oGrid\_drf"}\NormalTok{,}
+                           \AttributeTok{sort\_by =} \StringTok{"auc"}\NormalTok{,}
+                           \AttributeTok{decreasing =} \ConstantTok{TRUE}\NormalTok{)}
+
+\CommentTok{\# Güte im Trainingsset}
+\CommentTok{\#summary(h2oGridPerf\_drf)}
+\NormalTok{best\_drf }\OtherTok{\textless{}{-}} \FunctionTok{h2o.getModel}\NormalTok{(h2oGridPerf\_drf}\SpecialCharTok{@}\NormalTok{model\_ids[[}\DecValTok{1}\NormalTok{]])}
+\FunctionTok{h2o.performance}\NormalTok{(best\_drf, trainH2O)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## H2OBinomialMetrics: drf
+## 
+## MSE:  0.04435438
+## RMSE:  0.2106048
+## LogLoss:  0.1953865
+## Mean Per-Class Error:  0.01392376
+## AUC:  0.9985955
+## AUCPR:  0.9977602
+## Gini:  0.9971909
+## R^2:  0.8083469
+## 
+## Confusion Matrix (vertical: actual; across: predicted) for F1-optimal threshold:
+##           0    1    Error      Rate
+## 0      1822   27 0.014602  =27/1849
+## 1        14 1043 0.013245  =14/1057
+## Totals 1836 1070 0.014109  =41/2906
+## 
+## Maximum Metrics: Maximum metrics at their respective thresholds
+##                         metric threshold       value idx
+## 1                       max f1  0.420898    0.980724 202
+## 2                       max f2  0.370362    0.985005 215
+## 3                 max f0point5  0.471929    0.983054 190
+## 4                 max accuracy  0.425813    0.985891 201
+## 5                max precision  0.990591    1.000000   0
+## 6                   max recall  0.146652    1.000000 304
+## 7              max specificity  0.990591    1.000000   0
+## 8             max absolute_mcc  0.420898    0.969644 202
+## 9   max min_per_class_accuracy  0.420898    0.985398 202
+## 10 max mean_per_class_accuracy  0.420898    0.986076 202
+## 11                     max tns  0.990591 1849.000000   0
+## 12                     max fns  0.990591 1056.000000   0
+## 13                     max fps  0.000547 1849.000000 399
+## 14                     max tps  0.146652 1057.000000 304
+## 15                     max tnr  0.990591    1.000000   0
+## 16                     max fnr  0.990591    0.999054   0
+## 17                     max fpr  0.000547    1.000000 399
+## 18                     max tpr  0.146652    1.000000 304
+## 
+## Gains/Lift Table: Extract with `h2o.gainsLift(<model>, <data>)` or `h2o.gainsLift(<model>, valid=<T/F>, xval=<T/F>)`
+\end{verbatim}
+
+\hypertarget{guxfcte-anhand-threshold-basierend-auf-f1-metrik}{%
+\subsection{Güte anhand Threshold basierend auf
+F1-Metrik}\label{guxfcte-anhand-threshold-basierend-auf-f1-metrik}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Anwendung auf Testdatenset}
+\NormalTok{best\_drf\_perf }\OtherTok{\textless{}{-}} \FunctionTok{h2o.performance}\NormalTok{(}\AttributeTok{model =}\NormalTok{ best\_drf,}
+                                  \AttributeTok{newdata =}\NormalTok{ testH2O)}
+\NormalTok{best\_drf\_perf}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## H2OBinomialMetrics: drf
+## 
+## MSE:  0.178343
+## RMSE:  0.4223067
+## LogLoss:  0.5276054
+## Mean Per-Class Error:  0.2560927
+## AUC:  0.8145365
+## AUCPR:  0.7497429
+## Gini:  0.6290729
+## R^2:  0.2634024
+## 
+## Confusion Matrix (vertical: actual; across: predicted) for F1-optimal threshold:
+##          0   1    Error      Rate
+## 0      394 173 0.305115  =173/567
+## 1       82 314 0.207071   =82/396
+## Totals 476 487 0.264798  =255/963
+## 
+## Maximum Metrics: Maximum metrics at their respective thresholds
+##                         metric threshold      value idx
+## 1                       max f1  0.284329   0.711212 243
+## 2                       max f2  0.177830   0.815145 302
+## 3                 max f0point5  0.547362   0.697950 124
+## 4                 max accuracy  0.323775   0.744548 222
+## 5                max precision  0.968650   1.000000   0
+## 6                   max recall  0.012103   1.000000 393
+## 7              max specificity  0.968650   1.000000   0
+## 8             max absolute_mcc  0.313084   0.483823 228
+## 9   max min_per_class_accuracy  0.315160   0.742504 227
+## 10 max mean_per_class_accuracy  0.313084   0.744990 228
+## 11                     max tns  0.968650 567.000000   0
+## 12                     max fns  0.968650 395.000000   0
+## 13                     max fps  0.000429 567.000000 399
+## 14                     max tps  0.012103 396.000000 393
+## 15                     max tnr  0.968650   1.000000   0
+## 16                     max fnr  0.968650   0.997475   0
+## 17                     max fpr  0.000429   1.000000 399
+## 18                     max tpr  0.012103   1.000000 393
+## 
+## Gains/Lift Table: Extract with `h2o.gainsLift(<model>, <data>)` or `h2o.gainsLift(<model>, valid=<T/F>, xval=<T/F>)`
+\end{verbatim}
+
+Der Threshold wird automatisch auf die Metrik F1 optimiert.
+
+Ein deutlich niedriger Threshold (F1) als auf dem Trainingsdatenset ist
+zu erkennen sowie eine hohe FP-Klassifizierungsrate.
+
+\hypertarget{auswahl-threshold-anhand-der-roc-kurve}{%
+\subsection{Auswahl Threshold anhand der
+ROC-Kurve}\label{auswahl-threshold-anhand-der-roc-kurve}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Anwendung auf Testset}
+\NormalTok{predictBestGrid\_drf }\OtherTok{\textless{}{-}} \FunctionTok{h2o.predict}\NormalTok{(best\_drf, }\AttributeTok{newdata =}\NormalTok{ testH2O)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   |                                                                              |                                                                      |   0%  |                                                                              |======================================================================| 100%
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Umwandlung in generic dataframe }
+\NormalTok{drfPrediciton\_df }\OtherTok{\textless{}{-}} \FunctionTok{as.data.frame}\NormalTok{(predictBestGrid\_drf)}
+\NormalTok{testH2O\_asdf\_drf }\OtherTok{\textless{}{-}} \FunctionTok{as.data.frame}\NormalTok{(testH2O)}
+\NormalTok{testH2O\_asdf\_drf}\SpecialCharTok{$}\NormalTok{prob }\OtherTok{\textless{}{-}}\NormalTok{ drfPrediciton\_df}\SpecialCharTok{$}\NormalTok{p1}
+
+
+\NormalTok{testH2O\_asdf\_drf}\SpecialCharTok{$}\NormalTok{EmployeeChurned }\OtherTok{\textless{}{-}} \FunctionTok{as.numeric}\NormalTok{(}\FunctionTok{as.character}\NormalTok{(testH2O\_asdf\_drf}\SpecialCharTok{$}\NormalTok{EmployeeChurned))}
+
+\NormalTok{pred\_rocr\_drf }\OtherTok{\textless{}{-}} \FunctionTok{prediction}\NormalTok{(testH2O\_asdf\_drf}\SpecialCharTok{$}\NormalTok{prob, testH2O\_asdf\_drf}\SpecialCharTok{$}\NormalTok{EmployeeChurned)}
+\NormalTok{perf\_rocr\_drf }\OtherTok{\textless{}{-}} \FunctionTok{performance}\NormalTok{(pred\_rocr\_drf, }\StringTok{"tpr"}\NormalTok{, }\StringTok{"fpr"}\NormalTok{ )}
+
+\FunctionTok{performance}\NormalTok{(pred\_rocr\_drf, }\StringTok{"auc"}\NormalTok{)}\SpecialCharTok{@}\NormalTok{y.values}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [[1]]
+## [1] 0.814601
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Darstellung der ROC{-}Kurve}
+\FunctionTok{plot}\NormalTok{(perf\_rocr\_drf, }\AttributeTok{col=}\StringTok{"blue"}\NormalTok{)}
+\FunctionTok{abline}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{)}
+\FunctionTok{abline}\NormalTok{(}\AttributeTok{v=}\FloatTok{0.22}\NormalTok{, }\AttributeTok{col=}\StringTok{"red"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Abgabe_Gruppe_C_files/figure-latex/unnamed-chunk-18-1.pdf}
+Die ROC-Kurve verläuft deutlich oberhalb der Diagonalen. Bei Anwendung
+des Modells wird somit eine höhere Vorhersagequalität erreicht, als mit
+reinem Raten.
+
+\hypertarget{auswahl-threshold-aus-roc-kurve-ellenbogenpunkt}{%
+\subsection{Auswahl Threshold aus ROC-Kurve
+(``Ellenbogenpunkt'')}\label{auswahl-threshold-aus-roc-kurve-ellenbogenpunkt}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{threshold\_drf }\OtherTok{\textless{}{-}} \FloatTok{0.22}
+\CommentTok{\#Ein Ellenbogenpunkt ist ablesbar und wird tendenziell eher niedriger gewählt,}
+\CommentTok{\#um die Anzahl an FP{-}Klassifikationen zu minimieren.}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{modellguxfcte-anhand-der-konfusionsmatrix-bestimmen-1}{%
+\subsection{Modellgüte anhand der Konfusionsmatrix
+bestimmen}\label{modellguxfcte-anhand-der-konfusionsmatrix-bestimmen-1}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{testH2O\_asdf\_drf}\SpecialCharTok{$}\NormalTok{predict }\OtherTok{\textless{}{-}}\FunctionTok{classify}\NormalTok{(testH2O\_asdf\_drf}\SpecialCharTok{$}\NormalTok{prob, threshold\_drf)}
+
+\FunctionTok{confusionMatrix}\NormalTok{(}\FunctionTok{factor}\NormalTok{(testH2O\_asdf\_drf}\SpecialCharTok{$}\NormalTok{predict), }\FunctionTok{factor}\NormalTok{(testH2O\_asdf\_drf}\SpecialCharTok{$}\NormalTok{EmployeeChurned),}
+                \AttributeTok{positive =} \StringTok{"1"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction   0   1
+##          0 326  55
+##          1 241 341
+##                                           
+##                Accuracy : 0.6926          
+##                  95% CI : (0.6624, 0.7217)
+##     No Information Rate : 0.5888          
+##     P-Value [Acc > NIR] : 1.735e-11       
+##                                           
+##                   Kappa : 0.4072          
+##                                           
+##  Mcnemar's Test P-Value : < 2.2e-16       
+##                                           
+##             Sensitivity : 0.8611          
+##             Specificity : 0.5750          
+##          Pos Pred Value : 0.5859          
+##          Neg Pred Value : 0.8556          
+##              Prevalence : 0.4112          
+##          Detection Rate : 0.3541          
+##    Detection Prevalence : 0.6044          
+##       Balanced Accuracy : 0.7180          
+##                                           
+##        'Positive' Class : 1               
+## 
+\end{verbatim}
+
+Im Vergleich zur Threshold-Wahl basierend auf der Maximierung des
+F1-Scores ist die Genauigkeit um geringer, dafür ist die balanzierte
+Genauigkeit nur geringfügig gesunken. Demgegenüber ist die Sensitivität
+stark angestiegen, was im Sinne des Use Cases wünschenswert ist, auch
+wenn dafür die Spezifizität gesunken ist.
+
+\hypertarget{optimierung-mit-kostenfunktion-1}{%
+\subsection{Optimierung mit
+Kostenfunktion}\label{optimierung-mit-kostenfunktion-1}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{pred\_class }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(x, threshold)\{}
+  \FunctionTok{ifelse}\NormalTok{(x }\SpecialCharTok{\textless{}}\NormalTok{ threshold,}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{)}
+\NormalTok{\}}
+
+\NormalTok{cost }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(prob, actual,threshold2, cost\_FN\_func, cost\_FP\_func)\{}
+\NormalTok{    predicted\_automate2 }\OtherTok{\textless{}{-}} \FunctionTok{pred\_class}\NormalTok{(prob,threshold2)}
+\NormalTok{    count\_FN }\OtherTok{\textless{}{-}} \FunctionTok{sum}\NormalTok{(predicted\_automate2 }\SpecialCharTok{==} \DecValTok{0} \SpecialCharTok{\&}\NormalTok{ actual }\SpecialCharTok{==} \StringTok{"1"}\NormalTok{)}
+\NormalTok{    count\_FP }\OtherTok{\textless{}{-}} \FunctionTok{sum}\NormalTok{(predicted\_automate2 }\SpecialCharTok{==} \DecValTok{1} \SpecialCharTok{\&}\NormalTok{ actual }\SpecialCharTok{==} \StringTok{"0"}\NormalTok{)}
+\NormalTok{    cost }\OtherTok{\textless{}{-}}\NormalTok{ count\_FN }\SpecialCharTok{*}\NormalTok{ cost\_FN\_func }\SpecialCharTok{+}\NormalTok{ count\_FP }\SpecialCharTok{*}\NormalTok{ cost\_FP\_func}
+    \FunctionTok{return}\NormalTok{ (cost)}
+\NormalTok{\}}
+
+\NormalTok{threshold\_input\_drf }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\FloatTok{0.05}\NormalTok{, }\FloatTok{0.1}\NormalTok{, }\FloatTok{0.14}\NormalTok{, }\FloatTok{0.15}\NormalTok{, }\FloatTok{0.16}\NormalTok{, }\FloatTok{0.17}\NormalTok{, }\FloatTok{0.18}\NormalTok{,}
+                         \FloatTok{0.2}\NormalTok{, }\FloatTok{0.23}\NormalTok{, }\FloatTok{0.24}\NormalTok{, }\FloatTok{0.25}\NormalTok{,}
+                         \FloatTok{0.3}\NormalTok{, }\FloatTok{0.35}\NormalTok{, }\FloatTok{0.45}\NormalTok{, }\FloatTok{0.7}\NormalTok{) }
+
+\NormalTok{i }\OtherTok{\textless{}{-}} \DecValTok{1}
+\NormalTok{costs\_drf }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{()}
+
+\ControlFlowTok{while}\NormalTok{ (i }\SpecialCharTok{\textless{}} \FunctionTok{length}\NormalTok{(threshold\_input\_drf)}\SpecialCharTok{+}\DecValTok{1}\NormalTok{) \{}
+\NormalTok{    costs\_drf[[(}\FunctionTok{length}\NormalTok{(costs\_drf) }\SpecialCharTok{+}\DecValTok{1}\NormalTok{)]] }\OtherTok{\textless{}{-}} \FunctionTok{cost}\NormalTok{(testH2O\_asdf\_drf}\SpecialCharTok{$}\NormalTok{prob, }
+\NormalTok{                                        testH2O\_asdf\_drf}\SpecialCharTok{$}\NormalTok{EmployeeChurned, }
+\NormalTok{                                        threshold\_input\_drf[i], cost\_FN, cost\_FP)}
+\NormalTok{    i }\OtherTok{\textless{}{-}}\NormalTok{ i}\SpecialCharTok{+}\DecValTok{1}
+\NormalTok{\}}
+
+\NormalTok{cost\_drf\_matrix }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(}\FunctionTok{c}\NormalTok{(threshold\_input\_drf,costs\_drf),}\AttributeTok{nrow=}\FunctionTok{length}\NormalTok{(threshold\_input\_drf))}
+\FunctionTok{colnames}\NormalTok{(cost\_drf\_matrix) }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"Threshold"}\NormalTok{, }\StringTok{"Kosten in Euro"}\NormalTok{)}
+\NormalTok{cost\_drf\_matrix}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##       Threshold Kosten in Euro
+##  [1,] 0.05      243000        
+##  [2,] 0.1       235500        
+##  [3,] 0.14      234500        
+##  [4,] 0.15      235500        
+##  [5,] 0.16      242000        
+##  [6,] 0.17      240000        
+##  [7,] 0.18      242000        
+##  [8,] 0.2       268500        
+##  [9,] 0.23      287000        
+## [10,] 0.24      288500        
+## [11,] 0.25      301500        
+## [12,] 0.3       365000        
+## [13,] 0.35      459000        
+## [14,] 0.45      616000        
+## [15,] 0.7       858000
+\end{verbatim}
+
+Mit Betrachtung der Kosten liegt der optimale Threshold für das Model
+bei 0,15. Aufgrund der geringen Unterschiede wäre auch 0,17 als
+Threshold sinnvoll und sollte für Vorhersagen eingesetzt werden.
+
+\hypertarget{modellguxfcte-mit-optimiertem-threshold-anhand-der-konfusionsmatrix-bestimmen-1}{%
+\subsection{Modellgüte mit optimiertem Threshold anhand der
+Konfusionsmatrix
+bestimmen}\label{modellguxfcte-mit-optimiertem-threshold-anhand-der-konfusionsmatrix-bestimmen-1}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{threshold\_drf\_opti }\OtherTok{\textless{}{-}} \FloatTok{0.17}
+
+\NormalTok{testH2O\_asdf\_drf}\SpecialCharTok{$}\NormalTok{predict\_opti }\OtherTok{\textless{}{-}}\FunctionTok{classify}\NormalTok{(testH2O\_asdf\_drf}\SpecialCharTok{$}\NormalTok{prob, threshold\_drf\_opti)}
+
+\FunctionTok{confusionMatrix}\NormalTok{(}\FunctionTok{factor}\NormalTok{(testH2O\_asdf\_drf}\SpecialCharTok{$}\NormalTok{predict\_opti), }\FunctionTok{factor}\NormalTok{(testH2O\_asdf\_drf}\SpecialCharTok{$}\NormalTok{EmployeeChurned),}
+                \AttributeTok{positive =} \StringTok{"1"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction   0   1
+##          0 261  29
+##          1 306 367
+##                                           
+##                Accuracy : 0.6521          
+##                  95% CI : (0.6211, 0.6822)
+##     No Information Rate : 0.5888          
+##     P-Value [Acc > NIR] : 3.214e-05       
+##                                           
+##                   Kappa : 0.3502          
+##                                           
+##  Mcnemar's Test P-Value : < 2.2e-16       
+##                                           
+##             Sensitivity : 0.9268          
+##             Specificity : 0.4603          
+##          Pos Pred Value : 0.5453          
+##          Neg Pred Value : 0.9000          
+##              Prevalence : 0.4112          
+##          Detection Rate : 0.3811          
+##    Detection Prevalence : 0.6989          
+##       Balanced Accuracy : 0.6935          
+##                                           
+##        'Positive' Class : 1               
+## 
+\end{verbatim}
+
+Verglichen mit vorher eingesetzten Thresholds ist dies der niedrigste,
+da eine FN-Klassifikation stärker bestraft wird, als eine
+FP-Klassifikation. Das bestätigt auch die hohe Sensitivität. Dadurch
+sinkt die Genauigkeit sowie die balanzierte Genauigkeit, wobei letztere
+größer ist und verglichen zum Ausgangswert (F1-Score-optimierter
+Threshold) nur geringfügig niedriger ist. Die hohe Anzahl an
+FP-Klassifizierten Werte sollten im Rahmen des Use-Cases kritisch
+betrachtet werden, da diese Daten zur Unterstützung von Managern gelten
+soll und mit diesem Ergebnis viel Arbeit für diese Nutzergruppe
+entstehen würde.
+
+\hypertarget{wichtigkeit-der-features}{%
+\subsection{Wichtigkeit der Features}\label{wichtigkeit-der-features}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{varimp\_drf }\OtherTok{\textless{}{-}} \FunctionTok{h2o.varimp}\NormalTok{(best\_drf) }
+\NormalTok{varimp\_drf}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Variable Importances: 
+##                            variable relative_importance scaled_importance
+## 1                 decrease_Category         6657.850586          1.000000
+## 2                  Month Of Service         6012.672363          0.903095
+## 3     Months Since Last Development         5413.939941          0.813166
+## 4                               Age         4984.118652          0.748608
+## 5                          Paybands         2721.566895          0.408776
+## 6        Nationality_Classification         1625.058472          0.244082
+## 7                 TemporaryPersonel         1352.042358          0.203075
+## 8               start_contract type         1061.703003          0.159466
+## 9  Vertical_Horizontal_Developments         1028.706299          0.154510
+## 10                           Gender          839.325317          0.126066
+## 11                   Part Time Mark          511.457489          0.076820
+## 12             start_Part time mark          399.696045          0.060034
+## 13                        NonExempt          271.078796          0.040716
+## 14            development to exempt          189.866058          0.028518
+## 15                  start_NonExempt          165.968216          0.024928
+##    percentage
+## 1    0.200326
+## 2    0.180914
+## 3    0.162899
+## 4    0.149966
+## 5    0.081888
+## 6    0.048896
+## 7    0.040681
+## 8    0.031945
+## 9    0.030952
+## 10   0.025254
+## 11   0.015389
+## 12   0.012026
+## 13   0.008156
+## 14   0.005713
+## 15   0.004994
+\end{verbatim}
+
+Wie im vorher eingesetzten Algorithmus (rpart) sind der
+Funktionsbereich, die Dauer der Zugehörigkeit, die Dauer seit letzter
+Entwciklung, das Alter sowie die Zuordnung in die Gehaltsbänder
+ausschlaggebend für die Vorhersage einer Mitarbeiter:innen-Abwanderung.
+Auffällig ist, dass die Zuordnung in Befristung (TemporaryPersonel) eine
+weniger wichtige Rolle als im Modell basierend auf dem rpart-Algorithmus
+einnimmt.
+
+\hypertarget{vergleich-rpart-und-h2o-distributed-random-forest}{%
+\subsection{Vergleich rpart und H2O Distributed Random
+Forest}\label{vergleich-rpart-und-h2o-distributed-random-forest}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{confusionMatrix}\NormalTok{(}\FunctionTok{factor}\NormalTok{(test\_rpart}\SpecialCharTok{$}\NormalTok{predict\_rpart), }\FunctionTok{factor}\NormalTok{(test\_rpart}\SpecialCharTok{$}\NormalTok{EmployeeChurned),}
+                \AttributeTok{positive =} \StringTok{"1"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction   0   1
+##          0  41   3
+##          1 566 357
+##                                           
+##                Accuracy : 0.4116          
+##                  95% CI : (0.3804, 0.4433)
+##     No Information Rate : 0.6277          
+##     P-Value [Acc > NIR] : 1               
+##                                           
+##                   Kappa : 0.0449          
+##                                           
+##  Mcnemar's Test P-Value : <2e-16          
+##                                           
+##             Sensitivity : 0.99167         
+##             Specificity : 0.06755         
+##          Pos Pred Value : 0.38678         
+##          Neg Pred Value : 0.93182         
+##              Prevalence : 0.37229         
+##          Detection Rate : 0.36918         
+##    Detection Prevalence : 0.95450         
+##       Balanced Accuracy : 0.52961         
+##                                           
+##        'Positive' Class : 1               
+## 
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{confusionMatrix}\NormalTok{(}\FunctionTok{factor}\NormalTok{(testH2O\_asdf\_drf}\SpecialCharTok{$}\NormalTok{predict\_opti), }\FunctionTok{factor}\NormalTok{(testH2O\_asdf\_drf}\SpecialCharTok{$}\NormalTok{EmployeeChurned),}
+                \AttributeTok{positive =} \StringTok{"1"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction   0   1
+##          0 261  29
+##          1 306 367
+##                                           
+##                Accuracy : 0.6521          
+##                  95% CI : (0.6211, 0.6822)
+##     No Information Rate : 0.5888          
+##     P-Value [Acc > NIR] : 3.214e-05       
+##                                           
+##                   Kappa : 0.3502          
+##                                           
+##  Mcnemar's Test P-Value : < 2.2e-16       
+##                                           
+##             Sensitivity : 0.9268          
+##             Specificity : 0.4603          
+##          Pos Pred Value : 0.5453          
+##          Neg Pred Value : 0.9000          
+##              Prevalence : 0.4112          
+##          Detection Rate : 0.3811          
+##    Detection Prevalence : 0.6989          
+##       Balanced Accuracy : 0.6935          
+##                                           
+##        'Positive' Class : 1               
+## 
+\end{verbatim}
+
+Der Distributed Random Forest erzielt nicht nur allgemein eine größere
+AUC, auch die Genauigkeit (inklusive balanzierter Genauigkeit) sind in
+den optimierten Modellen deutlich höher. Gleicher Threshold nach
+Kostenfunktion(kann zufällig sein)
+
+\hypertarget{logistic-regression}{%
+\section{Logistic Regression}\label{logistic-regression}}
+
+\hypertarget{predictors-und-response}{%
+\subsection{Predictors und response}\label{predictors-und-response}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# zuerst die 6 Features auswählen, die die stärkste Abhängikeit nach den Trees haben}
+\NormalTok{predictors\_drf\_strong }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"decrease\_Category"}\NormalTok{,}
+                \StringTok{"Month Of Service"}\NormalTok{,}
+                \StringTok{"Months Since Last Development"}\NormalTok{,}
+                \StringTok{"Age"}\NormalTok{,}
+                \StringTok{"Paybands"}\NormalTok{,}
+                \StringTok{"Nationality\_Classification"}\NormalTok{)}
+\CommentTok{\# alle raw{-}Features, da H2O durch das setzen von alpha = 1 automatisch die besten Features auswählt}
+\NormalTok{predictors }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"Gender"}\NormalTok{,}
+                \StringTok{"Part Time Mark"}\NormalTok{,}
+                \StringTok{"TemporaryPersonel"}\NormalTok{,}
+                \StringTok{"development to exempt"}\NormalTok{,}
+                \StringTok{"Vertical\_Horizontal\_Developments"}\NormalTok{,}
+                \StringTok{"start\_contract type"}\NormalTok{,}
+                \StringTok{"start\_Part time mark"}\NormalTok{,}
+                \StringTok{"decrease\_Category"}\NormalTok{,}
+                \StringTok{"Nationality\_Classification"}\NormalTok{,}
+                \StringTok{"Month Of Service"}\NormalTok{,}
+                \StringTok{"Age"}\NormalTok{,}
+                \StringTok{"Months Since Last Development"}\NormalTok{,}
+                \StringTok{"NonExempt"}\NormalTok{,}
+                \StringTok{"Paybands"}\NormalTok{,}
+                \StringTok{"start\_NonExempt"}\NormalTok{)}
+\CommentTok{\# one{-}Hot}
+\NormalTok{predictors\_hot }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"Gender"}\NormalTok{,}
+                \StringTok{"TemporaryPersonel"}\NormalTok{,}
+                \StringTok{"Part Time Mark"}\NormalTok{,}
+                \StringTok{"NonExempt"}\NormalTok{,}
+                \StringTok{"start\_NonExempt"}\NormalTok{,}
+                \StringTok{"development to exempt"}\NormalTok{,}
+                \StringTok{"Vertical\_Horizontal\_Developments\_\textgreater{}= 3"}\NormalTok{,}
+                \StringTok{"Vertical\_Horizontal\_Developments\_0"}\NormalTok{,}
+                \StringTok{"Vertical\_Horizontal\_Developments\_1{-}2"}\NormalTok{,}
+                \StringTok{"start\_contract type\_apprentice"}\NormalTok{,}
+                \StringTok{"start\_contract type\_permanent staff"}\NormalTok{,}
+                \StringTok{"start\_contract type\_temporary personnel"}\NormalTok{,}
+                \StringTok{"start\_Part time mark"}\NormalTok{,}
+                \StringTok{"decrease\_Category\_Customer"}\NormalTok{,}
+                \StringTok{"decrease\_Category\_GB Management"}\NormalTok{,}
+                \StringTok{"decrease\_Category\_GBR/N"}\NormalTok{,}
+                \StringTok{"decrease\_Category\_GTU GD"}\NormalTok{,}
+                \StringTok{"decrease\_Category\_Human Resources GBS"}\NormalTok{,}
+                \StringTok{"decrease\_Category\_Intellectual Property"}\NormalTok{,}
+                \StringTok{"decrease\_Category\_IT Service CC"}\NormalTok{,}
+                \StringTok{"decrease\_Category\_Other"}\NormalTok{,}
+                \StringTok{"decrease\_Category\_People"}\NormalTok{,}
+                \StringTok{"decrease\_Category\_Planning \& Development"}\NormalTok{,}
+                \StringTok{"decrease\_Category\_Procurement Services {-} GP"}\NormalTok{,}
+                \StringTok{"decrease\_Category\_RAA/A Competence"}\NormalTok{,}
+                \StringTok{"decrease\_Category\_Safety"}\NormalTok{,}
+                \StringTok{"decrease\_Category\_Supplier \& Reporting"}\NormalTok{,}
+                \StringTok{"Nationality\_Classification\_EU"}\NormalTok{,}
+                \StringTok{"Nationality\_Classification\_German"}\NormalTok{,}
+                \StringTok{"Nationality\_Classification\_Other"}\NormalTok{,}
+                \StringTok{"Paybands\_A"}\NormalTok{,}
+                \StringTok{"Paybands\_B"}\NormalTok{,}
+                \StringTok{"Paybands\_C"}\NormalTok{,}
+                \StringTok{"Paybands\_D"}\NormalTok{,}
+                \StringTok{"Paybands\_E"}\NormalTok{,}
+                \StringTok{"Paybands\_F"}\NormalTok{,}
+                \StringTok{"Paybands\_G"}\NormalTok{,}
+                \StringTok{"Paybands\_H"}\NormalTok{,}
+                \StringTok{"Month Of Service"}\NormalTok{,}
+                \StringTok{"Age"}\NormalTok{,}
+                \StringTok{"Months Since Last Development"}\NormalTok{)}
+\NormalTok{response }\OtherTok{\textless{}{-}} \StringTok{"EmployeeChurned"}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{model-bauen}{%
+\subsection{Model bauen}\label{model-bauen}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{glm\_model }\OtherTok{\textless{}{-}} \FunctionTok{h2o.glm}\NormalTok{(}\AttributeTok{family =} \StringTok{"binomial"}\NormalTok{,}
+                     \CommentTok{\# x = predictors\_drf\_strong,}
+                     \CommentTok{\# x = predictors\_hot,}
+                     \AttributeTok{x =}\NormalTok{ predictors,}
+                     \AttributeTok{y =}\NormalTok{ response,}
+                     \AttributeTok{training\_frame =}\NormalTok{ trainH2O,}
+                     \CommentTok{\# training\_frame = hot\_train,}
+                     \AttributeTok{alpha =} \DecValTok{1}\NormalTok{,}
+                     \AttributeTok{lambda =} \FloatTok{0.00001}\NormalTok{,}
+                     \AttributeTok{compute\_p\_values =} \ConstantTok{FALSE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   |                                                                              |                                                                      |   0%  |                                                                              |======================================================================| 100%
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(glm\_model)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Model Details:
+## ==============
+## 
+## H2OBinomialModel: glm
+## Model Key:  GLM_model_R_1643915634597_12051 
+## GLM Model: summary
+##     family  link           regularization number_of_predictors_total
+## 1 binomial logit Lasso (lambda = 1.0E-5 )                         43
+##   number_of_active_predictors number_of_iterations  training_frame
+## 1                          39                    6 RTMP_sid_8bcf_5
+## 
+## H2OBinomialMetrics: glm
+## ** Reported on training data. **
+## 
+## MSE:  0.1842888
+## RMSE:  0.4292887
+## LogLoss:  0.539815
+## Mean Per-Class Error:  0.3243357
+## AUC:  0.7636351
+## AUCPR:  0.6469586
+## Gini:  0.5272701
+## R^2:  0.2036972
+## Residual Deviance:  3137.405
+## AIC:  3217.405
+## 
+## Confusion Matrix (vertical: actual; across: predicted) for F1-optimal threshold:
+##           0    1    Error        Rate
+## 0       912  937 0.506760   =937/1849
+## 1       150  907 0.141911   =150/1057
+## Totals 1062 1844 0.374054  =1087/2906
+## 
+## Maximum Metrics: Maximum metrics at their respective thresholds
+##                         metric threshold       value idx
+## 1                       max f1  0.292874    0.625302 261
+## 2                       max f2  0.192869    0.782089 314
+## 3                 max f0point5  0.516828    0.617593 130
+## 4                 max accuracy  0.516828    0.723331 130
+## 5                max precision  0.988141    1.000000   0
+## 6                   max recall  0.013254    1.000000 393
+## 7              max specificity  0.988141    1.000000   0
+## 8             max absolute_mcc  0.505766    0.371337 136
+## 9   max min_per_class_accuracy  0.375653    0.679827 207
+## 10 max mean_per_class_accuracy  0.375653    0.683811 207
+## 11                     max tns  0.988141 1849.000000   0
+## 12                     max fns  0.988141 1056.000000   0
+## 13                     max fps  0.001106 1849.000000 399
+## 14                     max tps  0.013254 1057.000000 393
+## 15                     max tnr  0.988141    1.000000   0
+## 16                     max fnr  0.988141    0.999054   0
+## 17                     max fpr  0.001106    1.000000 399
+## 18                     max tpr  0.013254    1.000000 393
+## 
+## Gains/Lift Table: Extract with `h2o.gainsLift(<model>, <data>)` or `h2o.gainsLift(<model>, valid=<T/F>, xval=<T/F>)`
+## 
+## 
+## 
+## Scoring History: 
+##             timestamp   duration iterations negative_log_likelihood objective
+## 1 2022-02-03 20:49:02  0.000 sec          0              1904.98260   0.65553
+## 2 2022-02-03 20:49:03  0.006 sec          1              1601.00024   0.55109
+## 3 2022-02-03 20:49:03  0.008 sec          2              1573.96241   0.54184
+## 4 2022-02-03 20:49:03  0.010 sec          3              1569.73507   0.54040
+## 5 2022-02-03 20:49:03  0.012 sec          4              1569.00154   0.54016
+## 6 2022-02-03 20:49:03  0.014 sec          5              1568.77950   0.54010
+## 7 2022-02-03 20:49:03  0.016 sec          6              1568.70228   0.54008
+##   training_rmse training_logloss training_r2 training_auc training_pr_auc
+## 1            NA               NA          NA           NA              NA
+## 2            NA               NA          NA           NA              NA
+## 3            NA               NA          NA           NA              NA
+## 4            NA               NA          NA           NA              NA
+## 5            NA               NA          NA           NA              NA
+## 6            NA               NA          NA           NA              NA
+## 7       0.42929          0.53981     0.20370      0.76364         0.64696
+##   training_lift training_classification_error
+## 1            NA                            NA
+## 2            NA                            NA
+## 3            NA                            NA
+## 4            NA                            NA
+## 5            NA                            NA
+## 6            NA                            NA
+## 7       2.56600                       0.37405
+## 
+## Variable Importances: (Extract with `h2o.varimp`) 
+## =================================================
+## 
+## Variable Importances: 
+##                          variable relative_importance scaled_importance
+## 1                      Paybands.A            6.956101          1.000000
+## 2         decrease_Category.Other            3.278105          0.471256
+## 3 decrease_Category.GB Management            3.180520          0.457227
+## 4        decrease_Category.Safety            1.609598          0.231394
+## 5         development to exempt.1            1.326404          0.190682
+##   percentage
+## 1   0.266451
+## 2   0.125567
+## 3   0.121829
+## 4   0.061655
+## 5   0.050807
+## 
+## ---
+##                                 variable relative_importance scaled_importance
+## 38                      Part Time Mark.0            0.019239          0.002766
+## 39                      Part Time Mark.1            0.009553          0.001373
+## 40 Vertical_Horizontal_Developments.>= 3            0.000000          0.000000
+## 41        start_contract type.apprentice            0.000000          0.000000
+## 42                start_Part time mark.0            0.000000          0.000000
+## 43               development to exempt.0            0.000000          0.000000
+##    percentage
+## 38   0.000737
+## 39   0.000366
+## 40   0.000000
+## 41   0.000000
+## 42   0.000000
+## 43   0.000000
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{h2o.std\_coef\_plot}\NormalTok{(glm\_model)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Abgabe_Gruppe_C_files/figure-latex/unnamed-chunk-26-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# AUC = 0.7636248 one hot}
+\CommentTok{\# AUC = 0.7636351 mit predictors}
+\end{Highlighting}
+\end{Shaded}
+
+Es hat sich gezeigt, dass das Model ohne One-Hot Featueres mit allen
+Features am besten performt.
+
+\hypertarget{hyperparameterwahl-und-tuning}{%
+\subsection{Hyperparameterwahl und
+Tuning}\label{hyperparameterwahl-und-tuning}}
+
+\url{https://docs.h2o.ai/h2o/latest-stable/h2o-docs/grid-search.html\#supported-grid-search-hyperparameters}
+\url{https://docs.h2o.ai/h2o/latest-stable/h2o-docs/grid-search.html\#supported-grid-search-hyperparameters}
+\url{https://docs.h2o.ai/h2o/latest-stable/h2o-docs/grid-search.html}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{glm\_params }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{( }\AttributeTok{alpha =} \FunctionTok{c}\NormalTok{(}\FloatTok{0.01}\NormalTok{, }\FloatTok{0.25}\NormalTok{, }\FloatTok{0.5}\NormalTok{, }\FloatTok{0.75}\NormalTok{, }\DecValTok{1}\NormalTok{),}
+                    \AttributeTok{lambda =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\FloatTok{0.5}\NormalTok{, }\FloatTok{0.1}\NormalTok{, }\FloatTok{0.01}\NormalTok{, }\FloatTok{0.001}\NormalTok{, }\FloatTok{0.0001}\NormalTok{, }\FloatTok{0.00001}\NormalTok{, }\DecValTok{0}\NormalTok{)}
+                    \CommentTok{\# missing\_values\_handling = c("Skip", "MeanImputation", "PlugValues")}
+                    \CommentTok{\# standardize = c(TRUE, FALSE)}
+\NormalTok{                    )}
+\CommentTok{\#search\_criteria strategy “Cartesian”}
+\NormalTok{h2oGrid }\OtherTok{\textless{}{-}} \FunctionTok{h2o.grid}\NormalTok{(}\StringTok{"glm"}\NormalTok{, }\AttributeTok{x =}\NormalTok{ predictors, }\AttributeTok{y =}\NormalTok{ response,}
+            \AttributeTok{grid\_id =} \StringTok{"h2oGrid"}\NormalTok{,}
+            \AttributeTok{training\_frame =}\NormalTok{ trainH2O,}
+            \AttributeTok{hyper\_params =}\NormalTok{ glm\_params,}
+            \AttributeTok{seed =} \DecValTok{1234}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   |                                                                              |                                                                      |   0%  |                                                                              |======================================================================| 100%
+\end{verbatim}
+
+\begin{verbatim}
+## Warning in h2o.getGrid(grid_id = grid_id): Adding alpha array to hyperparameter
+## runs slower with gridsearch. This is due to the fact that the algo has to
+## run initialization for every alpha value. Setting the alpha array as a model
+## parameter will skip the initialization and run faster overall.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#summary(h2oGrid, show\_stack\_traces = TRUE)}
+
+\CommentTok{\#Auswahl der optimalen Parameter anhand der AUC der einzelnen Modelle}
+\NormalTok{h2oGridPerf }\OtherTok{\textless{}{-}} \FunctionTok{h2o.getGrid}\NormalTok{(}\AttributeTok{grid\_id =} \StringTok{"h2oGrid"}\NormalTok{,}
+                           \AttributeTok{sort\_by =} \StringTok{"auc"}\NormalTok{,}
+                           \AttributeTok{decreasing =} \ConstantTok{TRUE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning in h2o.getGrid(grid_id = "h2oGrid", sort_by = "auc", decreasing = TRUE):
+## Adding alpha array to hyperparameter runs slower with gridsearch. This is due to
+## the fact that the algo has to run initialization for every alpha value. Setting
+## the alpha array as a model parameter will skip the initialization and run faster
+## overall.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Güte im Trainingsset}
+\CommentTok{\#summary(h2oGridPerf)}
+\NormalTok{best\_glm }\OtherTok{\textless{}{-}} \FunctionTok{h2o.getModel}\NormalTok{(h2oGridPerf}\SpecialCharTok{@}\NormalTok{model\_ids[[}\DecValTok{1}\NormalTok{]])}
+\FunctionTok{h2o.performance}\NormalTok{(best\_glm, trainH2O)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## H2OBinomialMetrics: glm
+## 
+## MSE:  0.1842888
+## RMSE:  0.4292887
+## LogLoss:  0.539815
+## Mean Per-Class Error:  0.3243357
+## AUC:  0.7636351
+## AUCPR:  0.6469586
+## Gini:  0.5272701
+## R^2:  0.2036972
+## Residual Deviance:  3137.405
+## AIC:  3217.405
+## 
+## Confusion Matrix (vertical: actual; across: predicted) for F1-optimal threshold:
+##           0    1    Error        Rate
+## 0       912  937 0.506760   =937/1849
+## 1       150  907 0.141911   =150/1057
+## Totals 1062 1844 0.374054  =1087/2906
+## 
+## Maximum Metrics: Maximum metrics at their respective thresholds
+##                         metric threshold       value idx
+## 1                       max f1  0.292874    0.625302 261
+## 2                       max f2  0.192869    0.782089 314
+## 3                 max f0point5  0.516828    0.617593 130
+## 4                 max accuracy  0.516828    0.723331 130
+## 5                max precision  0.988141    1.000000   0
+## 6                   max recall  0.013254    1.000000 393
+## 7              max specificity  0.988141    1.000000   0
+## 8             max absolute_mcc  0.505766    0.371337 136
+## 9   max min_per_class_accuracy  0.375653    0.679827 207
+## 10 max mean_per_class_accuracy  0.375653    0.683811 207
+## 11                     max tns  0.988141 1849.000000   0
+## 12                     max fns  0.988141 1056.000000   0
+## 13                     max fps  0.001106 1849.000000 399
+## 14                     max tps  0.013254 1057.000000 393
+## 15                     max tnr  0.988141    1.000000   0
+## 16                     max fnr  0.988141    0.999054   0
+## 17                     max fpr  0.001106    1.000000 399
+## 18                     max tpr  0.013254    1.000000 393
+## 
+## Gains/Lift Table: Extract with `h2o.gainsLift(<model>, <data>)` or `h2o.gainsLift(<model>, valid=<T/F>, xval=<T/F>)`
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{h2o.performance}\NormalTok{(best\_glm, testH2O)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## H2OBinomialMetrics: glm
+## 
+## MSE:  0.1914298
+## RMSE:  0.4375269
+## LogLoss:  0.556293
+## Mean Per-Class Error:  0.3045535
+## AUC:  0.7675409
+## AUCPR:  0.6985322
+## Gini:  0.5350819
+## R^2:  0.2093507
+## Residual Deviance:  1071.42
+## AIC:  1151.42
+## 
+## Confusion Matrix (vertical: actual; across: predicted) for F1-optimal threshold:
+##          0   1    Error      Rate
+## 0      319 248 0.437390  =248/567
+## 1       68 328 0.171717   =68/396
+## Totals 387 576 0.328141  =316/963
+## 
+## Maximum Metrics: Maximum metrics at their respective thresholds
+##                         metric threshold      value idx
+## 1                       max f1  0.311048   0.674897 250
+## 2                       max f2  0.180690   0.813112 323
+## 3                 max f0point5  0.543002   0.641691 118
+## 4                 max accuracy  0.480070   0.701973 144
+## 5                max precision  0.985191   1.000000   0
+## 6                   max recall  0.023236   1.000000 387
+## 7              max specificity  0.985191   1.000000   0
+## 8             max absolute_mcc  0.311048   0.392311 250
+## 9   max min_per_class_accuracy  0.375296   0.676768 207
+## 10 max mean_per_class_accuracy  0.311048   0.695447 250
+## 11                     max tns  0.985191 567.000000   0
+## 12                     max fns  0.985191 395.000000   0
+## 13                     max fps  0.001077 567.000000 399
+## 14                     max tps  0.023236 396.000000 387
+## 15                     max tnr  0.985191   1.000000   0
+## 16                     max fnr  0.985191   0.997475   0
+## 17                     max fpr  0.001077   1.000000 399
+## 18                     max tpr  0.023236   1.000000 387
+## 
+## Gains/Lift Table: Extract with `h2o.gainsLift(<model>, <data>)` or `h2o.gainsLift(<model>, valid=<T/F>, xval=<T/F>)`
+\end{verbatim}
+
+Es kann als Treshold abgelesen werden: max f1 = 0.292874
+
+\hypertarget{anwendung-auf-testdaten-und-auswahl-threshold}{%
+\subsection{Anwendung auf Testdaten und Auswahl
+Threshold}\label{anwendung-auf-testdaten-und-auswahl-threshold}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Anwendung auf Testset}
+\NormalTok{pred }\OtherTok{\textless{}{-}} \FunctionTok{h2o.predict}\NormalTok{(best\_glm, }\AttributeTok{newdata =}\NormalTok{ testH2O)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   |                                                                              |                                                                      |   0%  |                                                                              |======================================================================| 100%
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Prediciton\_df }\OtherTok{\textless{}{-}} \FunctionTok{as.data.frame}\NormalTok{(pred)}
+
+\NormalTok{test\_asdf }\OtherTok{\textless{}{-}} \FunctionTok{as.data.frame}\NormalTok{(testH2O)}
+\NormalTok{test\_asdf}\SpecialCharTok{$}\NormalTok{prob }\OtherTok{\textless{}{-}}\NormalTok{ Prediciton\_df}\SpecialCharTok{$}\NormalTok{p1}
+
+\NormalTok{test\_asdf}\SpecialCharTok{$}\NormalTok{EmployeeChurned }\OtherTok{\textless{}{-}} \FunctionTok{as.numeric}\NormalTok{(}\FunctionTok{as.character}\NormalTok{(test\_asdf}\SpecialCharTok{$}\NormalTok{EmployeeChurned))}
+
+\NormalTok{pred\_rocr\_glm }\OtherTok{\textless{}{-}} \FunctionTok{prediction}\NormalTok{(test\_asdf}\SpecialCharTok{$}\NormalTok{prob, test\_asdf}\SpecialCharTok{$}\NormalTok{EmployeeChurned)}
+\NormalTok{perf\_rocr\_glm }\OtherTok{\textless{}{-}} \FunctionTok{performance}\NormalTok{(pred\_rocr\_glm, }\StringTok{"tpr"}\NormalTok{, }\StringTok{"fpr"}\NormalTok{ )}
+
+\FunctionTok{performance}\NormalTok{(pred\_rocr\_glm, }\StringTok{"auc"}\NormalTok{)}\SpecialCharTok{@}\NormalTok{y.values}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [[1]]
+## [1] 0.7674897
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Darstellung der ROC{-}Kurve mit Threshhold}
+\FunctionTok{plot}\NormalTok{(perf\_rocr\_glm, }\AttributeTok{col=}\StringTok{"blue"}\NormalTok{)}
+\FunctionTok{abline}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{)}
+\FunctionTok{abline}\NormalTok{(}\AttributeTok{v=}\FloatTok{0.29}\NormalTok{, }\AttributeTok{col=}\StringTok{"green"}\NormalTok{)}
+\FunctionTok{abline}\NormalTok{(}\AttributeTok{v=}\FloatTok{0.292874}\NormalTok{, }\AttributeTok{col=}\StringTok{"red"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Abgabe_Gruppe_C_files/figure-latex/unnamed-chunk-28-1.pdf}
+Die ROC-Kurve verläuft deutlich oberhalb der Diagonalen. Bei Anwendung
+des Modells wird somit eine höhere Vorhersagequalität erreicht, als mit
+reinem Raten. Die grüne Linie zeigt den selbst geschätzten bzw.
+gesehenen Treshold am Ellenbogenpunkt. Die rote Line zeigt den
+berechneten Treshold.
+
+\hypertarget{auswahl-threshold-aus-roc-kurve-ellenbogenpunkt-1}{%
+\subsection{Auswahl Threshold aus ROC-Kurve
+(``Ellenbogenpunkt'')}\label{auswahl-threshold-aus-roc-kurve-ellenbogenpunkt-1}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{threshold\_glm\_gesehen }\OtherTok{\textless{}{-}} \FloatTok{0.29}
+\NormalTok{threshold\_glm }\OtherTok{\textless{}{-}} \FloatTok{0.292874}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{modellguxfcte-anhand-der-konfusionsmatrix-bestimmen-und-threshholds-vergleichen}{%
+\subsection{Modellgüte anhand der Konfusionsmatrix bestimmen und
+Threshholds
+vergleichen}\label{modellguxfcte-anhand-der-konfusionsmatrix-bestimmen-und-threshholds-vergleichen}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{classify }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(x, threshold)\{}
+  \FunctionTok{ifelse}\NormalTok{(x }\SpecialCharTok{\textless{}}\NormalTok{ threshold,}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{)}
+\NormalTok{\}}
+\NormalTok{test\_asdf}\SpecialCharTok{$}\NormalTok{predict1 }\OtherTok{\textless{}{-}} \FunctionTok{classify}\NormalTok{(test\_asdf}\SpecialCharTok{$}\NormalTok{prob, }\AttributeTok{threshold =}\NormalTok{ threshold\_glm\_gesehen)}
+\NormalTok{test\_asdf}\SpecialCharTok{$}\NormalTok{predict2 }\OtherTok{\textless{}{-}} \FunctionTok{classify}\NormalTok{(test\_asdf}\SpecialCharTok{$}\NormalTok{prob, }\AttributeTok{threshold =}\NormalTok{ threshold\_glm\_gesehen)}
+
+\FunctionTok{confusionMatrix}\NormalTok{(}\FunctionTok{factor}\NormalTok{(test\_asdf}\SpecialCharTok{$}\NormalTok{predict1), }\FunctionTok{factor}\NormalTok{(test\_asdf}\SpecialCharTok{$}\NormalTok{EmployeeChurned),}
+                \AttributeTok{positive =} \StringTok{"1"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction   0   1
+##          0 286  57
+##          1 281 339
+##                                           
+##                Accuracy : 0.649           
+##                  95% CI : (0.6179, 0.6792)
+##     No Information Rate : 0.5888          
+##     P-Value [Acc > NIR] : 7.345e-05       
+##                                           
+##                   Kappa : 0.3321          
+##                                           
+##  Mcnemar's Test P-Value : < 2.2e-16       
+##                                           
+##             Sensitivity : 0.8561          
+##             Specificity : 0.5044          
+##          Pos Pred Value : 0.5468          
+##          Neg Pred Value : 0.8338          
+##              Prevalence : 0.4112          
+##          Detection Rate : 0.3520          
+##    Detection Prevalence : 0.6438          
+##       Balanced Accuracy : 0.6802          
+##                                           
+##        'Positive' Class : 1               
+## 
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{confusionMatrix}\NormalTok{(}\FunctionTok{factor}\NormalTok{(test\_asdf}\SpecialCharTok{$}\NormalTok{predict2), }\FunctionTok{factor}\NormalTok{(test\_asdf}\SpecialCharTok{$}\NormalTok{EmployeeChurned),}
+                \AttributeTok{positive =} \StringTok{"1"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction   0   1
+##          0 286  57
+##          1 281 339
+##                                           
+##                Accuracy : 0.649           
+##                  95% CI : (0.6179, 0.6792)
+##     No Information Rate : 0.5888          
+##     P-Value [Acc > NIR] : 7.345e-05       
+##                                           
+##                   Kappa : 0.3321          
+##                                           
+##  Mcnemar's Test P-Value : < 2.2e-16       
+##                                           
+##             Sensitivity : 0.8561          
+##             Specificity : 0.5044          
+##          Pos Pred Value : 0.5468          
+##          Neg Pred Value : 0.8338          
+##              Prevalence : 0.4112          
+##          Detection Rate : 0.3520          
+##    Detection Prevalence : 0.6438          
+##       Balanced Accuracy : 0.6802          
+##                                           
+##        'Positive' Class : 1               
+## 
+\end{verbatim}
+
+Der gesehene Ellnbogenpunkt und der berechnete threshhold liefern
+identische Ergebnisse auf dem Testdatensatz.
+
+\hypertarget{optimierung-mit-kostenfunktion-2}{%
+\subsection{Optimierung mit
+Kostenfunktion}\label{optimierung-mit-kostenfunktion-2}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{pred\_class }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(x, threshold)\{}
+  \FunctionTok{ifelse}\NormalTok{(x }\SpecialCharTok{\textless{}}\NormalTok{ threshold,}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{)}
+\NormalTok{\}}
+
+\NormalTok{cost }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(prob, actual,threshold2, cost\_FN\_func, cost\_FP\_func)\{}
+\NormalTok{    predicted\_automate2 }\OtherTok{\textless{}{-}} \FunctionTok{pred\_class}\NormalTok{(prob,threshold2)}
+\NormalTok{    count\_FN }\OtherTok{\textless{}{-}} \FunctionTok{sum}\NormalTok{(predicted\_automate2 }\SpecialCharTok{==} \DecValTok{0} \SpecialCharTok{\&}\NormalTok{ actual }\SpecialCharTok{==} \StringTok{"1"}\NormalTok{)}
+\NormalTok{    count\_FP }\OtherTok{\textless{}{-}} \FunctionTok{sum}\NormalTok{(predicted\_automate2 }\SpecialCharTok{==} \DecValTok{1} \SpecialCharTok{\&}\NormalTok{ actual }\SpecialCharTok{==} \StringTok{"0"}\NormalTok{)}
+\NormalTok{    cost }\OtherTok{\textless{}{-}}\NormalTok{ count\_FN }\SpecialCharTok{*}\NormalTok{ cost\_FN\_func }\SpecialCharTok{+}\NormalTok{ count\_FP }\SpecialCharTok{*}\NormalTok{ cost\_FP\_func}
+    \FunctionTok{return}\NormalTok{ (cost)}
+\NormalTok{\}}
+
+\NormalTok{threshold\_input\_glm }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\FloatTok{0.05}\NormalTok{, }\FloatTok{0.1}\NormalTok{, }\FloatTok{0.14}\NormalTok{, }\FloatTok{0.15}\NormalTok{, }\FloatTok{0.16}\NormalTok{, }\FloatTok{0.17}\NormalTok{, }\FloatTok{0.18}\NormalTok{, }\FloatTok{0.19}\NormalTok{,}
+                         \FloatTok{0.2}\NormalTok{, }\FloatTok{0.23}\NormalTok{, }\FloatTok{0.24}\NormalTok{, }\FloatTok{0.25}\NormalTok{, }\FloatTok{0.29}\NormalTok{, }\FloatTok{0.292874}\NormalTok{,}
+                         \FloatTok{0.3}\NormalTok{, }\FloatTok{0.35}\NormalTok{, }\FloatTok{0.45}\NormalTok{, }\FloatTok{0.7}\NormalTok{) }
+
+\NormalTok{i }\OtherTok{\textless{}{-}} \DecValTok{1}
+\NormalTok{costs\_glm }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{()}
+\NormalTok{cost\_FN }\OtherTok{\textless{}{-}} \DecValTok{3000}
+\NormalTok{cost\_FP }\OtherTok{\textless{}{-}} \DecValTok{500}
+
+\ControlFlowTok{while}\NormalTok{ (i }\SpecialCharTok{\textless{}} \FunctionTok{length}\NormalTok{(threshold\_input\_glm)}\SpecialCharTok{+}\DecValTok{1}\NormalTok{) \{}
+\NormalTok{    costs\_glm[[(}\FunctionTok{length}\NormalTok{(costs\_glm) }\SpecialCharTok{+}\DecValTok{1}\NormalTok{)]] }\OtherTok{\textless{}{-}} \FunctionTok{cost}\NormalTok{(test\_asdf}\SpecialCharTok{$}\NormalTok{prob, }
+\NormalTok{                                                test\_asdf}\SpecialCharTok{$}\NormalTok{EmployeeChurned, }
+\NormalTok{                                                threshold\_input\_glm[i], cost\_FN, cost\_FP)}
+\NormalTok{    i }\OtherTok{\textless{}{-}}\NormalTok{ i}\SpecialCharTok{+}\DecValTok{1}
+\NormalTok{\}}
+
+\NormalTok{cost\_glm\_matrix }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(}\FunctionTok{c}\NormalTok{(threshold\_input\_glm,costs\_glm),}\AttributeTok{nrow=}\FunctionTok{length}\NormalTok{(threshold\_input\_glm))}
+\FunctionTok{colnames}\NormalTok{(cost\_glm\_matrix) }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"Threshold"}\NormalTok{, }\StringTok{"Kosten in Euro"}\NormalTok{)}
+\NormalTok{cost\_glm\_matrix}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##       Threshold Kosten in Euro
+##  [1,] 0.05      245500        
+##  [2,] 0.1       248000        
+##  [3,] 0.14      241000        
+##  [4,] 0.15      242500        
+##  [5,] 0.16      239500        
+##  [6,] 0.17      237500        
+##  [7,] 0.18      233500        
+##  [8,] 0.19      243000        
+##  [9,] 0.2       251500        
+## [10,] 0.23      261500        
+## [11,] 0.24      273500        
+## [12,] 0.25      272000        
+## [13,] 0.29      311500        
+## [14,] 0.292874  324000        
+## [15,] 0.3       333500        
+## [16,] 0.35      420000        
+## [17,] 0.45      609000        
+## [18,] 0.7       1015000
+\end{verbatim}
+
+Mit Betrachtung der Kosten liegt der optimale Threshold für das Model
+bei 0,18.
+
+\hypertarget{modellguxfcte-mit-optimiertem-threshold-anhand-der-konfusionsmatrix-bestimmen-2}{%
+\subsection{Modellgüte mit optimiertem Threshold anhand der
+Konfusionsmatrix
+bestimmen}\label{modellguxfcte-mit-optimiertem-threshold-anhand-der-konfusionsmatrix-bestimmen-2}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{threshold\_glm\_opti }\OtherTok{\textless{}{-}} \FloatTok{0.18}
+\NormalTok{test\_asdf}\SpecialCharTok{$}\NormalTok{predict\_opti }\OtherTok{\textless{}{-}}\FunctionTok{classify}\NormalTok{(test\_asdf}\SpecialCharTok{$}\NormalTok{prob, threshold\_glm\_opti)}
+\FunctionTok{confusionMatrix}\NormalTok{(}\FunctionTok{factor}\NormalTok{(test\_asdf}\SpecialCharTok{$}\NormalTok{predict\_opti), }\FunctionTok{factor}\NormalTok{(test\_asdf}\SpecialCharTok{$}\NormalTok{EmployeeChurned),}
+                \AttributeTok{positive =} \StringTok{"1"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction   0   1
+##          0 184  14
+##          1 383 382
+##                                          
+##                Accuracy : 0.5877         
+##                  95% CI : (0.5559, 0.619)
+##     No Information Rate : 0.5888         
+##     P-Value [Acc > NIR] : 0.5399         
+##                                          
+##                   Kappa : 0.2535         
+##                                          
+##  Mcnemar's Test P-Value : <2e-16         
+##                                          
+##             Sensitivity : 0.9646         
+##             Specificity : 0.3245         
+##          Pos Pred Value : 0.4993         
+##          Neg Pred Value : 0.9293         
+##              Prevalence : 0.4112         
+##          Detection Rate : 0.3967         
+##    Detection Prevalence : 0.7944         
+##       Balanced Accuracy : 0.6446         
+##                                          
+##        'Positive' Class : 1              
+## 
+\end{verbatim}
+
+Verglichen mit vorher eingesetzten Thresholds ist dies der niedrigste,
+da eine FP-Klassifikation stärker bestraft wird, als eine
+FN-Klassifikation. Das bestätigt auch die hohe Sensitivität. Dadurch
+sinkt die Genauigkeit sowie die balanzierte Genauigkeit, wobei letztere
+größer ist und verglichen zum Ausgangswert (F1-Score-optimierter
+Threshold) nur um 0,04 niedriger ist. Die 383 FP-Klassifizierten Werte
+sollten im Rahmen des Use-Cases kritisch betrachtet werden, da diese
+Daten zur Unterstützung von Managern gelten soll und mti diesem Ergebnis
+viel Arbeit für diese Nutzergruppe entstehen würde.
+
+\hypertarget{wichtigkeit-der-features-1}{%
+\subsection{Wichtigkeit der Features}\label{wichtigkeit-der-features-1}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{varimp\_glm }\OtherTok{\textless{}{-}} \FunctionTok{h2o.varimp}\NormalTok{(best\_glm)}
+\NormalTok{varimp\_glm}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Variable Importances: 
+##                          variable relative_importance scaled_importance
+## 1                      Paybands.A            6.956101          1.000000
+## 2         decrease_Category.Other            3.278105          0.471256
+## 3 decrease_Category.GB Management            3.180520          0.457227
+## 4        decrease_Category.Safety            1.609598          0.231394
+## 5         development to exempt.1            1.326404          0.190682
+##   percentage
+## 1   0.266451
+## 2   0.125567
+## 3   0.121829
+## 4   0.061655
+## 5   0.050807
+## 
+## ---
+##                                 variable relative_importance scaled_importance
+## 38                      Part Time Mark.0            0.019239          0.002766
+## 39                      Part Time Mark.1            0.009553          0.001373
+## 40 Vertical_Horizontal_Developments.>= 3            0.000000          0.000000
+## 41        start_contract type.apprentice            0.000000          0.000000
+## 42                start_Part time mark.0            0.000000          0.000000
+## 43               development to exempt.0            0.000000          0.000000
+##    percentage
+## 38   0.000737
+## 39   0.000366
+## 40   0.000000
+## 41   0.000000
+## 42   0.000000
+## 43   0.000000
+\end{verbatim}
+
+\hypertarget{support-vector-machine}{%
+\section{Support Vector Machine}\label{support-vector-machine}}
+
+\hypertarget{datenimport-und-vorbereitung-1}{%
+\subsection{Datenimport und
+Vorbereitung}\label{datenimport-und-vorbereitung-1}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df\_svm }\OtherTok{\textless{}{-}} \FunctionTok{read\_xlsx}\NormalTok{(}\StringTok{"20220110\_dataPrepped\_beforeOneHot.xlsx"}\NormalTok{)}
+
+\CommentTok{\# Kategorische Variablen umwandeln}
+\NormalTok{factorCols }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"EmployeeChurned"}\NormalTok{,}
+                \StringTok{"decrease\_Category"}\NormalTok{,}
+                \StringTok{"Nationality\_Classification"}\NormalTok{,}
+                \StringTok{"Paybands"}\NormalTok{)}
+
+\NormalTok{df\_svm }\SpecialCharTok{\%\textless{}\textgreater{}\%} \FunctionTok{mutate\_at}\NormalTok{(factorCols, factor)}
+\CommentTok{\# Auswählen der zu nutzenden Spalten auf Grund der Ergebnisse von Random Forrest, die Nutzung aller Features ist mit einem sehr hohen Rechenaufwand verbunden, der nicht geleistet werden konnte.}
+\NormalTok{df\_svm }\OtherTok{\textless{}{-}} \FunctionTok{subset}\NormalTok{(df\_svm, }\AttributeTok{select =} \FunctionTok{c}\NormalTok{(EmployeeChurned, decrease\_Category, }\StringTok{\textasciigrave{}}\AttributeTok{Month Of Service}\StringTok{\textasciigrave{}}\NormalTok{, }\StringTok{\textasciigrave{}}\AttributeTok{Months Since Last Development}\StringTok{\textasciigrave{}}\NormalTok{, Age, Paybands, Nationality\_Classification))}
+
+\CommentTok{\# Ansehen der Daten}
+\FunctionTok{plot}\NormalTok{(df\_svm, }\AttributeTok{col=}\NormalTok{df\_svm}\SpecialCharTok{$}\NormalTok{EmployeeChurned)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Abgabe_Gruppe_C_files/figure-latex/unnamed-chunk-34-1.pdf}
+
+\hypertarget{erstellen-der-train-und-test-datensets-1}{%
+\subsection{Erstellen der Train und Test
+Datensets}\label{erstellen-der-train-und-test-datensets-1}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data\_test }\OtherTok{\textless{}{-}} \FunctionTok{subset}\NormalTok{(hot\_df, }\AttributeTok{select =} \FunctionTok{c}\NormalTok{(}\StringTok{"EmployeeChurned"}\NormalTok{, }\StringTok{"Age"}\NormalTok{, }\StringTok{"Month Of Service"}\NormalTok{))}
+\NormalTok{df\_test }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(data\_test)}
+\NormalTok{n }\OtherTok{\textless{}{-}} \FunctionTok{nrow}\NormalTok{(df\_test)}
+
+\NormalTok{train\_indices }\OtherTok{\textless{}{-}} \FunctionTok{sample}\NormalTok{(}\DecValTok{1}\SpecialCharTok{:}\NormalTok{n, }\FunctionTok{round}\NormalTok{(}\DecValTok{2}\SpecialCharTok{/}\DecValTok{3} \SpecialCharTok{*}\NormalTok{ n))}
+\NormalTok{train }\OtherTok{\textless{}{-}}\NormalTok{ df\_test[train\_indices,]}
+\NormalTok{test }\OtherTok{\textless{}{-}}\NormalTok{ df\_test[}\SpecialCharTok{{-}}\NormalTok{train\_indices,]}
+
+\CommentTok{\# erstmal 2 Features auswählen }
+\NormalTok{features }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"Age"}\NormalTok{, }\StringTok{"Month.Of.Service"}\NormalTok{)}
+\NormalTok{cols }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(features, }\StringTok{"EmployeeChurned"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{svm}{%
+\subsection{SVM}\label{svm}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# erstmal 2 Features auswählen }
+\NormalTok{features }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"Age"}\NormalTok{, }\StringTok{"Month.Of.Service"}\NormalTok{)}
+\NormalTok{cols }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(features, }\StringTok{"EmployeeChurned"}\NormalTok{)}
+
+\CommentTok{\# fit an SVM with linear kernel}
+\NormalTok{svmfit }\OtherTok{\textless{}{-}} \FunctionTok{svm}\NormalTok{(EmployeeChurned }\SpecialCharTok{\textasciitilde{}}\NormalTok{ ., }\AttributeTok{data =}\NormalTok{ train[,cols], }\AttributeTok{kernel =} \StringTok{"linear"}\NormalTok{, }
+              \AttributeTok{cost =} \DecValTok{1}\NormalTok{, }\AttributeTok{scale =} \ConstantTok{TRUE}\NormalTok{)}
+
+\CommentTok{\# information about the model including the support vectors}
+\FunctionTok{summary}\NormalTok{(svmfit)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## svm(formula = EmployeeChurned ~ ., data = train[, cols], kernel = "linear", 
+##     cost = 1, scale = TRUE)
+## 
+## 
+## Parameters:
+##    SVM-Type:  C-classification 
+##  SVM-Kernel:  linear 
+##        cost:  1 
+## 
+## Number of Support Vectors:  1944
+## 
+##  ( 965 979 )
+## 
+## 
+## Number of Classes:  2 
+## 
+## Levels: 
+##  0 1
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# plot it including the separation lines (hyperplanes)}
+\FunctionTok{plot}\NormalTok{(svmfit, train[,cols])}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Abgabe_Gruppe_C_files/figure-latex/unnamed-chunk-36-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# predict on the test data set}
+\NormalTok{prediction }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(svmfit, test, }\AttributeTok{type =} \StringTok{"class"}\NormalTok{)}
+
+\CommentTok{\# confusion matrix with quality measures}
+\FunctionTok{confusionMatrix}\NormalTok{(prediction, test[,}\StringTok{"EmployeeChurned"}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction   0   1
+##          0 802 488
+##          1   0   0
+##                                           
+##                Accuracy : 0.6217          
+##                  95% CI : (0.5946, 0.6483)
+##     No Information Rate : 0.6217          
+##     P-Value [Acc > NIR] : 0.5124          
+##                                           
+##                   Kappa : 0               
+##                                           
+##  Mcnemar's Test P-Value : <2e-16          
+##                                           
+##             Sensitivity : 1.0000          
+##             Specificity : 0.0000          
+##          Pos Pred Value : 0.6217          
+##          Neg Pred Value :    NaN          
+##              Prevalence : 0.6217          
+##          Detection Rate : 0.6217          
+##    Detection Prevalence : 1.0000          
+##       Balanced Accuracy : 0.5000          
+##                                           
+##        'Positive' Class : 0               
+## 
+\end{verbatim}
+
+Wir erkennen sowohl an der Confusions Matrix, als auch am Plot, dass die
+svm Methode hier nicht zum Erfolg führt, da alle Predictions 0 sind.
+Dies wird an der Art unserer Daten liegen und wie das Data Frame nach
+dem One-Hot-Encoding aufgebaut ist. Daher haben wir uns entschieden auf
+das H2O-Paket umzusteigen, welches selbst die Daten richtig aufbereitet
+und wir die Rohdaten nutzen konnten.
+
+Wir haben bewusst nicht alle Features betrachtet, da nicht alle Merkmale
+einen signifikanten Einfluss haben. Mehr wollten wir auf den Ergebnissen
+der anderen Methoden aufbauen und ermitteln, ob wir eine noch bessere
+Vorhersage mit der Support-Vector-Machine erreichen können. Des Weiteren
+stand uns nicht genügend Rechenkraft zur Seite beim Tuning um alle
+Features zu berücksichtigen.
+
+\hypertarget{h2o-vorbereitung-und-umwandlung-der-daten-1}{%
+\subsection{H2O Vorbereitung und Umwandlung der
+Daten}\label{h2o-vorbereitung-und-umwandlung-der-daten-1}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df\_svmH2O }\OtherTok{\textless{}{-}} \FunctionTok{as.h2o}\NormalTok{(df\_svm)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   |                                                                              |                                                                      |   0%  |                                                                              |======================================================================| 100%
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#in H2o Test und Train erzeugen, da sonst keine validen Ergebnisse}
+\NormalTok{splits }\OtherTok{\textless{}{-}} \FunctionTok{h2o.splitFrame}\NormalTok{(}\AttributeTok{data =}\NormalTok{  df\_svmH2O, }\AttributeTok{ratios =} \FloatTok{0.75}\NormalTok{, }\AttributeTok{seed =} \DecValTok{1234}\NormalTok{)}
+\NormalTok{trainH2O\_svm }\OtherTok{\textless{}{-}}\NormalTok{ splits[[}\DecValTok{1}\NormalTok{]]}
+\NormalTok{testH2O\_svm }\OtherTok{\textless{}{-}}\NormalTok{ splits[[}\DecValTok{2}\NormalTok{]]}
+
+\NormalTok{target }\OtherTok{\textless{}{-}} \StringTok{"EmployeeChurned"}
+\CommentTok{\# erstmal 2 Features auswählen die die stärkste Abhängikeit nach den Trees haben}
+\NormalTok{predictors }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{( }\StringTok{"decrease\_Category"}\NormalTok{, }\StringTok{"Month Of Service"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{svm-mit-h2o}{%
+\subsection{SVM mit H2O}\label{svm-mit-h2o}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#https://docs.h2o.ai/h2o/latest{-}stable/h2o{-}docs/data{-}science/svm.html}
+\CommentTok{\#SVM durchführen }
+\NormalTok{svm\_model }\OtherTok{\textless{}{-}} \FunctionTok{h2o.psvm}\NormalTok{(}
+  \AttributeTok{rank\_ratio =} \FloatTok{0.1}\NormalTok{,}
+  \AttributeTok{y =}\StringTok{"EmployeeChurned"}\NormalTok{,}
+  \AttributeTok{training\_frame =}\NormalTok{ trainH2O\_svm, }
+  \AttributeTok{disable\_training\_metrics =} \ConstantTok{FALSE}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   |                                                                              |                                                                      |   0%  |                                                                              |======================================================================| 100%
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#svm auf Testdatensatz testen}
+\NormalTok{svm\_model\_h20 }\OtherTok{\textless{}{-}} \FunctionTok{h2o.getModel}\NormalTok{(svm\_model}\SpecialCharTok{@}\NormalTok{model\_id)}
+\NormalTok{perf\_svm }\OtherTok{\textless{}{-}} \FunctionTok{h2o.performance}\NormalTok{(svm\_model\_h20, testH2O\_svm)}
+\NormalTok{perf\_svm}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## H2OBinomialMetrics: psvm
+## 
+## MSE:  0.3987539
+## RMSE:  0.6314696
+## LogLoss:  NaN
+## Mean Per-Class Error:  0.4052629
+## AUC:  NaN
+## AUCPR:  NaN
+## Gini:  NaN
+## 
+## Confusion Matrix (vertical: actual; across: predicted) for F1-optimal threshold:
+##          0   1    Error      Rate
+## 0      358 209 0.368607  =209/567
+## 1      175 221 0.441919  =175/396
+## Totals 533 430 0.398754  =384/963
+## 
+## Maximum Metrics: Maximum metrics at their respective thresholds
+##                         metric threshold      value idx
+## 1                       max f1  1.000000   0.535109   0
+## 2                       max f2  1.000000   0.548659   0
+## 3                 max f0point5  1.000000   0.522212   0
+## 4                 max accuracy  1.000000   0.601246   0
+## 5                max precision  1.000000   0.513953   0
+## 6                   max recall  1.000000   0.558081   0
+## 7              max specificity  1.000000   0.631393   0
+## 8             max absolute_mcc  1.000000   0.187539   0
+## 9   max min_per_class_accuracy  1.000000   0.558081   0
+## 10 max mean_per_class_accuracy  1.000000   0.594737   0
+## 11                     max tns  1.000000 358.000000   0
+## 12                     max fns  1.000000 175.000000   0
+## 13                     max fps  1.000000 209.000000   0
+## 14                     max tps  1.000000 221.000000   0
+## 15                     max tnr  1.000000   0.631393   0
+## 16                     max fnr  1.000000   0.441919   0
+## 17                     max fpr  1.000000   0.368607   0
+## 18                     max tpr  1.000000   0.558081   0
+## 
+## Gains/Lift Table: Extract with `h2o.gainsLift(<model>, <data>)` or `h2o.gainsLift(<model>, valid=<T/F>, xval=<T/F>)`
+\end{verbatim}
+
+Die H20.psvm Methode führt eine svm aus und legt zusätzlich alle
+Informationen in das Model wie zum Beispiel die Confusions Matrix.
+Darüber hinaus wurde das Model auf den Testdatensatz angewendet. Das
+Ergebnis ist eine durchschnittlicher Error von ca. 40\%. Dies ist
+wesentlich weniger als 50\% und damit besser als raten (50\%). Jedoch
+ist es noch weit entfernt von einer Vorhersage, die wir uns wünschen.
+Wir hätten gern wie beim DRF eine Optimierung der Parameter ``Gamma''
+und ``Cost'' vorgenommen, nur leider ist dies in der H2O Bibliothek
+nicht möglich. Dies haben wir daher mit der e1071 Bibliothek realisiert,
+da wir rausgefunden haben, dass diese wieder anwendbar ist, nachdem
+umwandeln der der Daten von H20 und wieder zurück in ein ``normales''
+DataFrame.
+
+\hypertarget{svm-tune-funktion-mit-e1071}{%
+\subsection{SVM Tune Funktion mit
+e1071}\label{svm-tune-funktion-mit-e1071}}
+
+Folgend verwenden wir die Tune Funktion um das beste ``Gamma'' und
+``Cost'' zu ermitteln für eine optimale Vorhersage.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Umwandeln der H20 DataFrames in "normale" DataFrames, um das Tuning der e1071 Methode ausführen können.}
+\NormalTok{tunedf\_svm }\OtherTok{\textless{}{-}} \FunctionTok{as.data.frame}\NormalTok{(df\_svmH2O)}
+\NormalTok{trainDF\_svm }\OtherTok{\textless{}{-}} \FunctionTok{as.data.frame}\NormalTok{(trainH2O\_svm)}
+\NormalTok{testDF\_svm }\OtherTok{\textless{}{-}} \FunctionTok{as.data.frame}\NormalTok{(testH2O\_svm)}
+
+\CommentTok{\#Tuning der Parameter {-}\textgreater{} hier hätten wir gern eine größere Bandbreite an gamma und cost Variablen durchlaufen lassen, wurde aber von unserer Rechenleistung nicht gewährleistet. Daher haben wir in einzelnen Schritten uns den jetztigen WErten angenähert um so einen möglichst optimalen Wert zu finden. Auch ist zu ebachten, dass wir keinen Gamma{-}Wert unter 0.01 nutzen konnten, da diese nicht mehr von den folgenden Methoden unterstützt werden.}
+
+\NormalTok{tuneSVM }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(svm\_type) \{}
+
+\NormalTok{     tuned\_svm }\OtherTok{\textless{}{-}} \FunctionTok{tune}\NormalTok{(svm, EmployeeChurned }\SpecialCharTok{\textasciitilde{}}\NormalTok{ ., }
+              \AttributeTok{data =}\NormalTok{ trainDF\_svm, }
+              \AttributeTok{kernel =}\NormalTok{ svm\_type, }
+              \AttributeTok{scale =} \ConstantTok{TRUE}\NormalTok{, }
+              \AttributeTok{ranges =} \FunctionTok{list}\NormalTok{(}\AttributeTok{cost =} \FunctionTok{c}\NormalTok{(}\FloatTok{0.05}\NormalTok{, }\FloatTok{0.075}\NormalTok{),  }\AttributeTok{gamma =} \FunctionTok{c}\NormalTok{(}\FloatTok{0.01}\NormalTok{, }\FloatTok{0.02}\NormalTok{,}\FloatTok{0.25}\NormalTok{)), }
+              \AttributeTok{tunecontrol =} \FunctionTok{tune.control}\NormalTok{(}\AttributeTok{cross=}\DecValTok{5}\NormalTok{)}
+\NormalTok{              )}
+\NormalTok{    tuned\_svm}
+    
+    \CommentTok{\# train on the entire data set using best value for cost}
+\NormalTok{    best\_cost }\OtherTok{\textless{}{-}} \FunctionTok{as.numeric}\NormalTok{(tuned\_svm}\SpecialCharTok{$}\NormalTok{best.parameters[}\DecValTok{1}\NormalTok{])}
+    \FunctionTok{print}\NormalTok{(}\FunctionTok{paste0}\NormalTok{(}\StringTok{"Cost: "}\NormalTok{, best\_cost))}
+    
+\NormalTok{    best\_gamma }\OtherTok{\textless{}{-}} \FunctionTok{as.numeric}\NormalTok{(tuned\_svm}\SpecialCharTok{$}\NormalTok{best.parameters[}\DecValTok{2}\NormalTok{])}
+    \FunctionTok{print}\NormalTok{(}\FunctionTok{paste0}\NormalTok{(}\StringTok{"Gamma: "}\NormalTok{, best\_gamma))}
+        
+\NormalTok{    svmfit\_best }\OtherTok{\textless{}{-}} \FunctionTok{svm}\NormalTok{(EmployeeChurned }\SpecialCharTok{\textasciitilde{}}\NormalTok{ ., }
+                  \AttributeTok{data =}\NormalTok{ trainDF\_svm, }
+                  \AttributeTok{kernel =}\NormalTok{ svm\_type, }
+                  \AttributeTok{cost =}\NormalTok{ best\_cost, }
+                  \AttributeTok{gamma =}\NormalTok{ best\_gamma, }
+                  \AttributeTok{scale =} \ConstantTok{TRUE}\NormalTok{)}
+  \FunctionTok{return}\NormalTok{(svmfit\_best)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{linear-svm}{%
+\subsection{Linear SVM}\label{linear-svm}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{linear\_svm }\OtherTok{\textless{}{-}} \FunctionTok{tuneSVM}\NormalTok{(}\StringTok{"linear"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Cost: 0.075"
+## [1] "Gamma: 0.01"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#plot(linear\_svm, trainDF\_svm[,cols])}
+\CommentTok{\#Leider ist die Plotfunktion nicht mehr möglich nach dem umwandeln der Daten in H20 und wieder zurück}
+
+\CommentTok{\#predict}
+\NormalTok{prediction\_linear }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(linear\_svm, testDF\_svm, }\AttributeTok{type =} \StringTok{"class"}\NormalTok{)}
+    
+\CommentTok{\# confusion matrix with quality measures}
+\FunctionTok{confusionMatrix}\NormalTok{(prediction\_linear, testDF\_svm[, }\StringTok{"EmployeeChurned"}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction   0   1
+##          0 465 218
+##          1 102 178
+##                                          
+##                Accuracy : 0.6677         
+##                  95% CI : (0.637, 0.6974)
+##     No Information Rate : 0.5888         
+##     P-Value [Acc > NIR] : 2.839e-07      
+##                                          
+##                   Kappa : 0.2821         
+##                                          
+##  Mcnemar's Test P-Value : 1.287e-10      
+##                                          
+##             Sensitivity : 0.8201         
+##             Specificity : 0.4495         
+##          Pos Pred Value : 0.6808         
+##          Neg Pred Value : 0.6357         
+##              Prevalence : 0.5888         
+##          Detection Rate : 0.4829         
+##    Detection Prevalence : 0.7092         
+##       Balanced Accuracy : 0.6348         
+##                                          
+##        'Positive' Class : 0              
+## 
+\end{verbatim}
+
+\hypertarget{radial-svm}{%
+\subsection{Radial SVM}\label{radial-svm}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{radial\_svm }\OtherTok{\textless{}{-}} \FunctionTok{tuneSVM}\NormalTok{(}\StringTok{"radial"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Cost: 0.075"
+## [1] "Gamma: 0.25"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#predict}
+\NormalTok{prediction\_radial }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(radial\_svm, testDF\_svm, }\AttributeTok{type =} \StringTok{"class"}\NormalTok{)}
+    
+\CommentTok{\# confusion matrix with quality measures}
+\FunctionTok{confusionMatrix}\NormalTok{(prediction\_radial, testDF\_svm[, }\StringTok{"EmployeeChurned"}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction   0   1
+##          0 515 284
+##          1  52 112
+##                                         
+##                Accuracy : 0.6511        
+##                  95% CI : (0.62, 0.6812)
+##     No Information Rate : 0.5888        
+##     P-Value [Acc > NIR] : 4.252e-05     
+##                                         
+##                   Kappa : 0.2096        
+##                                         
+##  Mcnemar's Test P-Value : < 2.2e-16     
+##                                         
+##             Sensitivity : 0.9083        
+##             Specificity : 0.2828        
+##          Pos Pred Value : 0.6446        
+##          Neg Pred Value : 0.6829        
+##              Prevalence : 0.5888        
+##          Detection Rate : 0.5348        
+##    Detection Prevalence : 0.8297        
+##       Balanced Accuracy : 0.5956        
+##                                         
+##        'Positive' Class : 0             
+## 
+\end{verbatim}
+
+\hypertarget{svm-mit-besten-parametern}{%
+\subsection{SVM mit besten Parametern}\label{svm-mit-besten-parametern}}
+
+Für H2O nutzen wir die ermittelten Gamma Werte von Linear, da diese ein
+höhere Accuracy haben.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#https://docs.h2o.ai/h2o/latest{-}stable/h2o{-}docs/data{-}science/svm.html}
+\CommentTok{\#SVM durchführen }
+\NormalTok{svm\_model }\OtherTok{\textless{}{-}} \FunctionTok{h2o.psvm}\NormalTok{(}
+  \AttributeTok{hyper\_param =} \FloatTok{0.075}\NormalTok{,}
+  \AttributeTok{gamma =} \FloatTok{0.01}\NormalTok{,}
+  \AttributeTok{rank\_ratio =} \FloatTok{0.1}\NormalTok{,}
+  \AttributeTok{y =}\StringTok{"EmployeeChurned"}\NormalTok{,}
+  \AttributeTok{training\_frame =}\NormalTok{ trainH2O\_svm, }
+  \AttributeTok{disable\_training\_metrics =} \ConstantTok{FALSE}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   |                                                                              |                                                                      |   0%  |                                                                              |======================================================================| 100%
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# mehr Infos über Model und support Vektoren}
+\FunctionTok{summary}\NormalTok{(svm\_model)            }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Model Details:
+## ==============
+## 
+## H2OBinomialModel: psvm
+## Model Key:  PSVM_model_R_1643915634597_12096 
+## Model Summary: 
+##   number_of_support_vectors number_of_bounded_support_vectors
+## 1                      2168                              1994
+##   raw_model_size_in_bytes      rho number_of_iterations surrogate_gap
+## 1                  112736 -0.25657                   77       0.00002
+##   primal_residual dual_residual
+## 1         0.00000       0.00014
+## 
+## H2OBinomialMetrics: psvm
+## ** Reported on training data. **
+## ** Training metrics **
+## 
+## MSE:  0.3668273
+## RMSE:  0.6056627
+## LogLoss:  NaN
+## Mean Per-Class Error:  0.4005157
+## AUC:  NaN
+## AUCPR:  NaN
+## Gini:  NaN
+## 
+## Confusion Matrix (vertical: actual; across: predicted) for F1-optimal threshold:
+##           0    1    Error        Rate
+## 0      1337  512 0.276906   =512/1849
+## 1       554  503 0.524125   =554/1057
+## Totals 1891 1015 0.366827  =1066/2906
+## 
+## Maximum Metrics: Maximum metrics at their respective thresholds
+##                         metric threshold       value idx
+## 1                       max f1  1.000000    0.485521   0
+## 2                       max f2  1.000000    0.479687   0
+## 3                 max f0point5  1.000000    0.491499   0
+## 4                 max accuracy  1.000000    0.633173   0
+## 5                max precision  1.000000    0.495567   0
+## 6                   max recall  1.000000    0.475875   0
+## 7              max specificity  1.000000    0.723094   0
+## 8             max absolute_mcc  1.000000    0.200776   0
+## 9   max min_per_class_accuracy  1.000000    0.475875   0
+## 10 max mean_per_class_accuracy  1.000000    0.599484   0
+## 11                     max tns  1.000000 1337.000000   0
+## 12                     max fns  1.000000  554.000000   0
+## 13                     max fps  1.000000  512.000000   0
+## 14                     max tps  1.000000  503.000000   0
+## 15                     max tnr  1.000000    0.723094   0
+## 16                     max fnr  1.000000    0.524125   0
+## 17                     max fpr  1.000000    0.276906   0
+## 18                     max tpr  1.000000    0.475875   0
+## 
+## Gains/Lift Table: Extract with `h2o.gainsLift(<model>, <data>)` or `h2o.gainsLift(<model>, valid=<T/F>, xval=<T/F>)`
+## 
+## 
+## 
+## NULL
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#svm auf Testdatensatz testen}
+\NormalTok{best\_svm\_model\_h20 }\OtherTok{\textless{}{-}} \FunctionTok{h2o.getModel}\NormalTok{(svm\_model}\SpecialCharTok{@}\NormalTok{model\_id)}
+\NormalTok{best\_perf\_svm }\OtherTok{\textless{}{-}} \FunctionTok{h2o.performance}\NormalTok{(best\_svm\_model\_h20, testH2O\_svm)}
+\NormalTok{best\_perf\_svm}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## H2OBinomialMetrics: psvm
+## 
+## MSE:  0.384216
+## RMSE:  0.6198516
+## LogLoss:  NaN
+## Mean Per-Class Error:  0.4054834
+## AUC:  NaN
+## AUCPR:  NaN
+## Gini:  NaN
+## 
+## Confusion Matrix (vertical: actual; across: predicted) for F1-optimal threshold:
+##          0   1    Error      Rate
+## 0      405 162 0.285714  =162/567
+## 1      208 188 0.525253  =208/396
+## Totals 613 350 0.384216  =370/963
+## 
+## Maximum Metrics: Maximum metrics at their respective thresholds
+##                         metric threshold      value idx
+## 1                       max f1  1.000000   0.504021   0
+## 2                       max f2  1.000000   0.486039   0
+## 3                 max f0point5  1.000000   0.523385   0
+## 4                 max accuracy  1.000000   0.615784   0
+## 5                max precision  1.000000   0.537143   0
+## 6                   max recall  1.000000   0.474747   0
+## 7              max specificity  1.000000   0.714286   0
+## 8             max absolute_mcc  1.000000   0.193381   0
+## 9   max min_per_class_accuracy  1.000000   0.474747   0
+## 10 max mean_per_class_accuracy  1.000000   0.594517   0
+## 11                     max tns  1.000000 405.000000   0
+## 12                     max fns  1.000000 208.000000   0
+## 13                     max fps  1.000000 162.000000   0
+## 14                     max tps  1.000000 188.000000   0
+## 15                     max tnr  1.000000   0.714286   0
+## 16                     max fnr  1.000000   0.525253   0
+## 17                     max fpr  1.000000   0.285714   0
+## 18                     max tpr  1.000000   0.474747   0
+## 
+## Gains/Lift Table: Extract with `h2o.gainsLift(<model>, <data>)` or `h2o.gainsLift(<model>, valid=<T/F>, xval=<T/F>)`
+\end{verbatim}
+
+\hypertarget{auswahl-threshold-anhand-roc-kurve}{%
+\subsection{Auswahl Threshold anhand ROC
+Kurve}\label{auswahl-threshold-anhand-roc-kurve}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Anwendung auf Testset}
+\CommentTok{\#predict}
+\NormalTok{pred }\OtherTok{\textless{}{-}} \FunctionTok{h2o.predict}\NormalTok{(best\_svm\_model\_h20, }\AttributeTok{newdata =}\NormalTok{ testH2O\_svm)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   |                                                                              |                                                                      |   0%  |                                                                              |======================================================================| 100%
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{prediciton\_DF\_svm }\OtherTok{\textless{}{-}} \FunctionTok{as.data.frame}\NormalTok{(pred)}
+
+\NormalTok{asdf\_svm }\OtherTok{\textless{}{-}}\NormalTok{ testDF\_svm}
+\NormalTok{asdf\_svm}\SpecialCharTok{$}\NormalTok{prob }\OtherTok{\textless{}{-}}\NormalTok{ prediciton\_DF\_svm}\SpecialCharTok{$}\NormalTok{p1}
+
+\NormalTok{asdf\_svm}\SpecialCharTok{$}\NormalTok{EmployeeChurned }\OtherTok{\textless{}{-}} \FunctionTok{as.numeric}\NormalTok{(}\FunctionTok{as.character}\NormalTok{(asdf\_svm}\SpecialCharTok{$}\NormalTok{EmployeeChurned))}
+
+\NormalTok{pred\_rocr\_svm }\OtherTok{\textless{}{-}} \FunctionTok{prediction}\NormalTok{(asdf\_svm}\SpecialCharTok{$}\NormalTok{prob, asdf\_svm}\SpecialCharTok{$}\NormalTok{EmployeeChurned)}
+\NormalTok{perf\_rocr\_svm }\OtherTok{\textless{}{-}} \FunctionTok{performance}\NormalTok{(pred\_rocr\_svm, }\StringTok{"tpr"}\NormalTok{, }\StringTok{"fpr"}\NormalTok{ )}
+
+\FunctionTok{performance}\NormalTok{(pred\_rocr\_svm, }\StringTok{"auc"}\NormalTok{)}\SpecialCharTok{@}\NormalTok{y.values}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [[1]]
+## [1] 0.5945166
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Darstellung der ROC{-}Kurve}
+\FunctionTok{plot}\NormalTok{(perf\_rocr\_svm, }\AttributeTok{col=}\StringTok{"blue"}\NormalTok{)}
+\FunctionTok{abline}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Abgabe_Gruppe_C_files/figure-latex/unnamed-chunk-43-1.pdf}
+Die Fläche unterhalb der ROC-Kurve ist mit 0.6 größer als 0,5 und damit
+liefert das erstellte Modell eine genauere Vorhersage als bloßes Raten.
+
+\hypertarget{auswahl-threshold-1}{%
+\subsection{Auswahl Threshold}\label{auswahl-threshold-1}}
+
+Die Auswahl eines Thresholds ist bei einer SVM nicht sinnvoll, da das
+Ergebnis immer 1 oder 0 ist, d.h. entweder es ist auf der einen Seite
+der Linie oder der anderen. Daher ist der Threshold immer 1. Dies führt
+ebenfalls dazu, dass die Kostenfunktion nicht anwendbar ist, da der
+Threshold immer 1 ist, verändert sich das Ergebnis bei der
+Kostenfunktion ebenfalls nicht.
+
+\hypertarget{zusammenfassung-svm}{%
+\subsection{Zusammenfassung SVM}\label{zusammenfassung-svm}}
+
+Es wurden diverse Möglickeiten genutzt die beste Vorhersage durch das
+SVM-Modell zu bestimmen. Zu erst wurde das klassische Verfahren durch
+die e1071-Bibliothek angewendet. Auf Grund der Datenstruktur die
+vorliegt konnten keine statistisch sinnvollen Vorhersagen gemacht werde,
+da diese alle auf ``0'' gesetzt wurden. Somit wurden keine
+unterschiedlicen Bereiche entdeckt. Aus diesem Grund wurde mit der
+H2O-Bibliothek ein neuer Ansatz gestartet, da hier die DataFrames in
+eigene h20-DataFrames umgewandelt werden. Dies war jedoch nur auf den
+Rohdaten anwendbar und nicht mehr auf den One-Hot-Encodeten Daten.
+Hierbei wurden nicht alle Daten eingelesen, sondern nur diese, die durch
+das RandomForest-Modell den stärksten Einfluss haben, da sonst die
+Rechenleistung beim Tuning nicht ausreicht. Die Ergebnisse der H2O
+Vorhersage lagen bei einem Error von ca. 40\%. Darauf hin wurde
+getestet, ob die SVM-Methode von e1071 mit dem H2O-DataFram
+funktioniert, da dort die Daten wieder abgewandelt wurden. Dies hat
+funktioniert und dadurch konnte ein Tuning des ``Gamma'' und ``Cost''
+Wertes vorgenommen werden. Dies führte zu einer Genauigkeit von: 60\%
+für die Radial-Methode und 67\% bei der Linearen-Methode. Zur
+Vergleichbarkeit wurde eine ROC-Kurve konstuiert. Dabei war es leider
+nicht möglich die Modelle der e1071-Bibliothek zu nutzen, weshalb noch
+einmal die H2O-SVM methode mit den optimierten Parametern der
+e1071-tune-Funktion durchgeführt wurde. Dies führte zu einer
+Fehleranfälligkeit von 37\% jedoch bei der uns wichtigen False-Negative
+Rate einen Error von 28\%. Dies ist nochmals eine deutliche Verbessung
+zum Anfang und somit das beste Ergbnis des SVM-Modells.
+
+\hypertarget{vergleich-aller-modelle}{%
+\section{Vergleich aller Modelle}\label{vergleich-aller-modelle}}
+
+\hypertarget{vergleich-der-algorithmen-anhand-der-einzelnen-roc-kurven}{%
+\subsection{Vergleich der Algorithmen anhand der einzelnen
+ROC-Kurven}\label{vergleich-der-algorithmen-anhand-der-einzelnen-roc-kurven}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Darstellung der ROC{-}Kurve}
+\FunctionTok{plot}\NormalTok{(perf\_rocr\_rpart, }\AttributeTok{col=}\StringTok{"red"}\NormalTok{)}
+\FunctionTok{plot}\NormalTok{(perf\_rocr\_drf, }\AttributeTok{col=}\StringTok{"blue"}\NormalTok{, }\AttributeTok{add=}\ConstantTok{TRUE}\NormalTok{)}
+\FunctionTok{plot}\NormalTok{(perf\_rocr\_glm, }\AttributeTok{col=}\StringTok{"purple"}\NormalTok{, }\AttributeTok{add=}\ConstantTok{TRUE}\NormalTok{)}
+\FunctionTok{plot}\NormalTok{(perf\_rocr\_svm, }\AttributeTok{col=}\StringTok{"green"}\NormalTok{, }\AttributeTok{add=}\ConstantTok{TRUE}\NormalTok{)}
+\FunctionTok{abline}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{)}
+\FunctionTok{legend}\NormalTok{(}\AttributeTok{x =} \StringTok{"bottomright"}\NormalTok{,}
+       \AttributeTok{legend =} \FunctionTok{c}\NormalTok{(}\StringTok{"Einfacher Baum (rpart)"}\NormalTok{, }\StringTok{"Distributed Random Forest (H2O)"}\NormalTok{,}\StringTok{"Logistic Regression"}\NormalTok{, }\StringTok{"Support{-}Vector{-}Machine"}\NormalTok{),}
+       \AttributeTok{lty =} \FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{),}
+       \AttributeTok{col =} \FunctionTok{c}\NormalTok{(}\StringTok{"red"}\NormalTok{, }\StringTok{"blue"}\NormalTok{, }\StringTok{"purple"}\NormalTok{, }\StringTok{"green"}\NormalTok{))}
+\FunctionTok{title}\NormalTok{(}\AttributeTok{main =} \StringTok{"Vergleich der Algorithmen anhand der einzelnen ROC{-}Kurven"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Abgabe_Gruppe_C_files/figure-latex/unnamed-chunk-44-1.pdf}
+
+\hypertarget{vergleich-anhand-der-konfusionsmatrizen}{%
+\subsection{Vergleich anhand der
+Konfusionsmatrizen}\label{vergleich-anhand-der-konfusionsmatrizen}}
+
+Zum Vergleich aller Modelle, betrachten wir die
+Eintrittswahrscheinlichkeit von False-Negative Klassifikationen unter
+allen False-Predictions, d.h. die Wahrscheinlichkeit, dass vorrausgesagt
+wird der Mitarbeitende bleibt im Unternehmen ist falsch. Des Weiteren
+betrachten wir die allgemeine Acurracy. Dabei betrachten wir lediglich
+die besten Vorhersagen je Modell.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{false\_negative }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\DecValTok{10}\NormalTok{, }\DecValTok{7}\NormalTok{, }\DecValTok{29}\NormalTok{)}
+\NormalTok{acurracy }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\DecValTok{65}\NormalTok{,}\DecValTok{59}\NormalTok{, }\DecValTok{62}\NormalTok{)}
+\NormalTok{auswertung }\OtherTok{\textless{}{-}} \FunctionTok{matrix}\NormalTok{(}\FunctionTok{c}\NormalTok{(false\_negative, acurracy), }\AttributeTok{nrow=}\DecValTok{3}\NormalTok{)}
+\FunctionTok{colnames}\NormalTok{(auswertung) }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"False{-}Negative{-}Rate in \%"}\NormalTok{, }\StringTok{"Acurracy in \%"}\NormalTok{)}
+\FunctionTok{rownames}\NormalTok{(auswertung) }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}\StringTok{"Distributed Random Forrest"}\NormalTok{, }\StringTok{"Logistic Regression"}\NormalTok{, }\StringTok{"Support{-}Vector Machine"}\NormalTok{)}
+\FunctionTok{print}\NormalTok{(auswertung)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                            False-Negative-Rate in % Acurracy in %
+## Distributed Random Forrest                       10            65
+## Logistic Regression                               7            59
+## Support-Vector Machine                           29            62
+\end{verbatim}
+
+Die Matrix zeigt die zusammengefassten und berechneten Werte der besten
+Konfusionsmatrizen der verschiedenen Modelle. Klar erkennbar ist, dass
+die Anwendung des Support-Vector Machine Modells eine vergleichweise
+gute Genauigkeit vorweist wie die anderen. Jedoch schneidet die
+False-Positive-Rate wesentlich schlechter als die beiden anderen ab, was
+im Kontext des Anwendungsfalls zu höheren Kosten führen würde. Dies
+liegt daran, dass das Modell nicht extra daruaf trainiert werden konnte,
+da der Threshold wie oben beschrieben immer ``1'' ist. Daher wird jetzt
+der Unterschied der beiden anderen Modelle betrachtet. Dafür werden die
+Kostenfunktionen betrachtet.
+
+Kosten für DRF: 240.000
+
+Kosten für GLM: 233.500
+
+Nach dem aktuellen Modell und den aktuell berechneten Kosten ist das
+GLM-Modell wirtschaftlich besser, wobei der Distributed Random Forest
+als robusteres Modell angesehen werden kann. Zudem ist die Differenz der
+Kosten nur geringfügig.
+
+\end{document}

@@ -212,6 +212,7 @@ plot(perf_rocr_rpart, col="blue")
 abline(0,1)
 abline(v=0.2, col="red")
 ```
+/
 Die Fläche unterhalb der ROC-Kurve ist größer als 0,5 und damit liefert 
 das erstellte Modell eine genauere Vorhersage als bloßes Raten.
 
@@ -1018,6 +1019,7 @@ Die Matrix zeigt die zusammengefassten und berechneten Werte der besten Konfusio
 Daher wird jetzt der Unterschied der beiden anderen Modelle betrachtet. Dafür werden die Kostenfunktionen betrachtet.
 
 Kosten für DRF: 240.000
+
 Kosten für GLM: 233.500
 
 
