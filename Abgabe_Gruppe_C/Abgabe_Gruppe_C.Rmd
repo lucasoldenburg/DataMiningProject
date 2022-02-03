@@ -137,11 +137,15 @@ hot_test <- splits1[[2]]
 
 ## Erstellen der Train und Test Datensets
 ```{r}
-data_hot_test <- subset(hot_df, select = c("EmployeeChurned", "Age", "Month Of Service"))
-df_hot <- data.frame(data_hot_test)
+#data_hot_test <- subset(hot_df, select = c("EmployeeChurned", "Age", "Month Of Service")) #was?
+#df_hot <- data.frame(data_hot_test)
+#n <- nrow(df_hot)
+
+data_test <- subset(df, select = c("EmployeeChurned", "Age", "Month Of Service")) #was?
+df_hot <- data.frame(data_test)
 n <- nrow(df_hot)
 
-train_indices <- sample(1:n, round(2/3 * n))
+train_indices <- sample(1:n, round(0.75 * n))
 train <- df_hot[train_indices,]
 test <- df_hot[-train_indices,]
 
@@ -151,7 +155,7 @@ cols <- c(features, "EmployeeChurned")
 
 ```
 
-
+# Decision Tree
 
 ## Einfacher Entscheidungsbaum mit rpart-Bibliothek
 ```{r}
@@ -232,16 +236,16 @@ head(test_showPredict <- subset(test_rpart, select = c(prob,predict)),10)
 
 ## Modellgüte anhand der Konfusionsmatrix bestimmen
 ```{r}
-confusionMatrix(factor(test_rpart$predict), factor(test$EmployeeChurned),
+confusionMatrix(factor(test_rpart$predict), factor(test_rpart$EmployeeChurned),
                 positive = "1")
 ```
 Aufgrund des niedrigen Schwellenwertes, ist die Genauigkeit (Accuracy) gering. 
-Dafür weißt die balanzierte Genauigkeit (Balanced Accuracy) einen höheren Wert
+Dafür weist die balanzierte Genauigkeit (Balanced Accuracy) einen höheren Wert
 als die klassische Genauigkeit auf. 
 Es wird tendenziell erhöht auf eine Abwanderung der Mitarbeiter:innen klassifiziert.
-Dabei ist die geringe Spezifizität auf die hohe Zahl an FN-klassifizierten Werten 
+Dabei ist die geringe Spezifizität auf die hohe Zahl an FP-klassifizierten Werten 
 zurückzuführen. 
-Im Anwendungsfall ist dies nicht von Nachteil, da besonders FP-Klassifikationen
+Im Anwendungsfall ist dies nicht von Nachteil, da besonders FN-Klassifikationen
 vermieden werden sollten. Um dies aktiv in die Modellierung zu integrieren 
 sollen die mit den Fehlklassifikationen verbundenen Kosten in die Betrachtung
 mit einbezogen werden.
@@ -274,13 +278,13 @@ cost <- function(prob, actual,threshold2, cost_FN_func, cost_FP_func){
 }
 
 threshold_input_rpart <- c(0.05, 0.1, 0.15, 0.16, 0.17, 0.2, 0.23, 0.24, 0.25,
-                     0.3, 0.35, 0.45, 0.7) 
+                          0.26, 0.3, 0.35, 0.45, 0.7) 
 
 i <- 1
 costs_rpart <- c()
 
 while (i < length(threshold_input_rpart)+1) {
-    costs_rpart[[(length(costs_rpart) +1)]] <- cost(test$prob, test$EmployeeChurned, 
+    costs_rpart[[(length(costs_rpart) +1)]] <- cost(test_rpart$prob, test_rpart$EmployeeChurned, 
                                          threshold_input_rpart[i], cost_FN, cost_FP)
     i <- i+1
 }
@@ -289,8 +293,8 @@ cost_matrix_rpart <- matrix(c(threshold_input_rpart,costs_rpart),nrow=length(thr
 colnames(cost_matrix_rpart) <- c("Threshold", "Kosten in Euro")
 cost_matrix_rpart
 ```
-Mit Betrachtung der Kosten liegt der optimale Threshold für das Model bei 0,17
-und sollte für Vorhersagen eingesetzt werden. Es wurde der höchst mögliche 
+Mit Betrachtung der Kosten kann der optimale Threshold für das Modell festgelegt
+werden, der für die Vorhersagen eingesetzt werden sollte. Es wurde der höchst mögliche 
 Threshold bei den geringsten Kosten gewhählt, um ein balanzierteres Ergebnis
 zu erreichen.
 
@@ -304,8 +308,8 @@ confusionMatrix(factor(test_rpart$predict_rpart_opti), factor(test_rpart$Employe
                 positive = "1")
 ```
 Es werden fast alle Mitarbeiter:innen erkannt, die das Unternehmen verlassen.
-Allerdings ist die FN-Klassifikation sehr hoch. Eine Spezifizität von circa
-1/3 würde für einen hohen Aufwand bei Managern führen und nicht unbedingt für
+Allerdings ist die FP-Klassifikation sehr hoch. Eine Spezifizität von unter 0,5
+würde für einen hohen Aufwand bei Managern führen und nicht unbedingt für
 deren Zuspruch sorgen.
 Doch aufgrund der hohen Sensitivität kann eine noch gute balanzierte Genauigkeit
 von dem Modell bei Anwendung auf die Testdaten erreicht werden.
@@ -349,8 +353,8 @@ target_drf <- "EmployeeChurned"
 drf_params <- list( balance_classes = c(TRUE, FALSE),
                     ntrees = c(30, 50, 70),
                     max_depth = c(10, 15, 20, 25),
-                    min_split_improvement = c(0.001, 0.0001, 0.00001, 0.000001))
-#0.0000001
+                    min_split_improvement = c(0.001, 0.0001, 0.00001, 0.000001,
+                                              0.0000001))
 ```
 ## Hyperparameter
 balance classes - default False
@@ -387,9 +391,6 @@ best_drf_perf <- h2o.performance(model = best_drf,
 best_drf_perf
 ```
 Der Threshold wird automatisch auf die Metrik F1 optimiert.
-Empfohlener Threshold bei Maximierung von F1 bei ca. 0,27.
-Accuracy: ca. 73%
-Balanced Accuracy: ca. 73%  (Spezifizität: ca. 0,63)
 
 Ein deutlich niedriger Threshold (F1) als auf dem Trainingsdatenset ist zu erkennen
 sowie eine hohe FP-Klassifizierungsrate.
@@ -436,10 +437,10 @@ confusionMatrix(factor(testH2O_asdf_drf$predict), factor(testH2O_asdf_drf$Employ
                 positive = "1")
 ```
 Im Vergleich zur Threshold-Wahl basierend auf der Maximierung des F1-Scores ist 
-die Genauigkeit um fast 4 Prozentpunkte geringer, dafür ist die balanzierte
-Genauigkeit nur geringfügig gesunken. Dafür ist die Spezifizität von 0,63 auf
-0,88 stark angestiegen, was im Sinne des Use Cases wünschenswert ist, auch wenn
-dafür die Sensitivität von ca. 0,83 auf 0,56 gesunken ist.
+die Genauigkeit um geringer, dafür ist die balanzierte
+Genauigkeit nur geringfügig gesunken. Demgegenüber ist die Sensitivität
+stark angestiegen, was im Sinne des Use Cases wünschenswert ist, auch wenn
+dafür die Spezifizität gesunken ist.
 
 ## Optimierung mit Kostenfunktion
 ```{r}
@@ -487,15 +488,15 @@ confusionMatrix(factor(testH2O_asdf_drf$predict_opti), factor(testH2O_asdf_drf$E
                 positive = "1")
 
 ```
-Verglichen mit vorher eingesetten Thresholds ist dies der niedrigste, da eine 
-FP-Klassifikation stärker bestraft wird, als eine FN-Klassifikation. Das bestätigt
+Verglichen mit vorher eingesetzten Thresholds ist dies der niedrigste, da eine 
+FN-Klassifikation stärker bestraft wird, als eine FP-Klassifikation. Das bestätigt
 auch die hohe Sensitivität.
 Dadurch sinkt die Genauigkeit sowie die balanzierte Genauigkeit, wobei letztere
 größer ist und verglichen zum Ausgangswert (F1-Score-optimierter Threshold) nur 
-um 0,04 niedriger ist. 
-Die 311 FP-Klassifizierten Werte sollten im Rahmen des Use-Cases kritisch betrachtet
-werden, da diese Daten zur Unterstützung von Managern gelten soll und mti diesem
-Ergebnis viel Arbeit für diese Nutzergruppe entstehen würde. 
+geringfügig niedriger ist. 
+Die hohe Anzahl an FP-Klassifizierten Werte sollten im Rahmen des Use-Cases kritisch 
+betrachtet werden, da diese Daten zur Unterstützung von Managern gelten soll und mit
+diesem Ergebnis viel Arbeit für diese Nutzergruppe entstehen würde. 
 
 ## Wichtigkeit der Features
 ```{r}
@@ -524,10 +525,7 @@ Modellen deutlich höher.
 Gleicher Threshold nach Kostenfunktion(kann zufällig sein)
 
 
-
-
 # Logistic Regression
-
 
 ## Predictors und response
 ```{r}
@@ -757,7 +755,8 @@ varimp_glm <- h2o.varimp(best_glm)
 varimp_glm
 ```
 
-# Support Vecto Machine
+# Support Vector Machine
+
 ## Datenimport und Vorbereitung
 ```{r}
 df_svm <- read_xlsx("20220110_dataPrepped_beforeOneHot.xlsx")
@@ -976,22 +975,17 @@ das erstellte Modell eine genauere Vorhersage als bloßes Raten.
 Die Auswahl eines Thresholds ist bei einer SVM nicht sinnvoll, da das Ergebnis immer 1 oder 0 ist, d.h. entweder es ist auf der einen Seite der Linie oder der anderen. Daher ist der Threshold immer 1. Dies führt ebenfalls dazu, dass die Kostenfunktion nicht anwendbar ist, da der Threshold immer 1 ist, verändert sich das Ergebnis bei der Kostenfunktion ebenfalls nicht.
 
 ## Zusammenfassung SVM
-Es wurden diverse Möglickeiten genutzt die beste Vorhersage durch das SVM-Modell zu bestimmen. Zu erst wurde das klassische Verfahren durch die e1071-Bibliothek angewendet. Auf Grund der Datenstruktur die vorliegt konnten keine Statistisch sinnvollen Vorhersagen gemacht werde, da diese alle auf "0" gesetzt wurden. Somit wurden keine unterschiedlicen Bereiche entdeckt. 
+Es wurden diverse Möglickeiten genutzt die beste Vorhersage durch das SVM-Modell zu bestimmen. Zu erst wurde das klassische Verfahren durch die e1071-Bibliothek angewendet. Auf Grund der Datenstruktur die vorliegt konnten keine statistisch sinnvollen Vorhersagen gemacht werde, da diese alle auf "0" gesetzt wurden. Somit wurden keine unterschiedlicen Bereiche entdeckt. 
 Aus diesem Grund wurde mit der H2O-Bibliothek ein neuer Ansatz gestartet, da hier die DataFrames in eigene h20-DataFrames umgewandelt werden. Dies war jedoch nur auf den Rohdaten anwendbar und nicht mehr auf den One-Hot-Encodeten Daten. Hierbei wurden nicht alle Daten eingelesen, sondern nur diese, die durch das RandomForest-Modell den stärksten Einfluss haben, da sonst die Rechenleistung beim Tuning nicht ausreicht. 
 Die Ergebnisse der H2O Vorhersage lagen bei einem Error von ca. 40%.
 Darauf hin wurde getestet, ob die SVM-Methode von e1071 mit dem H2O-DataFram funktioniert, da dort die Daten wieder abgewandelt wurden. Dies hat funktioniert und dadurch konnte ein Tuning des "Gamma" und "Cost" Wertes vorgenommen werden. Dies führte zu einer Genauigkeit von: 60% für die Radial-Methode und 67% bei der Linearen-Methode. 
-Zur Vergelichbarkeit wurde eine ROC-Kurve konstuiert. Dabei war es leider nicht möglich die Modelle der e1071-Bibliothek zu nutzen, weshalb noch einmal die H2O-SVM methode mit den optimierten Parametern der e1071-tune-Funktion durchgeführt wurde. Dies führte zu einer Fehleranfälligkeit von 37% jedoch bei der uns wichtigen False-Negative Rate einen Error von 28%. Dies ist nochmals eine deutliche Verbessung zum Anfang und somit das beste Ergbnis des SVM-Modells.
+Zur Vergleichbarkeit wurde eine ROC-Kurve konstuiert. Dabei war es leider nicht möglich die Modelle der e1071-Bibliothek zu nutzen, weshalb noch einmal die H2O-SVM methode mit den optimierten Parametern der e1071-tune-Funktion durchgeführt wurde. Dies führte zu einer Fehleranfälligkeit von 37% jedoch bei der uns wichtigen False-Negative Rate einen Error von 28%. Dies ist nochmals eine deutliche Verbessung zum Anfang und somit das beste Ergbnis des SVM-Modells.
+
 
 # Vergleich aller Modelle
 
 ## Vergleich der Algorithmen anhand der einzelnen ROC-Kurven
 ```{r}
-# pred_rocr_drf <- prediction(raw_testH2O_asdf$prob, raw_testH2O_asdf$EmployeeChurned)
-# perf_rocr_drf <- performance(pred_rocr_drf, "tpr", "fpr" )
-# pred_rocr <- prediction(raw_test$prob, raw_test$EmployeeChurned)
-# perf_rocr <- performance(pred_rocr, "tpr", "fpr" )
-
-
 # Darstellung der ROC-Kurve
 plot(perf_rocr_rpart, col="red")
 plot(perf_rocr_drf, col="blue", add=TRUE)
@@ -1006,30 +1000,30 @@ title(main = "Vergleich der Algorithmen anhand der einzelnen ROC-Kurven")
 ```
 
 
-
-
 ## Vergleich anhand der Konfusionsmatrizen
 
-Zum Vergleich aller Modelle, betrachten wir die Eintrittswahrscheinlichkeit von False-Positive Klassifikation unter allen False-Predictions, d.h. die Wahrscheinlichkeit, dass vorrausgesagt wird der Mitarbeitende bleibt im Unternehmen ist falsch. Des Weiteren betrachten wir die allgemeine Acurracy. Dabei betrachten wir lediglich die besten Vorhersagen je Modell.
+Zum Vergleich aller Modelle, betrachten wir die Eintrittswahrscheinlichkeit von False-Negative Klassifikationen unter allen False-Predictions, d.h. die Wahrscheinlichkeit, dass vorrausgesagt wird der Mitarbeitende bleibt im Unternehmen ist falsch. Des Weiteren betrachten wir die allgemeine Acurracy. Dabei betrachten wir lediglich die besten Vorhersagen je Modell.
 
 ```{r}
-false_positive <- c(10, 7, 29)
+false_negative <- c(10, 7, 29)
 acurracy <- c(65,59, 62)
-auswertung <- matrix(c(false_positive, acurracy), nrow=3)
-colnames(auswertung) <- c("False-Positve-Rate", "Acurracy in %")
+auswertung <- matrix(c(false_negative, acurracy), nrow=3)
+colnames(auswertung) <- c("False-Negative-Rate in %", "Acurracy in %")
 rownames(auswertung) <- c("Distributed Random Forrest", "Logistic Regression", "Support-Vector Machine")
 print(auswertung)
 
 ```
 
 Die Matrix zeigt die zusammengefassten und berechneten Werte der besten Konfusionsmatrizen der verschiedenen Modelle. Klar erkennbar ist, dass die Anwendung des Support-Vector Machine Modells eine vergleichweise gute Genauigkeit vorweist wie die anderen. Jedoch schneidet die False-Positive-Rate wesentlich schlechter als die beiden anderen ab, was im Kontext des Anwendungsfalls zu höheren Kosten führen würde. Dies liegt daran, dass das Modell nicht extra daruaf trainiert werden konnte, da der Threshold wie oben beschrieben immer "1" ist. 
-Daher wird jetzt der Unterschied der beiden anderen Modelle betrachtet. Dafür werden Kostenfunktion betrachtet.
+Daher wird jetzt der Unterschied der beiden anderen Modelle betrachtet. Dafür werden die Kostenfunktionen betrachtet.
 
 Kosten für DRF: 240.000
 Kosten für GLM: 233.500
 
 
-Nach dem aktuellen Modell und den aktuell berechneten Kosten ist das GLM-Modell wirtschaftlich besser.
+Nach dem aktuellen Modell und den aktuell berechneten Kosten ist das GLM-Modell wirtschaftlich besser,
+wobei der Distributed Random Forest als robusteres Modell angesehen werden kann. Zudem ist die 
+Differenz der Kosten nur geringfügig.
 
 
 

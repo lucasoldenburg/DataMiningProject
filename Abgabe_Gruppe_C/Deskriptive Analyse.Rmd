@@ -1,0 +1,887 @@
+---
+title: "Deskriptive Analyse"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+## Employee Churn
+Wahrscheinlichkeit der Mitarbeiterfluktuation im BASF Service Hub Berlin
+
+
+Das BASF Service Hub Berlin ist ein Shared Service Center. Seit 2005 erbringt es
+Dienstleistungen für Gruppengesellschaften der BASF sowie dem Mutterkonzern, der BASF SE. Die BASF ist nach Umsatz das global führende Chemie-Unternehmen mit circa 115.000 Mitarbeitern weltweit.
+Die angebotenen Dienstleistungen umfassen Aktivitäten in den Bereichen Personalwesen, internes und externes Rechnungswesen, Einkauf, Supply Chain. Zudem bestehen kleinere Teams, die an digitalen Lösungen in der Landwirtschaft arbeiten oder im Feld der Produktsicherheit tätig sind. 
+
+Als Service Hub ist die Fluktuation, die Mitarbeiterabwanderung, höher als an den
+Produktionsstandorten der BASF und liegt im Durchschnitt bei 12-13% jährlich.
+Dies hat zur Folge, dass stetig rekrutiert werden muss, was einen Aufwand für die
+Recrutierungsabteilung und die Manager darstellt, die neue Kandidaten finden müssen.
+Zudem stellt das Onboarding einen zeitlichen Aufwand für die Teams dar und bis eine
+neue Arbeitskraft vollumfänglich eingearbeitet ist, muss das Tagesgeschäft von 
+den Kollegen:innen weiterhin gestemmt werden.
+
+Um die Fluktuationsrate zu senken, können Manager frühzeitig Maßnahmen einleiten.
+Dazu zählen beispielsweise Weiterbildungsangebote, Beförderungen, Job-Rotation oder -Enlargement.
+
+Dass die Wahrscheinlichkeit, dass eine Arbeitskraft das Unternehmen verlassen wird hoch ist, müssen die Manager erkennen. Dies ist jedoch in der Regel eine subjektive Einschätzung.
+
+"Data to Dialouge" - Mittels datengestützter Analysen soll eine zusätzliche Sicht auf die mögliche Fluktuation der Arbeitskräfte gelegt werden. Die aus den Daten gewonnenen Erkenntnisse können die Führungskräfte ihren eigenen Wahrnehmungen gegenüberstellen und abwägen, ob sie mit der Arbeitskraft ins Gespräch gehen und möglicherweise Maßnahmen zum Halten der Person einleiten.
+
+Das Ziel ist es demnach, vorherzusagen, wie wahrscheinlich es ist, dass eine Arbeitskraft zu einem Zeitpunkt das Unternehmen verlassen wird. Diese Informationen können dann in die bereits bestehende Reportinglandschaft (Dashboards) eingebettet werden.
+
+Im Rahmen der Arbeit betrachtete Abgänge sind dabei: Kündigung (von Mitarbeitenden oder Arbeitgeber veranlasst), Aufhebungsverträge (Einigungen das Arbeitsverhältnis vorzeitig zu beenden entweder von Mitarbeitenden oder Arbeitgeber veranlasst), Kündigung in der Probezeit und keine Verlängerung befristeter Arbeitsverhältnisse. Letzteres könnte in der Verfeinerung aus dem Modell entfernt werden. Es ist aufgrund der Bemühung genügend Datenpunkte zu erhalten im ersten Schritt nicht entfernt worden. 
+
+Für die Datengrundlage sind eine Reihe an Tabellen aus dem SAP Data Warehouse System im Einsatz. Orientiert wird sich dabei an Phasen, die eine Arbeitskraft im Zuge der Tätigkeit für ein Unternehmen durchläuft. Besonderer Fokus liegt dabei auf den Informationen über die Arbeitskraft zu Beginn der Arbeitstätigkeit und dem Zeitpunkt der letzten Aktivität sowie der Entwicklung. Im Detail werden im Weiteren die Merkmale einzeln beschrieben und analysiert, bei Bedarf klassiert (bei vielen Merkmalsausprägungen qualitativer Merkmale).
+Die Abgänge seit Januar 2016 bis Oktober 2021 sowie die derzeit aktiven Mitarbeitenden werden in dieser Arbeit betrachtet. 
+
+Zur Vorhersage, ob eine Arbeitskraft wahrscheinlich das Unternehmen verlässt, kommen Algorithmen des überwachten maschinellen Lernens zum Einsatz. Es handelt sich um eine Klassifizierung zwischen zwei Klassen. Neben einem Entscheidungsbaum und Tree-Ensambles (Boosting, Bagging, möglicherweise Einsatz von XGBoost) wird die logistische Regression eingesetzt. Im dritten Modell soll die Vorhersage mittels einer Support Vector Maschine durchgeführt werden.
+
+Die Ergebnisse der unterschiedlichen Modelle werden mittels der AUC (Area under the curve) und einer Confusion-Matrix miteinander verglichen. Zusätzlich zur Accuracy soll die Balanced Accuracy untersucht werden.
+
+Um die einzelne Modelle der Realität anzupassen soll mit einer Kostenfunktion optimiert werden, welche Falsch-Positive-Werte (FP) und Falsch-Negative-Werte (FN) unterschiedlich bestraft.
+Falsch-Negative-Werte (Arbeitskraft verlässt das Unternehmen, aber Modell hat als nicht-riskant klassifiziert) sorgen für Kosten in der Rekrutierung von neuem Personal und verursachen eine erhöhte Belastung für die Teams.
+Falsch-Positive-Werte (Arbeitskraft plant Unternehmen nicht zu verlassen, aber Modell hat als riskant klassifiziert) führen zu Kosten durch Aufwand für den Manager und die besagte Arbeitskraft, da diese in den Austausch gehen. Zusätzlich kann es zu möglicherweise vermeidbaren Kosten kommen, die im Zuge des Versuchs die Arbeitskraft zu halten, entstehen (Weiterbildung, Gehaltserhöhung). 
+Diese Kosten jedoch zu verallgemeinern, führt zu ungenauen und potenziell falschen Ergebnissen. Zudem ist für eine genaue Schätzung ein hoher Grad an Verständnis in dem Spezialbereich nötig. Dafür ist der Austausch mit den Experten der lokalen Personalabteilung des BASF Service Hubs Berlin geplant. Allgemein sollten jedoch die Falsch-Negativ-Klassifikationen minimiert werden.
+
+### Aufgabenstellung
+
+Deskriptive Analyse der Daten: Was beschreiben die Daten, was sind die Datentypen und Wertebereiche, fehlen Daten, gibt es falsche Werte, gibt es Korrelationen zwischen Merkmalen (Features, Spalten)? Benutzen Sie Visualisierungen, wenn es sinnvoll erscheint. Was können wir aus dieser deskriptiven Analyse über das Problem lernen?
+
+### Set-Up 
+Zu erst werden die benötigten Bibliotheken geladen. Die Daten werden anschließend aus einer .xlsx-Datei eingelesen.
+```{r}
+library(readxl)
+library(writexl)
+library(ggplot2)
+library(tidyr)
+library(stringr)
+library(lubridate)
+library(mltools)
+library(data.table)
+
+df <- read_xlsx("20211209_raw_dataset.xlsx")
+```
+Wie der Präsentation zur Projektdefiniton zu entnehmen ist, wurden die Daten mittels
+des Tools Alteryx aus dem SAP Data Warehouse extrahiert. Dabei kamen fünf untschiedliche
+Cubes als Datenbasis zum Einsatz. Darüber hinaus wurden mit Hilfe von zwei Mapping-
+Tabellen die Positionen in Gehaltsbänder sowie die den Mitarbeitenden zugeordneten
+Kostenstellen den Funktionsbereichen zugeordnet.
+Basierend auf der Central Person ID (Unique Identifier) wurden die Tabellen miteinander
+gejoined.
+Aus den Zeitstemplen wurden Zeiträumbe berechnet und im Themengebiet Entwicklung kam
+es zur Erstellung neuer Features aus den gegebenen Datenpunkten (Entwicklung von
+tariflicher Beschäftigung in außertarifliche Beschäftigung, Anzahl an horizontalen
+oder vertikalen Entwicklungen). 
+
+
+Danach erfolgt die Umwandlung von Zahlenwerten in das Format Numeric und die Datumswerte in das Format Datum. 
+```{r}
+#Years in Numerisch umwandeln
+#all Chars in numeric 
+  #Years of Service Berlin
+data_chars_as_num <- df
+
+YearsOfService_BASFBerlin <- df[3]
+data_chars_as_num[ ,  "YearsOfService_BASFBerlin"] <- 
+  as.data.frame(apply(data_chars_as_num[ , "YearsOfService_BASFBerlin"], 2, as.numeric))
+
+  #Years Service all
+YearsOfService_BASFall <- df[8]
+data_chars_as_num[ ,  "YearsOfService_BASFall"] <- 
+  as.data.frame(apply(data_chars_as_num[ , "YearsOfService_BASFall"], 2, as.numeric))
+
+df[3] <- data_chars_as_num[3]
+df[8] <- data_chars_as_num[8]
+
+
+df$`start_Calendar Year/Month` <- as.Date(df$`start_Calendar Year/Month`, "%d.%M.%y")
+df$`Date of Birth` <- as.Date(df$`Date of Birth`, '%d.%M.%y')
+df$`Last_Development_Calendar Year/Month` <- as.Date(df$`Last_Development_Calendar Year/Month`, '%d.%M.%y')
+df$`LastActive_Calendar Year/Month` <- as.Date(df$`LastActive_Calendar Year/Month`, '%d.%M.%y')
+
+```
+
+### Bereiniegen der Grunddaten und erzeugen neuer wichtiger Features
+Auf Grund der damaliegen Umstellung des Systems ist das Startdatum von 158 Mitarbeitern nicht bekannt. Diese entfernen wir aus unserem Datensatz, da wir für diese Mitarbeiter keine Anstellungsdauer berechnen können. 
+
+Folgend berechnen wir die Anstellungsdauer in Monaten, das Alter und die Zeit zwischen letztem Arbeitstag und letzter Beförderung der Mitarbeiter und legen diese jeweils in einer neuen Spalte ab. 
+Die Spalten 'YearsOfService_BASfall' 'YearsOfService_BASFBerlin', 'Last_Development_Calendar Year/Month' und 'Date of Birth' werden gelöscht, da wir diese durch 'month Of Service', 'Months Since Last Development' und 'age'.
+
+```{r}
+df <- df %>% drop_na('start_Calendar Year/Month')
+sum(is.na(df$`start_Calendar Year/Month`))
+
+start <- df$`start_Calendar Year/Month`
+end <- df$`LastActive_Calendar Year/Month`
+
+
+df$`Month Of Service` <- round(difftime(end, start, units = "days")/30)
+df$`Month Of Service` <- as.numeric(df$`Month Of Service`)
+# Age
+df$Age <- round(difftime(end, df$`Date of Birth`, units = "days") /365)
+df$Age <- as.numeric(df$Age)
+# Time since last development
+df$'Months Since Last Development' <- round(difftime(end, df$`Last_Development_Calendar Year/Month`, units = "days")/30)
+df$`Months Since Last Development` <- as.numeric(df$`Months Since Last Development`)
+
+df$YearsOfService_BASFBerlin <- NULL
+df$YearsOfService_BASFall <- NULL
+df$`Last_Development_Calendar Year/Month` <- NULL
+df$`Date of Birth` <- NULL
+
+```
+
+
+### EmployeeChurned
+Dies ist das Ziel-Merkmal und beschreibt, ob die Person das Unternehmen verlassen hat (1) oder noch aktiv ist (0).
+```{r}
+unique(df$EmployeeChurned)
+summary(df$EmployeeChurned)
+sum(is.na(df$EmployeeChurned))
+qplot(df$EmployeeChurned)
+```
+
+
+### Gender
+Dieses Merkmal beschreibt das Geschlecht der Person.
+```{r}
+df$Gender <- replace(df$Gender,df$Gender== "Male","0")
+df$Gender <- replace(df$Gender,df$Gender== "Female","1")
+
+unique(df$Gender)
+summary(df$Gender)
+sum(is.na(df$Gender))
+qplot(df$Gender)
+```
+
+### Nationality
+Dieses Merkmal beschreibt die Nationalität der Person.
+```{r}
+# todo: Gruppieren nach DE, EU, NotEU
+unique(df$Nationality)
+summary(df$Nationality)
+sum(is.na(df$Nationality))
+df$Nationality <- NULL
+```
+
+### Nationality_Classification
+Dieses Merkmal beschreibt die Nationalität der Person klassiert in "German", "EU" und "Other".
+```{r}
+unique(df$Nationality_Classification)
+summary(df$Nationality_Classification)
+sum(is.na(df$Nationality_Classification))
+qplot(sort(df$Nationality_Classification))
+
+df$Nationality_Classification <- as.factor(df$Nationality_Classification)
+```
+
+### Position text
+Dieses Merkmal beschreibt in welcher Position die Person tätig ist bzw. zuletzt war. 
+Es kann auch als Planstelle bezeichnet werden. Aufgrund der Menge an Merkmalsausprägungen
+werden diese im weiteren Verlauf in Clustern zusammengefasst (Paybands).
+```{r}
+unique(df$`Position text`)
+summary(df$`Position text`)
+sum(is.na(df$`Position text`))
+
+df$`Position text` <- NULL
+```
+
+### Role
+Dieses Merkmal beschreibt die Rolle der Person.
+Aufgrund der Menge an Merkmalsausprägungen und der weniger verbreiteten Anwendung
+im Unternehmenskontext wird dieses Merkmal entfernt. Die Informationen sind allerdings in 
+vergleichbarer Art im Paybands-Merkmal enthalten.
+```{r}
+unique(df$Role)
+summary(df$Role)
+sum(is.na(df$Role))
+# qplot(df$Role)
+
+df$Role <- NULL
+```
+
+### Part Time Mark
+Dieses Merkmal beschreibt, ob die Person zum Zeitpunkt der letzten Aktivität 
+in Teilzeit tätig ist/war (1) oder nicht (0).
+```{r}
+unique(df$`Part Time Mark`)
+summary(df$`Part Time Mark`)
+sum(is.na(df$`Part Time Mark`))
+qplot(df$`Part Time Mark`)
+
+df$`Part Time Mark` <- replace(df$`Part Time Mark`,df$`Part Time Mark`== "no","0")
+df$`Part Time Mark` <- replace(df$`Part Time Mark`,df$`Part Time Mark`== "yes","1")
+```
+
+### Global contract type
+Dieses Merkmal beschreibt die Vertragsart der Person zum Zeitpunkt der letzten Aktivität.
+0 - permanent staff (unbefristet)
+1 - temporary personnel (befristet)
+```{r}
+df$`Global contract type` <- replace(df$`Global contract type`,df$`Global contract type`== "apprentice","1")
+
+unique(df$`Global contract type`)
+summary(df$`Global contract type`)
+sum(is.na(df$`Global contract type`))
+qplot(df$`Global contract type`)
+
+df$`Global contract type` <- replace(df$`Global contract type`,df$`Global contract type`== "permanent staff","0")
+df$`Global contract type` <- replace(df$`Global contract type`,df$`Global contract type`== "temporary personnel","1")
+
+colnames(df)[which(names(df) == "Global contract type")] <- "TemporaryPersonel"
+qplot(df$`TemporaryPersonel`)
+```
+
+### Employee Subgroup text
+Dieses Merkmal beschreibt welcher Mitarbeitergruppe die Person zugeordnet ist/war.
+
+Aufgrund der Verteilung ist eine Einstufung nur in die Gruppen "exempt" (außertarfilich beschäftigt)
+und "non exempt" (tariflich beschäftigt).
+0 - "exempt" umfasst: "exempt", "exempt higher level", "senior executive"
+1 - "non exempt": "non-exempt (white)",  "working student whit", "apprentice"
+
+```{r}
+unique(df$`Employee Subgroup text`)
+summary(df$`Employee Subgroup text`)
+sum(is.na(df$`Employee Subgroup text`))
+# qplot(df$`Employee Subgroup text`)
+
+df$`Employee Subgoup text clustered` <- df$`Employee Subgroup text`
+df$`Employee Subgoup text clustered` <- replace(df$`Employee Subgoup text clustered`,df$`Employee Subgoup text clustered`== "exempt","0")
+df$`Employee Subgoup text clustered` <- replace(df$`Employee Subgoup text clustered`,df$`Employee Subgoup text clustered`== "exempt higher level","0")
+df$`Employee Subgoup text clustered` <- replace(df$`Employee Subgoup text clustered`,df$`Employee Subgoup text clustered`== "senior executive","0")
+df$`Employee Subgoup text clustered` <- replace(df$`Employee Subgoup text clustered`,df$`Employee Subgoup text clustered`== "non-exempt (white)","1")
+df$`Employee Subgoup text clustered` <- replace(df$`Employee Subgoup text clustered`,df$`Employee Subgoup text clustered`== "working student whit","1")
+df$`Employee Subgoup text clustered` <- replace(df$`Employee Subgoup text clustered`,df$`Employee Subgoup text clustered`== "apprentice","1")
+
+colnames(df)[which(names(df) == "Employee Subgoup text clustered")] <- "NonExempt"
+
+unique(df$'NonExempt')
+summary(df$'NonExempt')
+sum(is.na(df$'NonExempt'))
+qplot(df$'NonExempt')
+
+df$`Employee Subgroup text` <- NULL
+
+```
+
+### Cost Center long
+Dieses Merkmal beschreibt die Kostenstelle inclusive der Zuordnung der Region und dem Unternehmen.
+```{r}
+# unique(df$`Cost Center long`)
+summary(df$`Cost Center long`)
+sum(is.na(df$`Cost Center long`))
+
+df$`Cost Center long` <-  NULL
+```
+
+### Cost Center text
+Dieses Merkmal beschreibt den Namen der Kostenstelle.
+```{r}
+# unique(df$`Cost Center text`)
+summary(df$`Cost Center text`)
+sum(is.na(df$`Cost Center text`))
+
+df$`Cost Center text` <- NULL
+```
+
+### LastActive_Calendar Year/Month
+Dieses Merkmal beschreibt, wann die Person das letzte Mal aktiv war.
+```{r}
+# unique(df$`LastActive_Calendar Year/Month`)
+summary(df$`LastActive_Calendar Year/Month`)
+sum(is.na(df$`LastActive_Calendar Year/Month`))
+```
+
+### TEC
+Dieses Merkmal beschreibt ob die Person einen vollumfänglichen Vertrag mit dem Standort Berlin hat.
+Beispielsweise haben Praktikanten oder Leasingkräfte keinen solchen Vertrag. Im Fokus der Analyse
+sollten deswegen die TEC-Kräfte stehen, da diese auch nur im Personal-Reporting berücksichtigt werden.
+```{r}
+unique(df$TEC)
+summary(df$TEC)
+sum(is.na(df$TEC))
+
+df$TEC <- NULL
+```
+
+### Stelle (SAP)
+Dieses Merkmal beschreibt die Position der Person, wie sie in SAP (Quellsystem) gepflegt ist.
+```{r}
+unique(df$`Stelle (SAP)`)
+summary(df$`Stelle (SAP)`)
+sum(is.na(df$`Stelle (SAP)`))
+# qplot(df$`Stelle (SAP)`)
+```
+
+```{r}
+df$`Stelle (SAP)` <- NULL
+```
+
+### In Dashboard
+Dieses Merkmal beschreibt die Position der Person in Clustern. Dabei wird sich an den Gehaltsbändern orientiert.
+Payband "A" ist dabei das niedrigste und Payband "H" das höchste.
+```{r}
+unique(df$`In Dashboard`)
+summary(df$`In Dashboard`)
+sum(is.na(df$`In Dashboard`))
+# qplot(df$`In Dashboard`)
+
+df$`Paybands`<- df$`In Dashboard`
+df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Apprentice / Apprentice BA","A")
+df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Student Trainee / Trainee" ,"B")
+df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Assistant" ,"C")
+df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Officer / Team Assistant","C")
+df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Accountant/Advisor/Buyer/Specialist und Senior Officer","D")
+df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Senior Accountant/Advisor/Buyer/Specialist","D")
+df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Executive Accountant/Advisor/Buyer/Specialist/Assistant","E")
+df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Teamspecialist / Knowledge Coordinator" ,"F")
+df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Manager","G")
+df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Manager","G")
+df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Project Manager / Expert","G")
+df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Head of","H")
+df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Senior Expert / Senior Project Manager / Senior Manager/ Finance Manager","H")
+df$`Paybands` <- replace(df$`Paybands`,df$`Paybands`== "Senior Executive","H")
+
+df$`Paybands` <- as.factor(df$`Paybands`)
+qplot(df$Paybands)
+df$`In Dashboard` <- NULL
+```
+
+### Paybands
+Dieses Merkmal beschreibt die Position der Person in Klustern. Dabei wird sich an den Gehaltsbändern orientiert.
+```{r}
+sum(is.na(df$`Paybands`))
+
+#Verlust der Datenpunkte vermeiden und Gehaltsband mit höchster
+#Ausprägung angeben (Payband D)
+df$Paybands2 <- df$Paybands %>% str_replace_na("D")
+
+df$Paybands <- as.factor(df$Paybands2)
+df$Paybands2 <- NULL
+
+unique(df$`Paybands`)
+summary(df$`Paybands`)
+
+# qplot(df$`Paybands`)
+
+```
+
+
+### Name on Dashboard
+Dieses Merkmal beschreibt die Position der Person in Klustern. Dabei wird sich an den Gehaltsbändern orientiert und in Oberbegriffe untergliedert
+Da der Wertebereich noch relativ hoch ist, könnte eine zusätzliche Gruppierung, die sich noch näher an die Gehaltsbänder anpasst, 
+verfolgt werden.
+```{r}
+unique(df$`Name on Dashboard`)
+
+summary(df$`Name on Dashboard`)
+#sum(is.na(df$`Name on Dashboard`))
+
+df$`Name on Dashboard` <- NULL
+```
+
+
+### Classification
+Dieses Merkmal beschreibt die Einteilung in Mitarbeitergruppen in der Logik des Reportings am Standort Berlin.
+Die "Employee Subgroup" sollte bevorzugt eingesetzt werden in einer vergleichsweisen Gruppierung.
+```{r}
+unique(df$Classification)
+summary(df$Classification)
+sum(is.na(df$Classification))
+qplot(df$Classification)
+
+df$Classification <- NULL
+```
+
+### development to exempt
+Dieses Merkmal beschreibt die Entwicklung einer Person von tariflich beschäftigt zu außer-tariflich beschäftigt (1)
+oder nicht (0).
+Diese Entwicklung ist oft im Zusammenhang mit der Beförderung in eine Experten- oder Managerfunktion zu beobachten.
+Die zweifache Entwicklung zum außertariflichen Beschäftigungsverhältnis kann auf einen Eingabefehler zurück-
+geführt werden und wird in diesem Schritt in eine "1" umgewandelt.
+```{r}
+df$`development to exempt` <- replace(df$`development to exempt`,df$`development to exempt`== "2","1")
+unique(df$'development to exempt')
+summary(df$'development to exempt')
+sum(is.na(df$'development to exempt'))
+qplot(df$'development to exempt')
+
+```
+
+### Vertical_Horizontal_Developments 
+Dieser Wert sagt aus, wie oft der Mitarbeiter vertikal und horizontal im Unternhemen befördert wurde.
+
+```{r}
+unique(df$Vertical_Horizontal_Developments)
+summary(df$Vertical_Horizontal_Developments)
+sum(is.na(df$Vertical_Horizontal_Developments))
+qplot(df$Vertical_Horizontal_Developments)
+
+df$Vertical_Horizontal_Developments <- replace(df$Vertical_Horizontal_Developments,df$Vertical_Horizontal_Developments== "1","1-2")
+df$Vertical_Horizontal_Developments <- replace(df$Vertical_Horizontal_Developments,df$Vertical_Horizontal_Developments== "2","1-2")
+df$Vertical_Horizontal_Developments <- replace(df$Vertical_Horizontal_Developments,df$Vertical_Horizontal_Developments== "3",">= 3")
+df$Vertical_Horizontal_Developments <- replace(df$Vertical_Horizontal_Developments,df$Vertical_Horizontal_Developments== "4",">= 3")
+df$Vertical_Horizontal_Developments <- replace(df$Vertical_Horizontal_Developments,df$Vertical_Horizontal_Developments== "5",">= 3")
+df$Vertical_Horizontal_Developments <- replace(df$Vertical_Horizontal_Developments,df$Vertical_Horizontal_Developments== "6",">= 3")
+df$Vertical_Horizontal_Developments <- replace(df$Vertical_Horizontal_Developments,df$Vertical_Horizontal_Developments== "7",">= 3")
+df$Vertical_Horizontal_Developments <- replace(df$Vertical_Horizontal_Developments,df$Vertical_Horizontal_Developments== "8",">= 3")
+
+df$Vertical_Horizontal_Developments <- as.factor(df$Vertical_Horizontal_Developments)
+
+```
+
+### start_Calendar Year/Month 
+Ist das Datum an dem der Mitarbeiter im Unternhemen angefangen hat.
+
+```{r}
+# unique(df$'start_Calendar Year/Month')
+summary(df$'start_Calendar Year/Month')
+sum(is.na(df$'start_Calendar Year/Month'))
+#hier nach Jahren und eventuell Monaten splitten, dann könnte man ne Abhängigkeit zeigen, dass z.B. Menschen die Monat Januar anfangen schneller aussteigen als #im März :D
+
+```
+
+
+### start_contract type 
+Hat der Mitarbeiter bei Anstellung einen temporären oder dauerhaften Vertrag bekommen? Dieses Merkmal beschreibt 
+die Vertragsart der Person zum Start im Unternehmen. Diese unterscheidet sich leicht zur Ausprägung "Global contract type".
+```{r}
+unique(df$'start_contract type')
+summary(df$'start_contract type')
+sum(is.na(df$'start_contract type'))
+qplot(df$'start_contract type')
+
+df$'start_contract type' <- as.factor(df$'start_contract type')
+```
+
+### start_Part time mark 
+Zu Beginn der Anstellung in Teilzeit angestellt. Dieses Merkmal beschreibt, ob die Person zum Zeitpunkt
+der ersten Aktivität in Teilzeit tätig ist/war (1) oder nicht (0).
+```{r}
+unique(df$'start_Part time mark')
+summary(df$'start_Part time mark')
+sum(is.na(df$'start_Part time mark'))
+qplot(df$'start_Part time mark')
+
+df$'start_Part time mark' <- replace(df$'start_Part time mark',df$'start_Part time mark'== "no","0")
+df$'start_Part time mark' <- replace(df$'start_Part time mark',df$'start_Part time mark'== "yes","1")
+```
+
+
+### start_employee subgroup detail 
+Beschreibt Vertragsart bei Anstellung
+Aufgrund der Verteilung ist eine Einstufung nur in die Gruppen "exempt" (außertarfilich beschäftigt)
+und "non exempt" (tariflich beschäftigt).
+0 - "exempt" umfasst: "exempt", "exempt higher level", "senior executive"
+1 - "non exempt": "non-exempt (white)",  "working student whit", "apprentice"
+```{r}
+unique(df$'start_employee subgroup detail')
+summary(df$'start_employee subgroup detail')
+sum(is.na(df$'start_employee subgroup detail'))
+
+#cluster in exampt and non exempt
+df$'start_employee subgroup detail clustered' <- df$'start_employee subgroup detail'
+df$'start_employee subgroup detail clustered' <- replace(df$'start_employee subgroup detail clustered',df$'start_employee subgroup detail clustered'== "exempt","0")
+df$'start_employee subgroup detail clustered' <- replace(df$'start_employee subgroup detail clustered',df$'start_employee subgroup detail clustered'== "exempt higher level","0")
+df$'start_employee subgroup detail clustered' <- replace(df$'start_employee subgroup detail clustered',df$'start_employee subgroup detail clustered'== "senior executive","0")
+df$'start_employee subgroup detail clustered' <- replace(df$'start_employee subgroup detail clustered',df$'start_employee subgroup detail clustered'== "non-exempt (white)","1")
+df$'start_employee subgroup detail clustered' <- replace(df$'start_employee subgroup detail clustered',df$'start_employee subgroup detail clustered'== "working student whit","1")
+df$'start_employee subgroup detail clustered' <- replace(df$'start_employee subgroup detail clustered',df$'start_employee subgroup detail clustered'== "apprentice","1")
+
+colnames(df)[colnames(df) == "start_employee subgroup detail clustered"] <- "start_NonExempt"
+
+qplot(df$start_NonExempt)
+df$`start_employee subgroup detail` <- NULL
+
+```
+
+
+### start_Cost Center2 
+Dieses Merkmal beschreibt die Kostenstelle zum Start am Standort Berlin.
+```{r}
+# unique(df$'start_Cost Center2')
+summary(df$'start_Cost Center2')
+sum(is.na(df$'start_Cost Center2'))
+
+```
+Da es sehr viele unterschiedliche Ausprägungen bei diesem Merkmal gibt und die interne Rechnungstelle für uns in keinem sichtbaren Zusammenhang mit dem Mitarbeiter sthet, da dies keinen Einfluss auf den Mitarbeiter an sich hat, haben wir uns entschieden dieses Merkmal nicht weiter zu berücksichtiegen.
+Dieses Merkmal beschreibt die Kostenstelle inclusive der Zuordnung der Region und dem Unternehmen.
+
+```{r}
+df$`start_Cost Center2` <- NULL
+```
+
+
+### start_Employee group 
+Gibt an, ob der Mitarbeiter befristet oder unbefristet angestellt wurde. 
+Inhaltlich kommt es zu einer Überschneidung mit dem "start_contract type"-Merkmal.
+```{r}
+unique(df$'start_Employee group')
+summary(df$'start_Employee group')
+sum(is.na(df$'start_Employee groupl'))
+qplot(df$'start_Employee group')
+
+df$'start_Employee group' <- NULL
+```
+
+### Cost Center
+Dieses Merkmal beschreibt die Kostenstelle der Person zum letzten aktiven Zeitpunkt.
+```{r}
+# unique(df$'Cost Center')
+summary(df$'Cost Center')
+sum(is.na(df$'Cost Center'))
+# qplot(df$'Cost Center')
+```
+
+Wie oben bereits erläutert hat die Kostenstelle keinen Einfluss auf die Mitarbeiter, da dies intern geschieht und mögliche Zusammenhänge kausal ausgeschlossen sind, werden wir dieses Merkmal nicht weiter berücksichtigen
+```{r}
+df$`Cost Center` <- NULL
+```
+
+
+### decrease_Category 
+Funktionsbereich beim Verlassen des Unternehmens.
+Der Funktionsbereich wurde anhand der Kostenstelle aus einer weiteren Tabelle hinzugefügt. 
+```{r}
+sum(is.na(df$'decrease_Category'))
+df$decrease_Category2 <- df$'decrease_Category' %>% str_replace_na("Other")
+
+df$'decrease_Category' <- as.factor(df$'decrease_Category2')
+df$'decrease_Category2'<- NULL
+
+df$'decrease_Category' <- replace(df$'decrease_Category',df$'decrease_Category'== "IT Service CC","Other")
+df$'decrease_Category' <- replace(df$'decrease_Category',df$'decrease_Category'== "GBR/N","Other")
+df$'decrease_Category' <- replace(df$'decrease_Category',df$'decrease_Category'== "Intellectual Property","Other")
+df$'decrease_Category' <- replace(df$'decrease_Category',df$'decrease_Category'== "RAA/A Competence","Other")
+df$'decrease_Category' <- replace(df$'decrease_Category',df$'decrease_Category'== "Procurement Services - GP","Other")
+
+unique(df$'decrease_Category')
+summary(df$'decrease_Category')
+qplot(df$'decrease_Category')
+```
+Aufgrund nicht mehr existierender Kostenstellen, Funktionsbereichen oder
+nicht zugeordneten Kostenstellen zu Funktionsbereichen kommt es <NA>-Werten.
+Diese werden zusammen mit wenig besetzten Funktionsbereichen geclustered.
+Auch der Bereich "Procurement Services - GP" zählt dazu, da diese
+Dienstleistung nicht mehr vom Hub erbracht wird.
+
+
+### decrease_Sub-category 
+Abteilung beim Verlassen des Unternehmens
+```{r}
+unique(df$'decrease_Sub-category')
+summary(df$'decrease_Sub-category')
+sum(is.na(df$'decrease_Sub-category'))
+# qplot(df$'decrease_Sub-category')
+
+df$'decrease_Sub-category' <- NULL
+```
+
+
+### decrease_SDU Name for ExR 
+Offizieller Name der Abteilung beim Verlassen des Unternehmens
+```{r}
+unique(df$'decrease_SDU Name for ExR')
+summary(df$'decrease_SDU Name for ExR')
+sum(is.na(df$'decrease_SDU Name for ExR'))
+# qplot(df$'decrease_SDU Name for ExR')
+
+df$'decrease_SDU Name for ExR' <- NULL
+```
+
+### decrease_SDU 
+Interner Name/Abkürzung der Abteilung beim Verlassen des Unternehmens
+
+```{r}
+unique(df$'decrease_SDU')
+summary(df$'decrease_SDU')
+sum(is.na(df$'decrease_SDU'))
+```
+
+Da wir bereits den offiziellen namen der SDU betrachtet werden wir die gleichen Daten auf Grund von redundanz aus dem Datensatz entfernen
+```{r}
+df$decrease_SDU <- NULL
+```
+
+### decrease_Service Stream 
+Fachbereich beim verlassen des Unternehmens.
+```{r}
+unique(df$'decrease_Service Stream')
+summary(df$'decrease_Service Stream')
+sum(is.na(df$'decrease_Service Stream'))
+# qplot(df$'decrease_Service Stream')
+
+df$'decrease_Service Stream' <- NULL
+```
+
+### start_Category 
+Fachbereich in dem der Mitarbeiter anfangs eingestellt wurde.
+Das Quellsystem ist erst Zeit Oktober 2006 im Einsatz. Alle Mitarbeiter, die vorher begonnen haben, werden nicht berücksichtigt.
+Aus diesem Grund müssen diese (NaN) aus dem Datenset entfernt werden. Da es 895 
+dieser Fälle gibt, wird dieses Merkmal als Ganzes nicht weiter betrachet.
+```{r}
+unique(df$'start_Category')
+summary(df$'start_Category')
+sum(is.na(df$'start_Category'))
+# qplot(df$'start_Category')
+
+df$start_Category <- NULL
+#df$'start_Category' <- as.factor(df$'start_Category')
+```
+
+### start_Sub-category 
+Abteilung in dem der Mitarbeiter anfangs eingestellt wurde.
+```{r}
+unique(df$'start_Sub-category')
+summary(df$'start_Sub-category')
+sum(is.na(df$'start_Sub-category'))
+# qplot(df$'start_Sub-category')
+
+df$'start_Sub-category' <- NULL
+```
+
+### start_SDU Name for ExR 
+Offizieller Name der Abteilung beim Eintritt in das Unternehmen.
+```{r}
+unique(df$'start_SDU Name for ExR')
+summary(df$'start_SDU Name for ExR')
+sum(is.na(df$'start_SDU Name for ExR'))
+# qplot(df$'start_SDU Name for ExR')
+
+df$'start_SDU Name for ExR' <- NULL
+```
+
+
+### start_SDU 
+Interner Name der Abteilung beim Eintritt in das Unternehmen.
+```{r}
+unique(df$'start_SDU')
+summary(df$'start_SDU')
+sum(is.na(df$'start_SDU'))
+```
+
+Da wir bereits den offiziellen namen der SDU werden wir die gleichen Daten auf Grund von redundanz aus dem Datensatz entfernen
+```{r}
+df$start_SDU <- NULL
+```
+
+### start_Service Stream 
+Fachbereich beim Eintritt in das Unternehmen.
+```{r}
+unique(df$'start_Service Stream')
+summary(df$'start_Service Stream')
+sum(is.na(df$'start_Service Stream'))
+# qplot(df$'start_Service Stream')
+
+df$'start_Service Stream' <- NULL
+```
+### Age
+Dies ist das selbst berechnete Merkmal, welches das aktuelle Alter aller aktiven Mitarbeiter oder das Alter der Mitarbeiter
+bei Ihrem Ausstieg in Jahren anzeigt. 
+```{r}
+unique(df$Age)
+summary(df$Age)
+sum(is.na(df$Age))
+churned_employees <- subset(df, EmployeeChurned == 1)
+current_employees <- subset(df, EmployeeChurned == 0)
+
+mean(churned_employees$Age)
+median(churned_employees$Age)
+
+mean(current_employees$Age)
+median(current_employees$Age)
+
+qplot(df$Age)
+ggplot(df, aes(EmployeeChurned, Age)) + 
+  geom_boxplot(alpha=0.2)
+```
+Das Durchschnittsalter der aktiven Belegschaft ist geringer als das derer, die
+das Unternehmen verlassen haben.
+Es lässt sich erkennen, dass jüngere Mitarbeiter eher dazu tendieren das Unternehmen zu verlassen.
+
+### Month Of Service
+Dieses Merkmal haben wir erstellt, um die Anstellungszeit genauer darstellen zu können. Die Aufteilung in Jahre ist zu unspezidfisch 
+für unsere Analyse, da dieses merkmal auf Grund der Problemstellung eine wichtige Rolle in unserem Projetk spielen wird. 
+```{r}
+summary(df$`Month Of Service`)
+df$`Month Of Service` <- pmax(df$`Month Of Service`, 0)
+
+sum(is.na(df$`Month Of Service`))
+#Bei der Berechnung wurden bereits alle "NA"-Werte gelöscht, daher sind diese hier nicht mehr vorhanden. 
+
+qplot(df$`Month Of Service`)
+ggplot(df, aes(EmployeeChurned, `Month Of Service`)) + 
+  geom_boxplot(aes(colour = EmployeeChurned), alpha=0.2)
+```
+
+Es lässt sich erkennen, dass Mitarbeitende mit längerer Anstellungszeit eher im Unternehmen bleiben, als weniger lang angestellte Mitarbeitende.
+
+### Month Since Last Development
+Das hier von uns erzeugte und gezeigte Merkmal beschreibt die Dauer zwischen der letzten Beförderung und dem Austritt aus dem Unternehmen. Sollte der Mitarbeiter noch aktiv sein, bezieht sich die Dauer auf die letzte Beförderung und das aktuelle Datum.
+Hier gibt es falsche Werte. Diese sind negative Zeiten. Diese falschen Werte sind entstanden, wenn ein Mitarbeiter eine Beförderung erhalten, danach das Unternhemen verlassen und später wieder in das Unternehmen als Mitarbeiter aufgenommen wurde. Diese falschen Werte ersetzten wir durch 0.
+```{r}
+#ändert alle negativen Werte in 0
+df$`Months Since Last Development` <- pmax(df$`Months Since Last Development`, 0)
+
+summary(df$`Months Since Last Development`)
+sum(is.na(df$`Months Since Last Development`))
+qplot(df$`Months Since Last Development`)
+ggplot(df, aes(EmployeeChurned, `Months Since Last Development`)) + 
+  geom_boxplot(aes(colour = EmployeeChurned), alpha=0.2)
+```
+Auf den ersten Blick gibt es keinen erkennbaren Zusammenhang zwischen der Zielvariable EmployeeChurned und Month Since Last Development.
+
+### Visualisierungen 
+Die roten Punkte bedeuten, dass der Mitarbeiter nicht mehr im Unternehmen ist.
+```{r}
+str(df)
+df$EmployeeChurned <- as.factor(df$EmployeeChurned)
+df_cor <- data.frame(df$Age, df$`Month Of Service`, df$`Months Since Last Development`, df$NonExempt, df$Paybands, df$start_NonExempt,df$EmployeeChurned)
+df_cor$df.NonExempt <- as.factor(df_cor$df.NonExempt)
+df_cor$df.start_NonExempt <- as.factor(df_cor$df.start_NonExempt)
+pairs(df_cor[0:6], col = df_cor$df.EmployeeChurned)
+```
+Im nächsten Schritt wird beispielhaft versucht, Zusammenhänge zwischen verschiedenen Merkmalen und der Abwanderung zu Visualisieren.
+Besonderer Fokus soll dabei auf der Unterteilung in Mitarbeiter:innen bleiben
+oder verlassen das Unternehmen liegen sowie der Zugehörigkeitsdauer.
+
+```{r}
+ggplot(df, aes(`Month Of Service`, Age)) +
+geom_jitter(aes(colour = EmployeeChurned), alpha=0.2, height = 0.3)
+```
+Der Standord Berlin hat allgemein ein geringes Durchschnittsalter.
+Auch wenn die Anzahl der die im Unternehmen noch aktiven Mitarbeiter:innen die der gegangenen übersteigt, kann gesagt werden, dass ein Großteil nicht länger als
+50 Monate aktiv war. 
+Eine deutliche blaue Linie ist bei circa 24 Monaten zu erkennen. Viele Arbeit-
+nehmer:innen orientieren sich in der Regel nach dieser Zeit um. Es kann sich
+allerdings auch um befristete Verträge handeln.
+Die erhöhte Dichte von blauen Punkten im Bereich ab 60 Jahren ist auf den
+Renteneintritt zurückzuführen.
+
+```{r}
+ggplot(df, aes(TemporaryPersonel)) +
+  geom_bar(aes(colour = EmployeeChurned), alpha=0.2)
+
+ggplot(df, aes(TemporaryPersonel, `Month Of Service`)) + 
+  geom_boxplot(aes(colour = EmployeeChurned), alpha=0.2)
+```
+Befristungen bis 12 Monate oder 24 Monate sind eindeutig zu erkennen.
+Da seit 2021 stark auf die Hub-Entwicklung gesetzt wird, sind viele
+Positionen geschaffen und ersteinmal mit befristeten Verträgen besetzt worden.
+
+
+```{r}
+#Gender 1 entspricht weiblich
+ggplot(df, aes(Gender)) + 
+  geom_bar(aes(colour = EmployeeChurned), alpha=0.2)
+
+ggplot(df, aes(Gender,`Month Of Service`)) + 
+  geom_boxplot(aes(colour = EmployeeChurned), alpha=0.2)
+```
+Im Unternehmen sind mehr als 60% der Belegschaft weiblich. Der Anteil derer, die
+das Unternehmen verlassen ist bei dem männlichen Teil der Belegschaft höher, als
+für den weiblichen. 
+Während die Männer und Frauen, die das Unternehmen verlasssen dies nach ähnlicher 
+Dauer machen, kann für die gebliebenen festgestellt werden, dass die weiblichen 
+länger im Unternehmen bleiben.
+Frauen bleiben demnach länger im Unternehmen und die Abwanderungsrate ist geringer.
+
+
+```{r}
+ggplot(df, aes(`Month Of Service`, `start_Part time mark`)) +
+geom_jitter(aes(colour = EmployeeChurned), alpha=0.2, height = 0.3)
+```
+
+
+```{r}
+ggplot(df, aes(`Month Of Service`, `Part Time Mark`)) +
+geom_jitter(aes(colour = EmployeeChurned), alpha=0.2, height = 0.3)
+names(df)
+str(df)
+```
+Der Anteil an Teilzeitmitarbeiter:innen entweder zum Start, als auch beim
+letzten aktiven Zeitpunkt ist klar unterrepräsentiert. Es kann darüber hinaus
+kein Muster aus den beiden vorhergehenden Visualisierungen erkannt  werden. 
+
+
+```{r}
+ggplot(df, aes(Paybands)) +
+  geom_bar(aes(colour = EmployeeChurned), alpha=0.2)
+```
+Fokus auf Paybands "C" und "D", da hohe Zahl an Mitarbeitenden sowie Mitarbeiterabwanderung. 
+Speziell das Payband "C" weißt eine hohe Mitarbeiterabwanderung auf.
+
+Das Payband "A" umfasst die Auszubildenden, von denen laut der Daten keiner das Unternehmen
+während der Ausbildung verlassen hat. 
+
+
+```{r}
+ggplot(df, aes(Paybands, `Month Of Service`)) + 
+  geom_boxplot()
+
+ggplot(df, aes(Paybands, `Month Of Service`)) + 
+  geom_boxplot(aes(colour = EmployeeChurned), alpha=0.2)
+```
+Mitarbeitende in höheren Paybands zum Zeitpunkt der letzten Aktivität sind länger 
+im Unternehmen, als in unteren. Mitarbeitende, die das Unternehmen verlassen haben, waren in fast allen Paybands länger im Unternehmen als die aktiven. Dies kann auch daran liegen, dass solche Positionen auch nachbesetzt werden müssen, zum Teil von extern oder es rücken Mitarbeitende nach.
+
+```{r}
+ggplot(df, aes(decrease_Category)) +
+  geom_bar(aes(colour = EmployeeChurned), alpha=0.2) +
+  theme(axis.text.x=element_blank())
+```
+X-Achse:
+Customer
+GB Management 
+GTU GD 
+Human Resources GBS     
+Other 
+People    
+Planning & Development 
+Safety
+Supplier & Reporting 
+
+Aus dem Bereich GB Management verlassen wenige Mitarbeiter:innen das
+Unternehmen, was daran liegt, dass es sich eher um Senior-Positionen handelt und 
+es eine neuere Einheit ist.
+Die geringe Abwanderung im Bereich Safety kann darauf zurückgeführt werden,
+dass es sich um eine relativ neue Einheit handelt.
+
+"People" sowie "Supplier & Reporting" bilden die größten Bereiche.
+
+```{r}
+ggplot(df, aes(decrease_Category, `Month Of Service`)) + 
+  geom_boxplot(aes(colour = EmployeeChurned), alpha=0.2)+
+  theme(axis.text.x=element_blank())
+```
+X-Achse:
+Customer
+GB Management 
+GTU GD 
+Human Resources GBS     
+Other 
+People    
+Planning & Development 
+Safety
+Supplier & Reporting 
+
+In den größeren Bereichen (Customer, People, Supplier & Reporting) ist zu erkennen, 
+dass das Unternehmen enweder früh verlassen wird oder Mitarbeiter:innen deutlich
+länger bleiben. (Median größer als 12 Monate auseinander für betreffende Bereiche)
+
+
+```{r}
+write_xlsx(df,"20220110_dataPrepped_beforeOneHot.xlsx")
+```
+
+
+Umwandeln qualitativer Merkmal in für die algorithmen lesbare dichotome Merkmale (0 und 1).
+```{r}
+hot_df <- one_hot(as.data.table(df))
+write_xlsx(hot_df,"20220110_dataPrepped_afterOneHot.xlsx")
+```
+
+
