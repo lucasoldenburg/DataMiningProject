@@ -3,8 +3,8 @@ title: "Abgabe Gruppe C"
 author: 'Eric Beier, Lucas Oldenburg, Martin König, '
 date: "30/01/2022"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ## Bibliotheksimporte
@@ -132,6 +132,9 @@ splits1 <- h2o.splitFrame(data =  hot_dfH2O, ratios = 0.75, seed = 1234)
 hot_train <- splits1[[1]]
 hot_test <- splits1[[2]]
 
+#ohne H2o
+test <- as.data.frame(testH2O)
+train <- as.data.frame(trainH2O)
 
 ```
 
@@ -141,17 +144,17 @@ hot_test <- splits1[[2]]
 #df_hot <- data.frame(data_hot_test)
 #n <- nrow(df_hot)
 
-data_test <- subset(df, select = c("EmployeeChurned", "Age", "Month Of Service")) #was?
-df_hot <- data.frame(data_test)
-n <- nrow(df_hot)
-
-train_indices <- sample(1:n, round(0.75 * n))
-train <- df_hot[train_indices,]
-test <- df_hot[-train_indices,]
-
-# erstmal 2 Features auswählen 
-features <- c("Age", "Month.Of.Service")
-cols <- c(features, "EmployeeChurned")
+# data_test <- subset(df, select = c("EmployeeChurned", "Age", "Month Of Service")) #was?
+# df_hot <- data.frame(data_test)
+# n <- nrow(df_hot)
+# 
+# train_indices <- sample(1:n, round(0.75 * n))
+# train <- df_hot[train_indices,]
+# test <- df_hot[-train_indices,]
+# 
+# # erstmal 2 Features auswählen
+# features <- c("Age", "Month.Of.Service")
+# cols <- c(features, "EmployeeChurned")
 
 ```
 
@@ -334,7 +337,7 @@ in den darauffolgenden Splits relevant werden.
 
 Nicht zum Einsatz kommen: "Part Time Mark", "NonExempt", "start_NonExempt",
                 "development to exempt", "decrease_Category",
-                "Nationality_Classification", "Paybands"
+                "Nationality_Classification"
 
 
 ## H2O Distributed Random Forest (DRF)
@@ -417,7 +420,7 @@ performance(pred_rocr_drf, "auc")@y.values
 # Darstellung der ROC-Kurve
 plot(perf_rocr_drf, col="blue")
 abline(0,1)
-abline(v=0.22, col="red")
+abline(v=0.26, col="red")
 ```
 Die ROC-Kurve verläuft deutlich oberhalb der Diagonalen. Bei Anwendung des 
 Modells wird somit eine höhere Vorhersagequalität erreicht, als mit reinem
@@ -425,7 +428,7 @@ Raten.
 
 ## Auswahl Threshold aus ROC-Kurve ("Ellenbogenpunkt")
 ```{r}
-threshold_drf <- 0.22
+threshold_drf <- 0.26
 #Ein Ellenbogenpunkt ist ablesbar und wird tendenziell eher niedriger gewählt,
 #um die Anzahl an FP-Klassifikationen zu minimieren.
 ```
@@ -475,7 +478,7 @@ cost_drf_matrix <- matrix(c(threshold_input_drf,costs_drf),nrow=length(threshold
 colnames(cost_drf_matrix) <- c("Threshold", "Kosten in Euro")
 cost_drf_matrix
 ```
-Mit Betrachtung der Kosten liegt der optimale Threshold für das Model bei 0,15.
+Mit Betrachtung der Kosten liegt der optimale Threshold für das Model bei 0,14.
 Aufgrund der geringen Unterschiede wäre auch 0,17 als Threshold sinnvoll und
 sollte für Vorhersagen eingesetzt werden.
 
